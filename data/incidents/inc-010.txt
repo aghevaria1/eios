@@ -1,0 +1,8 @@
+INCIDENT-010 | pod-beta | 2026-01-25 | CRITICAL
+Node: pod-beta (NVIDIA B200) | Customer: Cisco
+Anomaly: Tokens/sec dropped from 900 to 0 instantaneously. Hard node failure.
+Temperature at time of failure: 77C. Utilization: 89%.
+Root Cause: PCIe bus error caused GPU to be ejected from OS device tree. Hardware fault confirmed.
+Action Taken: Immediate failover to pod-alpha. Cisco executive team notified. Hardware replacement initiated.
+SLA Impact: Cisco SLA breached. 11 minutes downtime. Penalty: $55,000 plus hardware replacement cost.
+Resolution: Replacement B200 installed. Node pod-beta restored after 4 hour maintenance window.

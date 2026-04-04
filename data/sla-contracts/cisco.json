@@ -1,0 +1,18 @@
+{
+  "customerId": "cisco",
+  "companyName": "Cisco Systems",
+  "tier": "Enterprise",
+  "sla": {
+    "maxLatencyMs": 50,
+    "minUptimePct": 99.99,
+    "maxCostPerTokenK": 0.002,
+    "maxTempC": 80,
+    "minTokensPerSec": 800,
+    "maxMemUsedPct": 90
+  },
+  "penalties": {
+    "perHourDowntime": 5000,
+    "perLatencyBreach": 1000
+  },
+  "nodes": ["pod-alpha", "pod-beta"]
+}

@@ -1,0 +1,14 @@
+RUNBOOK: Cascading Failure Prevention Protocol
+Trigger: Two or more nodes showing simultaneous degradation signals
+Severity: Always CRITICAL — cascade risk compounds every minute
+
+Step 1: Immediately assess if failures are correlated — shared cooling, shared network, shared power circuit
+Step 2: If correlated root cause suspected — do not failover to nodes on same circuit or rack
+Step 3: Identify truly independent failover targets — different rack, different power feed, different network path
+Step 4: Prioritize stabilizing the least degraded node first — prevent it from becoming the next failure
+Step 5: Activate cross-tier emergency protocol if same-tier nodes all compromised
+Step 6: Implement request queuing for non-latency-sensitive workloads immediately
+Step 7: Notify all affected customers simultaneously — do not stagger notifications during cascade
+Step 8: Engage infrastructure and networking teams in parallel — cascade requires multi-team response
+Step 9: Establish 5-minute check-in cadence until all nodes stable
+Recovery: Cascade cleared only when all nodes hold below 80% utilization for 10 consecutive minutes

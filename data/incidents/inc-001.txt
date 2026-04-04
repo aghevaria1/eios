@@ -1,0 +1,9 @@
+INCIDENT-001 | pod-alpha | 2025-11-14 | CRITICAL
+Node: pod-alpha (NVIDIA B200) | Customer: Cisco
+Anomaly: GPU utilization spiked to 97% sustained for 22 minutes during peak inference window.
+HBM memory pressure reached 188GB of 192GB. Token throughput dropped from 920 to 340 tokens/sec.
+Temperature reached 83C, approaching thermal throttle threshold.
+Root Cause: Batch size misconfiguration after model update pushed concurrent request load beyond node capacity.
+Action Taken: Traffic rerouted to pod-beta. Batch size corrected. Node recovered in 8 minutes.
+SLA Impact: Cisco latency SLA breached for 14 minutes. Penalty applied: $14,000.
+Resolution: Automated placement agent rerouted within 90 seconds of anomaly detection.

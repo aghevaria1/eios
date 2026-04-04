@@ -1,0 +1,8 @@
+INCIDENT-002 | pod-gamma | 2025-11-28 | HIGH
+Node: pod-gamma (AMD MI300X) | Customer: Hippocratic AI
+Anomaly: Temperature climbed to 88C over 35 minutes during overnight batch job.
+Utilization held at 91%. Token throughput stable but thermal headroom shrinking.
+Root Cause: Cooling system fan speed not scaling correctly with AMD MI300X thermal curve.
+Action Taken: Batch job migrated to pod-delta. Fan controller firmware updated.
+SLA Impact: No SLA breach. Proactive action prevented downtime.
+Resolution: Caught by telemetry agent 18 minutes before projected thermal throttle event.

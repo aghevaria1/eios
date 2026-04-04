@@ -1,0 +1,16 @@
+RUNBOOK: Power Cap Escalation Response
+Trigger: Node power draw exceeds 90% of rated cap for more than 2 minutes
+Severity Levels:
+  - WARNING: 90-94% — monitor, prepare load shed plan
+  - HIGH: 95-98% — execute load shed 25% to peer node
+  - CRITICAL: 99%+ — emergency load shed 50%, risk of hardware protection shutdown
+
+Step 1: Confirm power reading is sustained, not a transient spike
+Step 2: Check if new model deployment changed power envelope — compare to baseline
+Step 3: At WARNING: pre-position peer node to accept overflow traffic
+Step 4: At HIGH: shed 25% of lowest priority requests to peer node immediately
+Step 5: Verify peer node power headroom before accepting overflow
+Step 6: At CRITICAL: shed 50% load, notify customer of degraded capacity
+Step 7: Do not attempt to push node past rated cap — hardware protection shutdown causes full outage
+Step 8: Update node power profile if new model permanently raises power envelope
+Recovery: Return to full load only after sustained reading below 85% for 5 minutes

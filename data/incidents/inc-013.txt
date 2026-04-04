@@ -1,0 +1,8 @@
+INCIDENT-013 | pod-delta | 2026-02-14 | HIGH
+Node: pod-delta (AMD MI300X) | Customer: Hippocratic AI
+Anomaly: Power draw reached 748W, 99.7% of 750W cap. Temperature at 89C simultaneously.
+Both thermal and power headroom exhausted. Node on edge of emergency shutdown.
+Root Cause: Valentine's Day traffic surge — Hippocratic AI healthcare chatbot saw 3x normal query volume.
+Action Taken: Emergency load shedding to pod-gamma. 40% of requests queued. Pod-delta throttled to 600W.
+SLA Impact: Hippocratic AI throughput SLA breached for 7 minutes during load shed. Penalty: $3,500.
+Resolution: Demand forecasting added for known traffic surge events. Auto-scaling trigger added at 85% power.

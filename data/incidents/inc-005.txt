@@ -1,0 +1,8 @@
+INCIDENT-005 | pod-alpha | 2025-12-19 | HIGH
+Node: pod-alpha (NVIDIA B200) | Customer: Cisco
+Anomaly: Power draw reached 990W, approaching 1000W cap. Sustained for 11 minutes.
+Utilization at 95%. Temperature stable at 79C. No throughput degradation yet.
+Root Cause: New LLM model deployed with higher power envelope than previous version. Power budget not updated.
+Action Taken: Load shed 20% of requests to pod-beta. Power dropped to 820W.
+SLA Impact: No breach. Latency slightly elevated but within Cisco thresholds.
+Resolution: Power budget configuration updated in node profile. Monitoring threshold tightened.

@@ -1,0 +1,8 @@
+INCIDENT-014 | pod-epsilon | 2026-02-21 | MEDIUM
+Node: pod-epsilon (NVIDIA RTX PRO) | Customer: OpenColo
+Anomaly: Token throughput dropped from 260 to 140 tokens/sec. Utilization normal at 72%.
+Compute available but output rate halved. No thermal or memory pressure.
+Root Cause: Network egress bottleneck at top-of-rack switch. GPU computing fine but results not delivering.
+Action Taken: Traffic rerouted through secondary switch port. Throughput restored within 3 minutes.
+SLA Impact: OpenColo throughput SLA breached for 3 minutes. Penalty: $300.
+Resolution: Redundant switch path now active-active instead of active-standby.

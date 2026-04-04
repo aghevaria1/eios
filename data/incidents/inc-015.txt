@@ -1,0 +1,9 @@
+INCIDENT-015 | pod-alpha | 2026-03-01 | CRITICAL
+Node: pod-alpha (NVIDIA B200) | Customer: Cisco
+Anomaly: Cascading failure. pod-alpha thermal throttle triggered pod-beta overload within 4 minutes.
+Both Cisco nodes degraded simultaneously. No healthy failover target available within customer SLA tier.
+Root Cause: Simultaneous cooling failure on pod-alpha combined with peak load caused thermal shutdown.
+Overflow to pod-beta pushed it past 95% utilization causing secondary throughput collapse.
+Action Taken: Emergency cross-tier reroute to pod-gamma (Hippocratic). Cisco notified of tier exception.
+SLA Impact: Major breach. 18 minutes of degraded service. Penalty: $90,000. Escalated to executive review.
+Resolution: Cross-tier emergency failover protocol now codified. Cooling redundancy upgraded on pod-alpha rack.

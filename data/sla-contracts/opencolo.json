@@ -1,0 +1,18 @@
+{
+  "customerId": "opencolo",
+  "companyName": "OpenColo",
+  "tier": "Standard",
+  "sla": {
+    "maxLatencyMs": 200,
+    "minUptimePct": 99.5,
+    "maxCostPerTokenK": 0.01,
+    "maxTempC": 82,
+    "minTokensPerSec": 200,
+    "maxMemUsedPct": 95
+  },
+  "penalties": {
+    "perHourDowntime": 500,
+    "perLatencyBreach": 100
+  },
+  "nodes": ["pod-epsilon"]
+}

@@ -1,0 +1,8 @@
+INCIDENT-006 | pod-delta | 2025-12-22 | CRITICAL
+Node: pod-delta (AMD MI300X) | Customer: Hippocratic AI
+Anomaly: Complete node unresponsive for 3 minutes. All metrics flatlined.
+Utilization: 0%. Tokens/sec: 0. Temperature: last reading 71C before dropout.
+Root Cause: ROCm driver crash triggered by out-of-bounds memory access in custom attention kernel.
+Action Taken: Automatic failover to pod-gamma. Driver restarted. Node back online in 4 minutes.
+SLA Impact: Hippocratic AI uptime SLA breached. 3 minutes downtime. Penalty: $100.
+Resolution: Kernel patch applied. Driver watchdog timeout reduced from 10s to 3s for faster future detection.
