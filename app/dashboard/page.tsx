@@ -1,12 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { NodeMetrics } from '../../lib/types'
-
-interface AgentMessage {
-  agent: string
-  content: string
-}
 
 interface Incident {
   id: string
@@ -30,9 +25,15 @@ export default function Dashboard() {
   const [expandedIncident, setExpandedIncident] = useState<string | null>(null)
   const [whatifQuery, setWhatifQuery] = useState('')
   const [whatifResponse, setWhatifResponse] = useState('')
-  const [agentRunning, setAgentRunning] = useState(false)
   const [whatifRunning, setWhatifRunning] = useState(false)
+  const [agentRunning, setAgentRunning] = useState(false)
   const [status, setStatus] = useState<string>('Initializing...')
+  const [nocBriefGruve, setNocBriefGruve] = useState('')
+  const [nocBriefCustomer, setNocBriefCustomer] = useState('')
+  const [nocRunning, setNocRunning] = useState(false)
+  const [lastIncident, setLastIncident] = useState<any>(null)
+  const [lastDecision, setLastDecision] = useState<any>(null)
+  const [lastAlert, setLastAlert] = useState<any>(null)
 
   useEffect(() => {
     const es = new EventSource('/api/telemetry')
@@ -83,11 +84,49 @@ export default function Dashboard() {
           }))
         }
         if (payload.type === 'status') setStatus(payload.payload.message)
-        if (payload.type === 'alert') fetchIncidents()
+        if (payload.type === 'anomaly') setLastIncident(payload.payload)
+        if (payload.type === 'decision') setLastDecision(payload.payload)
+        if (payload.type === 'alert') {
+          setLastAlert(payload.payload)
+          fetchIncidents()
+        }
       }
     }
     setAgentRunning(false)
     setStatus('Pipeline complete')
+  }
+
+  async function generateNOCBrief() {
+    if (!lastIncident || !lastDecision || !lastAlert) return
+    setNocRunning(true)
+    setNocBriefGruve('')
+    setNocBriefCustomer('')
+
+    const res = await fetch('/api/brief', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        incident: lastIncident,
+        decision: lastDecision,
+        alert: lastAlert
+      })
+    })
+
+    const reader = res.body!.getReader()
+    const decoder = new TextDecoder()
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      const text = decoder.decode(value)
+      const lines = text.split('\n').filter(l => l.startsWith('data: '))
+      for (const line of lines) {
+        const payload = JSON.parse(line.slice(6))
+        if (payload.type === 'gruve') setNocBriefGruve(prev => prev + payload.token)
+        if (payload.type === 'customer') setNocBriefCustomer(prev => prev + payload.token)
+      }
+    }
+    setNocRunning(false)
   }
 
   async function runWhatIf() {
@@ -257,6 +296,35 @@ export default function Dashboard() {
           </div>
 
         </div>
+
+        {/* Panel 5 — NOC Brief */}
+        <div className="bg-gray-900 rounded-lg p-4 border border-gray-800 mt-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">NOC Brief Generator</h2>
+            <button
+              onClick={generateNOCBrief}
+              disabled={nocRunning || !lastAlert}
+              className="px-4 py-2 bg-purple-700 hover:bg-purple-600 disabled:bg-gray-700 disabled:text-gray-500 rounded text-sm font-bold transition-colors"
+            >
+              {nocRunning ? '⚡ Generating...' : '📋 Generate NOC Brief'}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-800 rounded p-3">
+              <div className="text-xs font-bold text-purple-400 mb-2 uppercase">Gruve Internal Brief</div>
+              <div className="text-xs text-gray-300 whitespace-pre-wrap max-h-48 overflow-y-auto font-mono">
+                {nocBriefGruve || <span className="text-gray-600">Run agents first, then generate brief...</span>}
+              </div>
+            </div>
+            <div className="bg-gray-800 rounded p-3">
+              <div className="text-xs font-bold text-blue-400 mb-2 uppercase">Customer Notification</div>
+              <div className="text-xs text-gray-300 whitespace-pre-wrap max-h-48 overflow-y-auto font-mono">
+                {nocBriefCustomer || <span className="text-gray-600">Run agents first, then generate brief...</span>}
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   )
