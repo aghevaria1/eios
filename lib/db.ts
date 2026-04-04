@@ -1,6 +1,5 @@
 import Database from 'better-sqlite3'
 import path from 'path'
-import fs from 'fs'
 
 const DB_PATH = path.join(process.cwd(), 'data', 'eios.db')
 
@@ -106,4 +105,8 @@ export function getNodeTrend(nodeId: string) {
   const db = getDB()
   const oneHourAgo = Date.now() - 3600000
   return db.prepare(`
-    SEL
+    SELECT * FROM metrics_log
+    WHERE nodeId = ? AND timestamp > ?
+    ORDER BY timestamp ASC
+  `).all(nodeId, oneHourAgo)
+}

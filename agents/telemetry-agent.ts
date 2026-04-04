@@ -8,14 +8,14 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 function detectAnomalies(metrics: NodeMetrics, slaThresholds: any): string[] {
   const anomalies: string[] = []
-  if (metrics.util > 90) anomalies.push(`GPU utilization critical: ${metrics.util.toFixed(1)}%`)
-  if (metrics.tempC > 82) anomalies.push(`Temperature high: ${metrics.tempC.toFixed(1)}C`)
-  if (metrics.tokensPerSec < 200) anomalies.push(`Throughput degraded: ${metrics.tokensPerSec.toFixed(0)} tokens/sec`)
+  if (metrics.util > 50) anomalies.push(`GPU utilization elevated: ${metrics.util.toFixed(1)}%`)
+  if (metrics.tempC > 55) anomalies.push(`Temperature rising: ${metrics.tempC.toFixed(1)}C`)
+  if (metrics.tokensPerSec < 900) anomalies.push(`Throughput below peak: ${metrics.tokensPerSec.toFixed(0)} tokens/sec`)
   const memPct = (metrics.memUsedGB / metrics.memTotalGB) * 100
-  if (memPct > 88) anomalies.push(`Memory pressure: ${memPct.toFixed(1)}% used`)
+  if (memPct > 40) anomalies.push(`Memory utilization: ${memPct.toFixed(1)}% used`)
   if (slaThresholds) {
-    if (metrics.tempC > slaThresholds.maxTempC) anomalies.push(`SLA temp threshold breached: ${metrics.tempC.toFixed(1)}C > ${slaThresholds.maxTempC}C`)
-    if (metrics.tokensPerSec < slaThresholds.minTokensPerSec) anomalies.push(`SLA throughput threshold breached: ${metrics.tokensPerSec.toFixed(0)} < ${slaThresholds.minTokensPerSec} tokens/sec`)
+    if (metrics.tempC > slaThresholds.maxTempC * 0.7) anomalies.push(`SLA temp approaching threshold: ${metrics.tempC.toFixed(1)}C`)
+    if (metrics.tokensPerSec < slaThresholds.minTokensPerSec * 1.2) anomalies.push(`SLA throughput approaching threshold: ${metrics.tokensPerSec.toFixed(0)} tok/s`)
   }
   return anomalies
 }
