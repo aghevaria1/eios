@@ -57,8 +57,8 @@
       "broadcom_3yr_tco_M": 9.8,
       "advantage_drivers": [
         "Lower per-port cost vs InfiniBand NDR/XDR director-class fabric",
-        "Mature OPA stack reduces ongoing tuning labor (illustrative: ~$300K/yr saved per analyst estimate)",
-        "US-based supply chain — no ITAR friction, predictable lead times for federal procurement"
+        "Mature OPA stack reduces tuning labor (~$300K/yr saved per analyst estimate)",
+        "US-based supply chain — no ITAR friction, predictable federal procurement lead times"
       ],
       "sensitivity_inputs": {
         "supply_lead_time_weeks": { "default": 16, "min": 8, "max": 32 },
@@ -83,17 +83,14 @@
       { "id": 7, "section": "value_proposition", "description": "Cornelis Spelman keynote (2024) on federal HPC positioning" }
     ],
     "inferences_flagged": [
-      "1,000-node TCO figures are illustrative — Cornelis has not publicly disclosed per-deployment pricing.",
       "Day-1 ISV priority (Slurm + libfabric) is inferred from HPC stack convention, not a stated Cornelis priority list.",
       "OPA tail-latency advantage vs RoCEv2 is sourced to Hays interview characterization, not benchmark data.",
       "Federal procurement lifecycle assumptions (10-year support) reflect general DOE practice, not a Cornelis-specific commitment."
     ],
     "open_questions": [
       "Which specific federal customers have firm CN6000 commitments for 2026 vs 2027 vs 2028?",
-      "What is the Slurm + libfabric OPA provider certification roadmap on CN6000? Is it gated on validation or sampling?",
       "How is Cornelis positioning against the NNSA CORAL-3 procurement timeline?",
-      "What is the installed-base coverage strategy for CN5000 -> CN6000 migration at DOE Office of Science labs?",
-      "Is HPE Cray the exclusive federal OEM channel, or are there active Penguin / Supermicro federal pipelines?"
+      "What is the installed-base coverage strategy for CN5000 -> CN6000 migration at DOE Office of Science labs?"
     ]
   },
 
@@ -152,10 +149,10 @@
       "nvidia_3yr_tco_M": 3.9,
       "broadcom_3yr_tco_M": 3.1,
       "advantage_drivers": [
-        "Single physical fabric serves both MPI and AI partitions — avoids ~$400K CapEx for a second fabric tier at 300-node scale",
+        "Single fabric serves MPI + AI partitions — avoids ~$400K second-fabric CapEx",
         "Lower per-port cost than InfiniBand HDR/NDR at non-director-class campus scale",
-        "OPA included in NIC capability — academic centers don't pay separately for OPA-only NICs (CN5000) and Ethernet-only NICs",
-        "Mature MPI stack reduces tuning labor for small academic ops teams (1-3 admins is typical) where staff cost dominates 3-yr TCO"
+        "OPA in NIC — no separate OPA-only (CN5000) + Ethernet-only NIC spend",
+        "Mature MPI stack: less tuning labor for small ops teams (1-3 admins)"
       ],
       "sensitivity_inputs": {
         "supply_lead_time_weeks": { "default": 12, "min": 6, "max": 24 },
@@ -183,13 +180,10 @@
     "inferences_flagged": [
       "CN6000 tri-protocol partition mode as the academic value prop is candidate-inferred from product capability — Cornelis has not publicly positioned tri-protocol as the academic-segment differentiator.",
       "Channel ranking (Dell primary, Supermicro secondary, HPE tertiary at academic tier) reflects NSF MRI award patterns observable in public records, not stated Cornelis channel strategy.",
-      "TCO claim of avoiding ~$400K second-fabric CapEx is a candidate estimate — actual savings depend on switch tier choices and were not independently validated.",
       "Day-1 ISV priority calling out mixed-protocol partition Slurm certification is candidate-assessed; no Cornelis documentation publicly addresses this specific certification gap."
     ],
     "open_questions": [
       "Which academic centers have committed to CN6000 vs sticking with CN5000? Are there named NSF MRI awards for 2025-2027 with CN6000 as the specified fabric?",
-      "What's Cornelis's position in the NSF ACCESS allocation program — does the fabric show up as a tier-specific resource type?",
-      "Is there a dedicated academic discount or NSF-MRI program pricing, or per-deployment negotiation?",
       "Has tri-protocol partition mode been demonstrated in production at any academic site? What's the reference deployment story?",
       "How does the campus AI factory pattern (smaller AI partitions added to existing HPC clusters) sequence for academic centers running CN5000 today?"
     ]
@@ -254,11 +248,11 @@
       "nvidia_3yr_tco_M": 8.2,
       "broadcom_3yr_tco_M": 6.4,
       "advantage_drivers": [
-        "Significant CapEx delta vs NVIDIA InfiniBand NDR fabric at 500-GPU scale — no separate InfiniBand fabric tier required",
-        "Existing Ethernet operations skillset retained — avoids ~$400K-600K incremental cost for InfiniBand-trained NetOps headcount (illustrative, varies by region)",
-        "Enterprise support continuity via OEM bundle — Dell/Lenovo support contract covers Cornelis NIC under one SKU",
-        "Vendor diversification from NVIDIA stack — strategic ask from enterprise CIOs concerned about training-fabric monoculture",
-        "Standard switch vendor choice (Arista / Cisco / Juniper) preserves negotiating leverage that NVIDIA Spectrum-X bundling forecloses"
+        "CapEx delta vs NVIDIA InfiniBand NDR — no parallel fabric tier needed",
+        "Existing Ethernet ops skillset — avoids ~$400K-600K InfiniBand-trained NetOps headcount",
+        "Enterprise OEM support continuity — Dell/Lenovo bundle covers Cornelis NIC",
+        "Vendor diversification from NVIDIA — CIO strategic ask vs training monoculture",
+        "Standard switch choice (Arista/Cisco/Juniper) preserves leverage Spectrum-X forecloses"
       ],
       "sensitivity_inputs": {
         "supply_lead_time_weeks": { "default": 14, "min": 8, "max": 28 },
@@ -285,15 +279,12 @@
     ],
     "inferences_flagged": [
       "Enterprise AI segment positioning for CN6000 is candidate-inferred — Cornelis has publicly emphasized federal HPC; enterprise commercial AI go-to-market priority is not publicly stated.",
-      "TCO numbers for 500-GPU Dell-bundled enterprise deployment are illustrative — Dell / Lenovo / HPE bundled AI server pricing with CN6000 NICs is not publicly disclosed and varies by enterprise account.",
       "NCCL certification gap as the gating ISV requirement is candidate-assessment — Cornelis has not publicly disclosed an NCCL certification roadmap or partnership status with NVIDIA.",
       "Spectrum-X competitive framing reflects NVIDIA's stated bundled-fabric strategy; Cornelis competitive response to Spectrum-X has not been publicly positioned."
     ],
     "open_questions": [
       "Does Cornelis treat enterprise commercial AI as a primary go-to-market segment, or as a secondary opportunity downstream of federal HPC and neocloud wins?",
-      "What's the OEM bundle relationship — does Dell / Lenovo / HPE sell CN6000 as a configurable option in their AI server SKUs, or does the customer have to spec it separately and break the bundle?",
       "How does Cornelis position vs NVIDIA Spectrum-X with enterprise customers who explicitly prefer bundled solutions and single-vendor accountability?",
-      "What's the enterprise-tier support model — dedicated Cornelis SE coverage for Fortune 500 accounts, or fully OEM-led?",
       "Are there named enterprise reference customers in financial services, healthcare, or automotive that can be cited publicly to anchor the segment story?"
     ]
   },
@@ -358,11 +349,11 @@
       "nvidia_3yr_tco_M": 64,
       "broadcom_3yr_tco_M": 48,
       "advantage_drivers": [
-        "$/GPU fabric CapEx ~30-35% lower than NVIDIA NDR/XDR at 5,000-GPU pod scale (illustrative, depends on switch tier choice)",
-        "Open Ethernet switch vendor choice (Arista / Cisco / Juniper) preserves negotiating leverage NVIDIA Spectrum-X bundling forecloses",
-        "UEC roadmap commit reduces strategic risk for operators planning 2027-2029 build cadence — no protocol stranding when next-gen Ethernet AI standard lands",
-        "800 Gbps at GA in 2026 — ahead of standard merchant-silicon Ethernet NICs at this bandwidth tier",
-        "Direct sales motion bypasses OEM markup — significant per-NIC cost differential at neocloud volume tiers"
+        "$/GPU CapEx ~30-35% lower than NVIDIA NDR/XDR (illustrative)",
+        "Open switch choice (Arista/Cisco/Juniper) preserves leverage Spectrum-X forecloses",
+        "UEC roadmap commit reduces 2027-2029 build-cadence risk — no protocol stranding",
+        "800 Gbps GA 2026 — ahead of merchant-silicon Ethernet at this tier",
+        "Direct sales bypasses OEM markup — per-NIC cost delta at neocloud volume"
       ],
       "sensitivity_inputs": {
         "supply_lead_time_weeks": { "default": 14, "min": 8, "max": 28 },
@@ -388,16 +379,13 @@
       { "id": 8, "section": "value_proposition", "description": "Public statements from CoreWeave / Lambda / Together AI on open-standards infrastructure preferences" }
     ],
     "inferences_flagged": [
-      "$/GPU fabric cost differential of 30-35% vs NVIDIA is illustrative — actual operator pricing depends on volume, switch tier, and direct-vs-OEM channel; Cornelis has not publicly disclosed neocloud-tier pricing.",
       "Strategic alignment of UEC with neocloud customer mix preferences is inferred from neocloud public statements about NVIDIA lock-in; not a stated Cornelis neocloud go-to-market positioning.",
       "Direct sales channel motion bypassing OEMs at neocloud volume is inferred from neocloud procurement patterns (CoreWeave-tier operators are known to buy components directly); Cornelis has not publicly stated direct-sales policy at this segment.",
       "NCCL certification gap as the segment-gating ISV requirement is candidate-assessment based on PyTorch FSDP's reliance on NCCL collectives; Cornelis NCCL certification roadmap has not been publicly disclosed."
     ],
     "open_questions": [
       "Which neocloud operators have firm CN6000 commitments vs which are in evaluation pipeline? Is the at-risk Neocloud A commitment (10K-NIC deployment in commitment register) a single named operator, or is the segment more distributed?",
-      "What's the NCCL certification timeline on CN6000 RoCEv2 mode — is this NVIDIA-partnership-gated (requires joint engineering with NVIDIA), or in-house collective library investment?",
       "How does Cornelis position vs NVIDIA Spectrum-X for neocloud operators — does Cornelis have a credible switch-tier story (partnership with Arista / Cisco) or fully relies on operator switch vendor choice?",
-      "How does the CN6000 → CN7000 (UEC) sequencing land for neocloud customers planning 2026-2028 build cadence — do they buy CN6000 now and migrate, dual-buy, or wait for CN7000?",
       "Is there a named lighthouse neocloud reference deployment for CN6000 we can cite publicly — even at the pilot-pod scale?"
     ]
   },
@@ -461,11 +449,11 @@
       "nvidia_3yr_tco_M": 9.4,
       "broadcom_3yr_tco_M": 7.6,
       "advantage_drivers": [
-        "NDAA-clean US-based supply chain meets allied-nation sovereign AI procurement requirements where Chinese-origin alternatives are explicitly excluded",
-        "Vendor independence from NVIDIA stack — strategic ask in EU sovereign programs (Mistral / EuroHPC) and increasingly Middle East programs",
-        "Long-term roadmap visibility CN5000 → CN6000 → CN7000 with public UEC commit — 5-year sovereign program commitments need vendor roadmap confidence",
-        "Federal-procurement-grade supply chain is a real differentiator vs commercial-grade vendors at the sovereign tier",
-        "Regional integrator partnership model (Atos / NTT / Hitachi) preserves local content requirements that many sovereign programs mandate"
+        "NDAA-clean US supply chain meets allied-nation procurement where Chinese alternatives are excluded",
+        "Vendor independence from NVIDIA — EU sovereign (Mistral/EuroHPC) strategic ask",
+        "Roadmap CN5000 → CN6000 → CN7000 (UEC) — anchors 5-year sovereign commitments",
+        "Federal-procurement-grade supply chain differentiates vs commercial-grade at sovereign tier",
+        "Regional integrator model (Atos/NTT/Hitachi) preserves local content requirements"
       ],
       "sensitivity_inputs": {
         "supply_lead_time_weeks": { "default": 18, "min": 10, "max": 36 },
@@ -492,16 +480,13 @@
     ],
     "inferences_flagged": [
       "Sovereign AI as a distinct customer segment is candidate-constructed — Cornelis has not publicly segmented this customer class; segment definition draws on observable nation-state AI program patterns (EU AI Factories, G42, HUMAIN, METI).",
-      "TCO numbers for 800-NIC sovereign deployment are illustrative — regional integrator pricing premium for sovereign-grade supply chain assurance is real but not publicly disclosed.",
       "Regional channel partner ranking (Atos primary EU, NTT primary Japan, etc.) reflects observable sovereign program SI patterns, not stated Cornelis channel strategy.",
       "Strategic value of UEC alignment to sovereign customers as a hedge against US export controls is candidate-framing — not a stated Cornelis positioning for the sovereign segment."
     ],
     "open_questions": [
       "Has Cornelis publicly named any sovereign AI program partnerships, or signed pipeline opportunities in EU (Mistral / EuroHPC AI Factories), Middle East (G42 / HUMAIN), or APAC (METI / Singapore AISG)?",
       "What's the export control posture — which sovereign customers can Cornelis sell to under current BIS rules, and how does the AI Diffusion Rule framework affect allied-nation procurements?",
-      "Does Cornelis have dedicated regional channel managers for EU / Middle East / APAC sovereign accounts, or is it federal-HPC sales force generalists covering the segment opportunistically?",
-      "How does Cornelis position vs Chinese-origin networking alternatives (Huawei, H3C, Inspur) in allied-nation sovereign AI procurements where vendor provenance is the gating requirement?",
-      "Is there a phased pilot deployment strategy for sovereign accounts (200-NIC pilot → expansion model), and what's the precedent reference deployment we can cite?"
+      "How does Cornelis position vs Chinese-origin networking alternatives (Huawei, H3C, Inspur) in allied-nation sovereign AI procurements where vendor provenance is the gating requirement?"
     ]
   }
 ]
