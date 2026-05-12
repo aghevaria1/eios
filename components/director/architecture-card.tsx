@@ -6,8 +6,8 @@ export function ArchitectureCard({ architecture }: { architecture: ReferenceArch
       <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Reference Architecture</h2>
       <div className="space-y-2 mb-3">
         {architecture.products.map((product, i) => (
-          <div key={i} className="flex gap-3 items-start text-xs">
-            <span className="text-blue-400 font-bold whitespace-nowrap min-w-[140px]">{product}</span>
+          <div key={i} className="grid grid-cols-[180px_1fr] gap-3 items-start text-xs">
+            <span className="text-blue-400 font-bold break-words">{product}</span>
             <span className="text-gray-300">{architecture.descriptions[i]}</span>
           </div>
         ))}
