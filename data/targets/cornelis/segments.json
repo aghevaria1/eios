@@ -36,7 +36,7 @@
         "Native OPA protocol — purpose-built for tightly-coupled MPI collectives",
         "Director-class fabric switch with up to 576 ports for fat-tree topologies"
       ],
-      "protocol_reasoning": "OPA over RoCEv2 for tightly-coupled HPC: 10+ years of MPI collective optimization, predictable tail latency under congestion, mature libfabric provider. RoCEv2 needs per-fabric DCQCN tuning with higher tail variance. UEC (CN7000) not production-ready for 2026-2027 federal cycles."
+      "protocol_reasoning": "Ten years of OPA MPI collective optimization deliver predictable tail latency under congestion — what RoCEv2 still tunes for and UEC hasn't replicated."
     },
     "channel": {
       "oem_odm": [
@@ -128,7 +128,7 @@
         "OPA for MPI partitions; RoCEv2 for AI partitions",
         "Cost-optimized switch tier (Arista / commodity Ethernet, not director-class)"
       ],
-      "protocol_reasoning": "Tri-protocol on one fabric is the academic differentiator: OPA preserves MPI performance (chemistry, climate), RoCEv2 serves AI training partitions. Academic budgets and 1-3 admin teams can't fund or run dual fabrics — single-fabric multi-protocol is where pure-InfiniBand and pure-Ethernet both lose."
+      "protocol_reasoning": "Tri-protocol on one fabric wins academic HPC on staffing, not just CapEx — small ops teams (1-3 admins) can't operate dual fabrics."
     },
     "channel": {
       "oem_odm": [
@@ -224,7 +224,7 @@
         "Compatible with enterprise data-center switching (Arista, Cisco, Juniper)",
         "Endpoint NIC tuned for AllReduce (DCQCN + Cornelis tail-variance handling)"
       ],
-      "protocol_reasoning": "Enterprise AI is RoCEv2-native: Ethernet fabric, ops, and vendor model already in place. InfiniBand requires parallel tier + headcount — most CIOs reject. Cornelis's edge: endpoint NIC tail-variance handling without per-fabric DCQCN tuning. CN6000 RoCEv2 is the workhorse through 3-5 year enterprise cycles."
+      "protocol_reasoning": "Enterprise AI is RoCEv2-native, and Cornelis's endpoint-NIC tail-variance handling delivers AllReduce performance without the parallel InfiniBand tier (and trained headcount) CIOs reject."
     },
     "channel": {
       "oem_odm": [
@@ -325,7 +325,7 @@
         "UEC roadmap commit (CN7000 at 1.6T) aligns with open-standards preference",
         "Dense rack designs (8-16 GPU/node) optimized for $/GPU at hyperscale"
       ],
-      "protocol_reasoning": "Neoclouds reject NVIDIA stack lock-in for two reasons: operator margin compression vs Spectrum-X, and customer mix that increasingly includes non-NVIDIA accelerators (AMD MI300, Trainium). CN6000 RoCEv2 today, CN7000 UEC tomorrow — UEC removes NVIDIA control of the next-gen collective standard. Cornelis chairs UEC; CN7000 will be among the first production 1.6T UEC chips in 2027-2028. Neoclouds buy the roadmap."
+      "protocol_reasoning": "Cornelis chairs UEC; CN7000 (1.6T, 2027-2028) will be among the first production UEC chips — neoclouds buy the roadmap, not the current part."
     },
     "channel": {
       "oem_odm": [
@@ -424,7 +424,7 @@
         "NDAA-clean supply chain meets allied-nation sovereign procurement requirements",
         "Region-dependent: Arista in EU, NTT/Hitachi-supported tiers in APAC. Pairs with regional integrator switch/server tier — named local partners required."
       ],
-      "protocol_reasoning": "Same RoCEv2 fit as Enterprise AI, but the value prop differs structurally: NDAA-clean supply chain (Chinese-origin alternatives can't meet allied-nation procurement), vendor independence from NVIDIA stack, and UEC alignment as a hedge against US export controls. Protocol independence here means buyer audit-ability — sovereign programs must inspect the fabric stack, which InfiniBand makes harder."
+      "protocol_reasoning": "NDAA-clean US supply chain meets allied-nation procurement, and UEC alignment hedges against US export-control shifts — the structural sovereign value prop, not RoCEv2 performance."
     },
     "channel": {
       "oem_odm": [
