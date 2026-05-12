@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
-export default function DirectorIndex() {
+export default function SegmentsIndex() {
   redirect('/director/segments/federal-hpc')
 }

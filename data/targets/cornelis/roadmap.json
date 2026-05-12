@@ -1,0 +1,92 @@
+{
+  "timeline_start_year": 2024,
+  "timeline_end_year": 2029,
+  "generation_phases": [
+    {
+      "generation": "cn5000",
+      "phases": [
+        { "phase": "production", "start": "2024", "end": "2027" },
+        { "phase": "sustaining", "start": "2027", "end": "2028" },
+        { "phase": "eol_phasing", "start": "2028", "end": "2029" }
+      ]
+    },
+    {
+      "generation": "cn6000",
+      "phases": [
+        { "phase": "development", "start": "2024", "end": "2026" },
+        { "phase": "sampling", "start": "2026", "end": "2026" },
+        { "phase": "production", "start": "2026", "end": "2029" }
+      ]
+    },
+    {
+      "generation": "cn7000",
+      "phases": [
+        { "phase": "concept", "start": "2024", "end": "2026" },
+        { "phase": "development", "start": "2026", "end": "2027" },
+        { "phase": "sampling", "start": "2027", "end": "2028" }
+      ]
+    }
+  ],
+  "eol_framework": {
+    "target_product": "cn5000",
+    "methodology_only": true,
+    "phases": [
+      {
+        "phase_number": 1,
+        "name": "End of New Orders",
+        "trigger_criteria": "CN6000 production stable for >=6 months AND installed-base coverage for next 24 months confirmed AND federal commitment register clear of CN5000-only entries.",
+        "decision_dependencies": "Federal commitment register, multi-year customer contracts with CN5000-only line items, HPE Cray EX-series CN6000 integration readiness."
+      },
+      {
+        "phase_number": 2,
+        "name": "Sustaining Mode Only",
+        "trigger_criteria": "End of New Orders +12 months AND all federal multi-year contracts with CN5000 commitments at delivery completion.",
+        "decision_dependencies": "Sparing inventory level, RMA volume trend, customer migration pipeline to CN6000."
+      },
+      {
+        "phase_number": 3,
+        "name": "End of Support",
+        "trigger_criteria": "Sustaining Mode +24 months AND installed-base coverage gap analysis confirms migration completeness >=95%.",
+        "decision_dependencies": "Final installed-base survey, customer support agreement terms, sparing inventory exhaustion."
+      }
+    ]
+  },
+  "commitment_register": [
+    {
+      "customer": "DOE / Lynx Cluster",
+      "commitment": "CN6000 800G upgrade path",
+      "date": "Q4 2026",
+      "status": "on_track"
+    },
+    {
+      "customer": "LLNL / CTS-3 procurement",
+      "commitment": "CN6000 fabric option in EX-series bid",
+      "date": "Q1 2027",
+      "status": "on_track"
+    },
+    {
+      "customer": "Neocloud A (under NDA)",
+      "commitment": "10K-NIC CN6000 leaf-spine deployment",
+      "date": "Q2 2027",
+      "status": "at_risk"
+    },
+    {
+      "customer": "Sovereign AI partner (FR)",
+      "commitment": "Phase-1 800-NIC pilot",
+      "date": "Q3 2027",
+      "status": "on_track"
+    },
+    {
+      "customer": "SNL Tier-1 Federal",
+      "commitment": "CN6000 EX-series integration delivery",
+      "date": "Q4 2027",
+      "status": "slip"
+    },
+    {
+      "customer": "Enterprise Automotive (Tier-1 OEM)",
+      "commitment": "Internal AI training cluster — CN6000 RoCEv2",
+      "date": "Q1 2027",
+      "status": "at_risk"
+    }
+  ]
+}

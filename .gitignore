@@ -7,3 +7,4 @@ data/eios.db
 *.db-wal
 .DS_Store
 .claude/
+tsconfig.tsbuildinfo

@@ -1,3 +1,7 @@
 {
-  "name": "Cornelis Networks"
+  "id": "cornelis",
+  "name": "Cornelis Networks",
+  "tagline": "High-performance networking for HPC and AI workloads",
+  "products": ["CN5000", "CN6000", "CN7000"],
+  "primary_product": "CN6000"
 }

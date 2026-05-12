@@ -1,0 +1,123 @@
+{
+  "program": "CN6000",
+  "methodology_framework_note": "Proposed tracking framework — actual phase-gate states would be informed by internal program data.",
+  "lanes": [
+    "architecture",
+    "silicon_design",
+    "validation",
+    "isv_certification",
+    "manufacturing",
+    "supply_chain",
+    "program"
+  ],
+  "phases": [
+    "concept",
+    "plan",
+    "development",
+    "sampling",
+    "production",
+    "sustaining"
+  ],
+  "states": [
+    { "lane": "architecture", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "architecture", "phase": "plan", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "architecture", "phase": "development", "status": "closed", "target_date": null, "detail": "tri-protocol architecture finalized" },
+    { "lane": "architecture", "phase": "sampling", "status": "future", "target_date": "Q2 2026", "detail": null },
+    { "lane": "architecture", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "architecture", "phase": "sustaining", "status": "future", "target_date": null, "detail": null },
+
+    { "lane": "silicon_design", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "silicon_design", "phase": "plan", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "silicon_design", "phase": "development", "status": "closed", "target_date": null, "detail": "tape-out complete" },
+    { "lane": "silicon_design", "phase": "sampling", "status": "in_progress", "target_date": "Q1 2026", "detail": "first silicon back, bring-up underway" },
+    { "lane": "silicon_design", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "silicon_design", "phase": "sustaining", "status": "future", "target_date": null, "detail": null },
+
+    { "lane": "validation", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "validation", "phase": "plan", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "validation", "phase": "development", "status": "at_risk", "target_date": "Q1 2026", "detail": "slip 4 weeks — silicon bring-up bench time contention" },
+    { "lane": "validation", "phase": "sampling", "status": "future", "target_date": "Q2 2026", "detail": null },
+    { "lane": "validation", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "validation", "phase": "sustaining", "status": "future", "target_date": null, "detail": null },
+
+    { "lane": "isv_certification", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "isv_certification", "phase": "plan", "status": "closed", "target_date": null, "detail": "Slurm + libfabric + NCCL targets locked" },
+    { "lane": "isv_certification", "phase": "development", "status": "in_progress", "target_date": "Q2 2026", "detail": "NCCL certification gap on RoCEv2 mode — partnership track in motion" },
+    { "lane": "isv_certification", "phase": "sampling", "status": "future", "target_date": "Q3 2026", "detail": null },
+    { "lane": "isv_certification", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "isv_certification", "phase": "sustaining", "status": "future", "target_date": null, "detail": null },
+
+    { "lane": "manufacturing", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "manufacturing", "phase": "plan", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "manufacturing", "phase": "development", "status": "in_progress", "target_date": "Q2 2026", "detail": "NPI line-build at contract manufacturer" },
+    { "lane": "manufacturing", "phase": "sampling", "status": "future", "target_date": "Q3 2026", "detail": null },
+    { "lane": "manufacturing", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "manufacturing", "phase": "sustaining", "status": "future", "target_date": null, "detail": null },
+
+    { "lane": "supply_chain", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "supply_chain", "phase": "plan", "status": "in_progress", "target_date": "Q1 2026", "detail": "Intel component lead-time extending — alt-source qual underway" },
+    { "lane": "supply_chain", "phase": "development", "status": "in_progress", "target_date": "Q2 2026", "detail": "PoP substrate sourcing — second supplier in qual" },
+    { "lane": "supply_chain", "phase": "sampling", "status": "future", "target_date": "Q3 2026", "detail": null },
+    { "lane": "supply_chain", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "supply_chain", "phase": "sustaining", "status": "future", "target_date": null, "detail": null },
+
+    { "lane": "program", "phase": "concept", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "program", "phase": "plan", "status": "closed", "target_date": null, "detail": null },
+    { "lane": "program", "phase": "development", "status": "in_progress", "target_date": "Q1 2026", "detail": "PRD locked, cross-functional cadence weekly" },
+    { "lane": "program", "phase": "sampling", "status": "future", "target_date": "Q3 2026", "detail": null },
+    { "lane": "program", "phase": "production", "status": "future", "target_date": "Q4 2026", "detail": null },
+    { "lane": "program", "phase": "sustaining", "status": "future", "target_date": null, "detail": null }
+  ],
+  "exec_decisions_needed": [
+    {
+      "title": "Validation Development phase slip",
+      "detail": "Silicon bring-up bench-time contention forecasts a 4-week slip on validation development. Decision: pull from sampling buffer (compresses sampling by 4 wk) or push GA by 4 wk?",
+      "owner": "VP Engineering",
+      "escalate_to": "COO",
+      "target_date": "Q1 2026"
+    },
+    {
+      "title": "Intel supply constraint — alt-source qualification",
+      "detail": "Intel component lead time extending from 16 to 24+ weeks. Decision: greenlight alt-source qual now (3-month qual cycle, ~$200K NRE) or hold and absorb the lead-time risk?",
+      "owner": "VP Operations",
+      "escalate_to": "COO",
+      "target_date": "Q1 2026"
+    },
+    {
+      "title": "NCCL certification gap — RoCEv2 mode",
+      "detail": "CN6000 RoCEv2 mode has no NCCL certification yet; gates enterprise AI + neocloud design wins. Decision: deepen NVIDIA partnership track (12-month timeline, low cost) or fund in-house collective library investment (6-month timeline, $1.5M)?",
+      "owner": "VP Product",
+      "escalate_to": "CEO",
+      "target_date": "Q2 2026"
+    }
+  ],
+  "what_if_scenarios": [
+    {
+      "id": "intel_supply",
+      "name": "Intel supply constraint",
+      "slider_label": "Component availability (%)",
+      "slider_default": 70,
+      "slider_min": 50,
+      "slider_max": 100,
+      "impact_template": "Validation slips 6wk → sampling Q3→Q4 2026 → automotive enterprise commitment slips Q1→Q2 2027. Revenue impact: ~$8M shifted to next quarter."
+    },
+    {
+      "id": "customer_pullin",
+      "name": "Customer pull-in request",
+      "slider_label": "Months earlier requested",
+      "slider_default": 3,
+      "slider_min": 0,
+      "slider_max": 6,
+      "impact_template": "Sampling pulled in 3mo → validation compresses 4wk → ISV certification risk increases (NCCL gap unresolved at GA). Mitigation: accept partial certification at GA and complete in field."
+    },
+    {
+      "id": "uec_delay",
+      "name": "UEC standardization delay",
+      "slider_label": "Months later than current plan",
+      "slider_default": 6,
+      "slider_min": 0,
+      "slider_max": 12,
+      "impact_template": "UEC v1.0 spec slips 6mo → CN7000 sampling slips Q3 2027→Q1 2028 → neocloud design wins (UEC-anchored) shift right one quarter. CN6000 lifecycle extends — sustaining mode delayed 6mo (revenue positive near-term)."
+    }
+  ]
+}
