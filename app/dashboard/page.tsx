@@ -28,7 +28,7 @@ export default function Dashboard() {
   const [whatifRunning, setWhatifRunning] = useState(false)
   const [agentRunning, setAgentRunning] = useState(false)
   const [status, setStatus] = useState<string>('Initializing...')
-  const [nocBriefGruve, setNocBriefGruve] = useState('')
+  const [nocBriefInternal, setNocBriefInternal] = useState('')
   const [nocBriefCustomer, setNocBriefCustomer] = useState('')
   const [nocRunning, setNocRunning] = useState(false)
   const [lastIncident, setLastIncident] = useState<any>(null)
@@ -99,7 +99,7 @@ export default function Dashboard() {
   async function generateNOCBrief() {
     if (!lastIncident || !lastDecision || !lastAlert) return
     setNocRunning(true)
-    setNocBriefGruve('')
+    setNocBriefInternal('')
     setNocBriefCustomer('')
 
     const res = await fetch('/api/brief', {
@@ -122,7 +122,7 @@ export default function Dashboard() {
       const lines = text.split('\n').filter(l => l.startsWith('data: '))
       for (const line of lines) {
         const payload = JSON.parse(line.slice(6))
-        if (payload.type === 'gruve') setNocBriefGruve(prev => prev + payload.token)
+        if (payload.type === 'internal') setNocBriefInternal(prev => prev + payload.token)
         if (payload.type === 'customer') setNocBriefCustomer(prev => prev + payload.token)
       }
     }
@@ -311,9 +311,9 @@ export default function Dashboard() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-800 rounded p-3">
-              <div className="text-xs font-bold text-purple-400 mb-2 uppercase">Gruve Internal Brief</div>
+              <div className="text-xs font-bold text-purple-400 mb-2 uppercase">Internal Brief</div>
               <div className="text-xs text-gray-300 whitespace-pre-wrap max-h-48 overflow-y-auto font-mono">
-                {nocBriefGruve || <span className="text-gray-600">Run agents first, then generate brief...</span>}
+                {nocBriefInternal || <span className="text-gray-600">Run agents first, then generate brief...</span>}
               </div>
             </div>
             <div className="bg-gray-800 rounded p-3">

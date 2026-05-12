@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
         }
 
         try {
-          // Brief 1 — Gruve Executive
-          const gruveprompt = `You are the EIOS NOC AI writing an internal executive brief for Gruve leadership.
+          // Brief 1 — Internal Executive
+          const internalprompt = `You are the EIOS NOC AI writing an internal executive brief for leadership.
 
 INCIDENT DATA:
 Node: ${incident?.nodeId}
@@ -36,9 +36,9 @@ Action Taken: ${decision?.action} → ${decision?.targetNodeId ?? 'None'}
 SLA Breach: ${alert?.breachConfirmed ? 'YES' : 'NO'}
 RCA Summary: ${alert?.rca?.slice(0, 500)}
 
-Write a concise internal NOC brief for Gruve executives. Format exactly as:
+Write a concise internal NOC brief for executives. Format exactly as:
 
-GRUVE INTERNAL NOC BRIEF
+INTERNAL NOC BRIEF
 ━━━━━━━━━━━━━━━━━━━━━━━━
 Incident ID: [id]
 Time: [current time]
@@ -62,15 +62,15 @@ NEXT STEPS:
 
 Keep it under 150 words. Executive tone.`
 
-          const gruveStream = await client.messages.stream({
+          const internalStream = await client.messages.stream({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 400,
-            messages: [{ role: 'user', content: gruveprompt }]
+            messages: [{ role: 'user', content: internalprompt }]
           })
 
-          for await (const chunk of gruveStream) {
+          for await (const chunk of internalStream) {
             if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-              send({ type: 'gruve', token: chunk.delta.text })
+              send({ type: 'internal', token: chunk.delta.text })
             }
           }
 

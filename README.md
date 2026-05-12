@@ -311,7 +311,7 @@ Natural language scenario simulation. Type any what-if question, get a streaming
 ### Panel 5 — NOC Brief Generator
 One-click generation of two professional briefs after any agent pipeline run:
 
-- **Gruve Internal Brief** — executive-facing internal NOC report with incident ID, what happened, action taken, SLA status, and next steps
+- **Internal Brief** — executive-facing internal NOC report with incident ID, what happened, action taken, SLA status, and next steps
 - **Customer Notification** — professional customer-facing service notification with impact summary, resolution, and financial impact
 
 ---
@@ -445,7 +445,7 @@ http://localhost:3000
 1. Start `npm run dev` 2 minutes before the demo
 2. Let the chaos engine run — nodes will start turning amber
 3. Click **▶ Run Agents** — walk through the 3-agent reasoning chain
-4. Click **📋 Generate NOC Brief** — show Gruve internal + customer briefs
+4. Click **📋 Generate NOC Brief** — show internal + customer briefs
 5. Type a what-if query — the $108K cascade analysis speaks for itself
 
 ---
