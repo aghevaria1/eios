@@ -18,12 +18,12 @@ export type SegmentId =
   | 'sovereign-ai'
 
 export interface Workload {
-  primary_mix: string
+  primary_mix: string | string[]
   typical_scale: string
-  critical_characteristics: string
+  critical_characteristics: string | string[]
   latency_budget: string
   bottleneck_profile: string
-  buying_criteria: string
+  buying_criteria: string | string[]
 }
 
 export interface ReferenceArchitecture {

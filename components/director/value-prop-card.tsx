@@ -7,14 +7,26 @@ export function ValuePropCard({ valueProposition }: { valueProposition: ValuePro
       <p className="text-sm text-gray-100 mb-4 italic leading-relaxed">{valueProposition.statement}</p>
       <div>
         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2">Competitive position</div>
-        <div className="space-y-3">
-          {valueProposition.competitive_position.map((c, i) => (
-            <div key={i} className="text-xs border-l-2 border-gray-700 pl-3">
-              <div className="text-blue-400 font-bold mb-0.5">vs {c.vs}</div>
-              <div className="text-gray-200 leading-relaxed">{c.angle}</div>
-            </div>
-          ))}
-        </div>
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-gray-700">
+              <th className="text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider py-2 pr-3 w-[200px]">
+                Competitor
+              </th>
+              <th className="text-left text-[10px] font-bold text-gray-500 uppercase tracking-wider py-2">
+                Cornelis advantage
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {valueProposition.competitive_position.map((c, i) => (
+              <tr key={i} className="border-b border-gray-800 last:border-b-0">
+                <td className="text-blue-400 font-bold align-top py-2 pr-3">{c.vs}</td>
+                <td className="text-gray-200 align-top py-2 leading-relaxed">{c.angle}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   )
