@@ -9,6 +9,14 @@ import { TCOCard } from '@/components/director/tco-card'
 import { ValuePropCard } from '@/components/director/value-prop-card'
 import { SourcesSidebar } from '@/components/director/sources-sidebar'
 
+const UNIT_BY_SEGMENT: Record<string, string> = {
+  'federal-hpc': 'nodes',
+  'academic-hpc': 'nodes',
+  'enterprise-ai': 'GPUs',
+  neoclouds: 'GPUs',
+  'sovereign-ai': 'NICs',
+}
+
 export function generateStaticParams() {
   return loadSegments().map((s) => ({ segmentId: s.id }))
 }
@@ -19,6 +27,7 @@ export default function SegmentPage({ params }: { params: { segmentId: string } 
   if (!segment) notFound()
 
   const tabs = segments.map((s) => ({ id: s.id, name: s.name, badge: s.badge }))
+  const unit = UNIT_BY_SEGMENT[segment.id] ?? 'nodes'
 
   return (
     <>
@@ -34,7 +43,7 @@ export default function SegmentPage({ params }: { params: { segmentId: string } 
             <WorkloadCard workload={segment.workload} />
             <ArchitectureCard architecture={segment.architecture} />
             <ChannelEcosystemCard channel={segment.channel} />
-            <TCOCard tco={segment.tco} />
+            <TCOCard tco={segment.tco} unit={unit} />
             <ValuePropCard valueProposition={segment.value_proposition} />
           </div>
           <div className="col-span-1">
