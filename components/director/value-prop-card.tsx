@@ -2,8 +2,11 @@ import type { ValueProposition } from '@/lib/director/types'
 
 export function ValuePropCard({ valueProposition }: { valueProposition: ValueProposition }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Value Proposition</h2>
+    <div className="bg-gray-900 border border-gray-800 border-l-[3px] border-l-[#6FA37A] rounded-lg p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-[#6FA37A] shrink-0" />
+        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Value Proposition</h2>
+      </div>
       <p className="text-sm text-gray-100 mb-4 italic leading-relaxed">{valueProposition.statement}</p>
       <div>
         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2">Competitive position</div>

@@ -39,9 +39,12 @@ export function TCOCard({ tco, unit }: { tco: TCOModel; unit: string }) {
   const maxVal = Math.max(cornelis, nvidia, broadcom)
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
+    <div className="bg-gray-900 border border-gray-800 border-l-[3px] border-l-[#C9A352] rounded-lg p-4">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">TCO Model</h2>
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-[#C9A352] shrink-0" />
+          <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">TCO Model</h2>
+        </div>
         <span className="text-[10px] text-gray-500 italic">
           Adjust deployment size and supply lead time to model your scenario
         </span>

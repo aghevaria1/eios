@@ -10,8 +10,11 @@ export function WorkloadCard({ workload }: { workload: Workload }) {
     ['Buying criteria', workload.buying_criteria],
   ]
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Workload Profile</h2>
+    <div className="bg-gray-900 border border-gray-800 border-l-[3px] border-l-[#4A7C98] rounded-lg p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-[#4A7C98] shrink-0" />
+        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Workload Profile</h2>
+      </div>
       <table className="w-full text-xs">
         <tbody>
           {rows.map(([label, value]) => (

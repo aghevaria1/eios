@@ -2,8 +2,11 @@ import type { ReferenceArchitecture } from '@/lib/director/types'
 
 export function ArchitectureCard({ architecture }: { architecture: ReferenceArchitecture }) {
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Reference Architecture</h2>
+    <div className="bg-gray-900 border border-gray-800 border-l-[3px] border-l-[#8A6FA3] rounded-lg p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="w-2 h-2 rounded-full bg-[#8A6FA3] shrink-0" />
+        <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Reference Architecture</h2>
+      </div>
       <div className="space-y-2 mb-3">
         {architecture.products.map((product, i) => (
           <div key={i} className="grid grid-cols-[180px_1fr] gap-3 items-start text-xs">
