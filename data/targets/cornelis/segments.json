@@ -224,7 +224,7 @@
         "Compatible with enterprise data-center switching (Arista, Cisco, Juniper)",
         "Endpoint NIC tuned for AllReduce (DCQCN + Cornelis tail-variance handling)"
       ],
-      "protocol_reasoning": "Enterprise AI is RoCEv2-native, and Cornelis's endpoint-NIC tail-variance handling delivers AllReduce performance without the parallel InfiniBand tier (and trained headcount) CIOs reject."
+      "protocol_reasoning": "Enterprise AI is RoCEv2-native; Cornelis's endpoint-NIC tail-variance handling delivers AllReduce performance without the parallel InfiniBand tier and trained headcount premium CIOs reject."
     },
     "channel": {
       "oem_odm": [
