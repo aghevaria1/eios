@@ -34,9 +34,10 @@ export interface ReferenceArchitecture {
 
 export interface ChannelEcosystem {
   oem_odm: Array<{ name: string; role: string }>
-  hpc_isvs: string[]
+  hpc_isvs?: string[]
+  hpc_isvs_note?: string
   ai_ml_isvs: string[]
-  day1_isv_priority: string
+  day1_isv_priority: string | string[]
 }
 
 export interface TCOModel {

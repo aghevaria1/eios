@@ -1,6 +1,7 @@
 import type { ChannelEcosystem } from '@/lib/director/types'
 
 export function ChannelEcosystemCard({ channel }: { channel: ChannelEcosystem }) {
+  const hasHpcIsvs = channel.hpc_isvs && channel.hpc_isvs.length > 0
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
       <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Channel & Partner Ecosystem</h2>
@@ -20,11 +21,15 @@ export function ChannelEcosystemCard({ channel }: { channel: ChannelEcosystem })
 
       <div className="mb-4">
         <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-2">Required HPC ISV certifications</div>
-        <div className="flex flex-wrap gap-1.5">
-          {channel.hpc_isvs.map((isv, i) => (
-            <span key={i} className="text-[11px] bg-gray-800 text-gray-200 px-2 py-0.5 rounded">{isv}</span>
-          ))}
-        </div>
+        {hasHpcIsvs ? (
+          <div className="flex flex-wrap gap-1.5">
+            {channel.hpc_isvs!.map((isv, i) => (
+              <span key={i} className="text-[11px] bg-gray-800 text-gray-200 px-2 py-0.5 rounded">{isv}</span>
+            ))}
+          </div>
+        ) : channel.hpc_isvs_note ? (
+          <p className="text-[11px] text-gray-400 italic">{channel.hpc_isvs_note}</p>
+        ) : null}
       </div>
 
       <div className="mb-4">
@@ -38,7 +43,15 @@ export function ChannelEcosystemCard({ channel }: { channel: ChannelEcosystem })
 
       <div className="border-t border-gray-800 pt-3">
         <div className="text-[10px] text-amber-400 font-bold uppercase tracking-wider mb-1">Day-1 ISV priority</div>
-        <p className="text-xs text-gray-200 leading-relaxed">{channel.day1_isv_priority}</p>
+        {Array.isArray(channel.day1_isv_priority) ? (
+          <ul className="list-disc list-outside ml-4 space-y-1 text-xs text-gray-200">
+            {channel.day1_isv_priority.map((item, i) => (
+              <li key={i}>{item}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-gray-200 leading-relaxed">{channel.day1_isv_priority}</p>
+        )}
       </div>
     </div>
   )
