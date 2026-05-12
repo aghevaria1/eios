@@ -1,4 +1,91 @@
-# EIOS — EdgeInferenceOS
+# EdgeInferenceOS
+
+This repository contains two related applications branched from a shared multi-agent architecture:
+
+- **v1** — production NOC inference orchestration system (multi-agent AI reasoning layer for edge inference infrastructure)
+- **v2** — Director PM Operating Framework, target-configurable, currently configured for **Cornelis Networks** (branched in `v2-cornelis`)
+
+The v2 section below covers the Director PM application. The v1 documentation that follows it covers the existing NOC system, unchanged.
+
+---
+
+# v2 — Director PM Operating Framework
+
+> ⚠ **Day 1 Thinking Artifact** — Synthesized from publicly available materials — Ready for correction by the team. Authored by Ashit Ghevaria as a structured proposal for how a Director PM would approach the Cornelis Networks role in their first 90 days. Built in Claude Code over one week, branched from production v1.
+
+## What it is
+
+A target-configurable Director PM Operating Framework. Same multi-agent architecture as v1, applied to a different domain: how a Director-level Product Manager would systematically operate a hardware product line. The framework retargets to any hardware product line by swapping the active target configuration in `data/targets/config.json`.
+
+## Current target
+
+**Cornelis Networks** — covering the CN5000 / CN6000 / CN7000 SuperNIC product family across five customer segments: Federal HPC, Academic HPC, Enterprise Commercial AI, Neoclouds, and Sovereign AI.
+
+## Architecture summary
+
+Three layers, target-driven:
+
+1. **UI** — Next.js App Router under `app/director/` with sub-routes per view (`/segments/[segmentId]`, `/phase-gate`, `/roadmap`, `/about`). Server components read target config + JSON at render; client components handle interactivity (slider state, agent invokes, what-if scenarios).
+2. **Agents** (planned) — Async functions in `agents/director/` following v1's `runXAgent(input, onStream?) → Promise<Output>` convention. Stream from Anthropic SDK, emit on the singleton bus, return typed output.
+3. **Data** — Per-target JSON in `data/targets/<active>/` (segments, products, roadmap, phase-gate, target metadata, RAG corpus). Active target read from `data/targets/config.json`. Loaded via typed readers in `lib/director/load-target.ts`.
+
+## Four views
+
+- **Customer Segments** (`/director/segments/[segmentId]`) — **live**, all five segments populated to production depth. Each segment renders workload profile, reference architecture, channel & partner ecosystem (OEM/ODM + HPC ISVs + AI/ML ISVs), TCO model with sensitivity inputs, value proposition with named competitive positioning, and a persistent sources sidebar with inferences flagged and Day-1 PM open questions.
+- **Phase-Gate Tracker** (`/director/phase-gate`) — **scaffolded route**. Will render the seven-lane × six-phase swim-lane for CN6000 program state with status-colored cells, exec decisions panel, and scripted what-if scenarios.
+- **Roadmap + Lifecycle** (`/director/roadmap`) — **scaffolded route**. Will render the CN5000 / CN6000 / CN7000 timeline, CN5000 end-of-life methodology framework, and customer commitment register.
+- **About** (`/director/about`) — **scaffolded route**. Content describing what this artifact is, what's public vs inferred vs methodology-only, and how to interpret each view and export.
+
+## Two agents planned
+
+Both follow v1's agent function-convention, stream from Anthropic SDK (pinned at `claude-sonnet-4-5` — current at v2 build time; v1 stays on its `claude-sonnet-4-20250514` snapshot), and emit on the singleton bus with new typed event methods.
+
+- **Phase-Gate Brief Generator** (`agents/director/phasegate-brief-agent.ts`) — given a selected lane × phase cell, drafts an executive brief for the escalation owner. Reads phase-gate JSON + retrieves from RAG corpus. Returns structured recommendation (option A or B + confidence).
+- **Roadmap Comms Generator** (`agents/director/roadmap-comms-agent.ts`) — given a roadmap event description, drafts a customer-facing communication. Reads roadmap + products JSON + RAG corpus. Returns suggested subject + body markdown.
+
+Neither agent is wired yet; both are scheduled for Day 4 of the build.
+
+## Three exports planned
+
+All carry Day-1 framing as embedded armor (cover sections, page/slide footers, speaker notes):
+
+- **PDF** per segment (`@react-pdf/renderer`) — 1-2 page reference architecture brief, two flavors: Internal (sources visible) and External (sources collapsed to footnote).
+- **Excel** of phase-gate tracker (`exceljs`) — Day-1 framing on every sheet rows 1-3, separate sheets for phase-gate state, exec decisions, what-if scenarios, and sources/methodology. Status-colored cells matching UI.
+- **PPT** of roadmap (`pptxgenjs`) — 5-7 slide exec deck: title with Day-1 framing, roadmap timeline, current quarter summary, decisions needed, EOL methodology, commitment register risk view, sources appendix. Speaker notes on every slide carry the full Day-1 framing.
+
+## Inherits v1 patterns
+
+v2 deliberately reuses v1's conventions to keep the codebase coherent:
+
+- **Agent function-convention** — `runXAgent(input, onStream?: (token: string) => void): Promise<Output>` exactly as in `agents/{telemetry,placement,sla}-agent.ts`
+- **RAG retrieval** — extends `lib/rag.ts` keyword-overlap retrieval with `retrieveTargetContext(query, targetId)` for target-scoped corpus
+- **MCP tool pattern** — adapts `lib/mcp-tools.ts` shape for v2 read paths (planned)
+- **Singleton bus** — extends `lib/bus.ts` with v2-specific typed event methods (`emitBriefGenerated`, `onBriefGenerated`, etc.) added next to v1's methods; v1 behavior untouched
+- **Server components for read paths, client components for interactivity** — established by the v2 scaffold
+
+## How to run v2
+
+```
+npm run dev
+```
+
+Then navigate to `http://localhost:3000/director`. The index redirects to `/director/segments/federal-hpc`.
+
+The active target is read from `data/targets/config.json` (currently `"cornelis"`). All UI and data flows resolve through that one switch.
+
+To retarget for a different company:
+
+1. Create `data/targets/<new-target-id>/` with `target.json`, `segments.json`, `products.json`, `roadmap.json`, `phase-gate.json`, and a `rag-corpus/` subdirectory of public-source documents
+2. Update `active_target` in `data/targets/config.json`
+3. Restart dev server — all UI, data loaders, and agents reconfigure for the new target automatically
+
+## v2 branch
+
+Branched as `v2-cornelis` from `main`. v1 routes (`/`, `/dashboard`, all `app/api/*`) remain untouched and functional throughout v2 development. v2 lives strictly under `app/director/`, `agents/director/`, `components/director/`, `data/targets/`, and `lib/director/`.
+
+---
+
+# v1 — EdgeInferenceOS (NOC inference orchestration)
 
 **A multi-agent AI reasoning layer for edge inference infrastructure.**
 
