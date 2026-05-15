@@ -31,10 +31,21 @@ Three layers, target-driven:
 
 ## Four views
 
-- **Customer Segments** (`/director/segments/[segmentId]`) — **live**, all five segments populated to production depth. Each segment renders workload profile, reference architecture, channel & partner ecosystem (OEM/ODM + HPC ISVs + AI/ML ISVs), TCO model with sensitivity inputs, value proposition with named competitive positioning, and a persistent sources sidebar with inferences flagged and Day-1 PM open questions.
-- **Phase-Gate Tracker** (`/director/phase-gate`) — **scaffolded route**. Will render the seven-lane × six-phase swim-lane for CN6000 program state with status-colored cells, exec decisions panel, and scripted what-if scenarios.
-- **Roadmap + Lifecycle** (`/director/roadmap`) — **scaffolded route**. Will render the CN5000 / CN6000 / CN7000 timeline, CN5000 end-of-life methodology framework, and customer commitment register.
+- **Customer Segments** (`/director/segments/[segmentId]`) — **live**, all five segments populated with demo-narratable content across multiple editorial passes. Each segment renders workload profile, reference architecture, channel & partner ecosystem (OEM/ODM + HPC ISVs + AI/ML ISVs), interactive TCO model with deployment-size and supply-lead-time sliders, value proposition with named competitive positioning, and a persistent sources sidebar with inferences flagged and Day-1 PM open questions. Visual section differentiation via muted left-border color accents across the five primary card types.
+- **Phase-Gate Tracker** (`/director/phase-gate`) — **live (basic view)**. Static seven-lane × six-phase swim-lane visualization. 42 status-colored cells across four states (closed / in_progress / at_risk / future), with methodology framing inline at the top of the view. Methodology callout component, exec decisions panel, and what-if scenario interactivity are deferred.
+- **Roadmap + Lifecycle** (`/director/roadmap`) — **live (basic view)**. Three cards: multi-generation Timeline (CN5000 / CN6000 / CN7000 across 2024–2029 with phase-coded bars and sub-row packing for boundary-year overlaps), CN5000 EOL Methodology Framework (three phases with trigger criteria + decision dependencies + methodology-only flag), and Commitment Register (six entries with status-coded badges).
 - **About** (`/director/about`) — **scaffolded route**. Content describing what this artifact is, what's public vs inferred vs methodology-only, and how to interpret each view and export.
+
+## Currently deferred
+
+Items intentionally out of scope for the demo spine but tracked for follow-up sessions:
+
+- **About view content** — scaffolded route, content not yet drafted
+- **Phase-Gate interactivity** — methodology callout component, exec decisions panel, what-if scenario sliders
+- **Two live agents** — Phase-Gate Brief Generator and Roadmap Comms Generator (see *Two agents planned* below)
+- **Three exports** — PDF per segment, Excel for phase-gate, PPT for roadmap (see *Three exports planned* below)
+- **10-minute demo script** — allocates airtime per view, identifies narrated vs reference content, anchors each view on its most distinctive moment
+- **v1 hygiene fixes** — three pre-existing TS errors in v1 scaffold files (`agents/placement-agent.ts`, `lib/rag.ts`, `lib/simulator.ts`) block `npm run build`; held off the v2-cornelis branch to preserve clean interview-artifact history. Dev mode is unaffected.
 
 ## Two agents planned
 
