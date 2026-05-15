@@ -5,9 +5,6 @@ import type {
   PhaseGatePhase,
 } from '@/lib/director/types'
 import { PhaseGateCell } from './phase-gate-cell'
-import { PhaseGateCellInteractive } from './phase-gate-cell-interactive'
-
-const INTERACTIVE_CELLS = new Set(['validation::development'])
 
 const LANE_LABELS: Record<PhaseGateLane, string> = {
   architecture: 'Architecture',
@@ -61,26 +58,15 @@ export function PhaseGateGrid({
           </div>
           {phases.map((phase) => {
             const cell = stateMap.get(`${lane}::${phase}`)
-            if (!cell) return <div key={phase} />
-            if (INTERACTIVE_CELLS.has(`${lane}::${phase}`)) {
-              return (
-                <PhaseGateCellInteractive
-                  key={phase}
-                  lane={lane}
-                  phase={phase}
-                  status={cell.status}
-                  targetDate={cell.target_date}
-                  detail={cell.detail}
-                />
-              )
-            }
-            return (
+            return cell ? (
               <PhaseGateCell
                 key={phase}
                 status={cell.status}
                 targetDate={cell.target_date}
                 detail={cell.detail}
               />
+            ) : (
+              <div key={phase} />
             )
           })}
         </Fragment>
