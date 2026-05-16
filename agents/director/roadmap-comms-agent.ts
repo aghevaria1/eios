@@ -3,8 +3,8 @@ import { loadRoadmap, loadSegments } from '@/lib/director/load-target'
 import type {
   CommitmentRegisterEntry,
   Segment,
-  SegmentId,
 } from '@/lib/director/types'
+import { resolveSegmentId } from '@/lib/director/customer-segment-resolver'
 import {
   parseRoadmapComms,
   type RoadmapComms,
@@ -18,16 +18,6 @@ const MODEL_FALLBACK = 'claude-sonnet-4-20250514'
 export interface RoadmapCommsInput {
   customer: string
   commitment: string
-}
-
-function resolveSegmentId(customer: string): SegmentId | null {
-  const c = customer.toLowerCase()
-  if (/neocloud/.test(c)) return 'neoclouds'
-  if (/sovereign/.test(c)) return 'sovereign-ai'
-  if (/enterprise|automotive|oem/.test(c)) return 'enterprise-ai'
-  if (/academic|university|ncsa/.test(c)) return 'academic-hpc'
-  if (/doe|llnl|snl|federal|nnsa|lanl/.test(c)) return 'federal-hpc'
-  return null
 }
 
 function joinOrPass(value: string | string[]): string {
