@@ -1,8 +1,13 @@
 import { loadPhaseGate } from '@/lib/director/load-target'
 import { PhaseGateGrid } from '@/components/director/phase-gate-grid'
+import { PhaseGateBriefShell } from '@/components/director/phase-gate-brief-shell'
 
 export default function PhaseGatePage() {
   const data = loadPhaseGate()
+  const fallback =
+    data.exec_decisions_needed.find((d) =>
+      d.title.toLowerCase().includes('validation'),
+    ) ?? null
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="mb-6">
@@ -12,7 +17,9 @@ export default function PhaseGatePage() {
           {data.methodology_framework_note}
         </p>
       </div>
-      <PhaseGateGrid lanes={data.lanes} phases={data.phases} states={data.states} />
+      <PhaseGateBriefShell fallbackDecision={fallback}>
+        <PhaseGateGrid lanes={data.lanes} phases={data.phases} states={data.states} />
+      </PhaseGateBriefShell>
     </div>
   )
 }
