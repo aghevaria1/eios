@@ -1,19 +1,5 @@
-import type {
-  CommitmentRegisterEntry,
-  CommitmentStatus,
-} from '@/lib/director/types'
-
-const STATUS_LABEL: Record<CommitmentStatus, string> = {
-  on_track: 'On track',
-  at_risk: 'At risk',
-  slip: 'Slip',
-}
-
-const STATUS_BADGE: Record<CommitmentStatus, string> = {
-  on_track: 'bg-[#6FA37A]/20 text-[#A8D4B5] border border-[#6FA37A]/50',
-  at_risk: 'bg-amber-900/40 text-amber-200 border border-amber-700/50',
-  slip: 'bg-[#A85D5D]/25 text-[#E6B5B5] border border-[#A85D5D]/60',
-}
+import type { CommitmentRegisterEntry } from '@/lib/director/types'
+import { CommitmentRegisterTbody } from './commitment-register-tbody'
 
 export function CommitmentRegisterCard({
   entries,
@@ -45,28 +31,7 @@ export function CommitmentRegisterCard({
             </th>
           </tr>
         </thead>
-        <tbody>
-          {entries.map((e, i) => (
-            <tr key={i} className="border-b border-gray-800 last:border-b-0">
-              <td className="text-blue-400 font-bold align-top py-2 pr-3 leading-relaxed">
-                {e.customer}
-              </td>
-              <td className="text-gray-200 align-top py-2 pr-3 leading-relaxed">
-                {e.commitment}
-              </td>
-              <td className="text-gray-300 align-top py-2 pr-3 leading-relaxed">
-                {e.date}
-              </td>
-              <td className="align-top py-2">
-                <span
-                  className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGE[e.status]}`}
-                >
-                  {STATUS_LABEL[e.status]}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+        <CommitmentRegisterTbody entries={entries} />
       </table>
     </div>
   )
