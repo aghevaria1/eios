@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ExecDecision } from '@/lib/director/types'
 import {
   parseBrief,
@@ -32,12 +32,8 @@ export function PhaseGateBriefPanel({
 }) {
   const [state, setState] = useState<StreamState>({ kind: 'streaming', text: '' })
   const fetchKey = `${lane}::${phase}`
-  const lastFetchedRef = useRef<string | null>(null)
 
   useEffect(() => {
-    if (lastFetchedRef.current === fetchKey) return
-    lastFetchedRef.current = fetchKey
-
     const ctrl = new AbortController()
     let cancelled = false
 
