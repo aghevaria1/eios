@@ -132,7 +132,10 @@ export function PhaseGateBriefPanel({
 }
 
 function StreamingView({ text }: { text: string }) {
-  const display = text.replace(/\n\s*SOURCES:[\s\S]*$/i, '').trimEnd()
+  const display = text
+    .replace(/\n\s*ORCHESTRATION:[\s\S]*?(?=\n\s*SOURCES:|$)/i, '')
+    .replace(/\n\s*SOURCES:[\s\S]*$/i, '')
+    .trimEnd()
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
@@ -174,6 +177,41 @@ function DoneView({ brief }: { brief: PhaseGateBrief }) {
             Rationale
           </div>
           <p className="text-xs text-gray-300 leading-relaxed">{brief.rationale}</p>
+        </div>
+      )}
+      {brief.orchestration && (
+        <div className="pt-2 border-t border-gray-800">
+          <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+            Orchestration
+          </div>
+          <ul className="text-[11px] text-gray-400 leading-relaxed space-y-0.5">
+            {brief.orchestration.rag_chunk_count > 0 && (
+              <li>
+                <span className="text-[#A8D4B5]">✓</span>{' '}
+                <span className="text-gray-300">RAG</span>
+                <span className="text-gray-500">
+                  {' '}
+                  · {brief.orchestration.rag_chunk_count} Cornelis program + product chunks
+                </span>
+              </li>
+            )}
+            {brief.orchestration.mcp_ok ? (
+              <li>
+                <span className="text-[#A8D4B5]">✓</span>{' '}
+                <span className="text-gray-300">MCP → Segments Server</span>
+                <span className="text-gray-500">
+                  {' '}
+                  · {brief.orchestration.mcp_segment_count} segments
+                </span>
+                <span className="text-gray-600 italic"> (Salesforce stand-in)</span>
+              </li>
+            ) : (
+              <li>
+                <span className="text-[#E6B5B5]">✗</span>{' '}
+                <span className="text-gray-500">MCP → Segments Server (skipped — fallback)</span>
+              </li>
+            )}
+          </ul>
         </div>
       )}
       {brief.sources.length > 0 && (

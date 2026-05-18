@@ -8,6 +8,12 @@ export interface BriefSource {
   title: string
 }
 
+export interface BriefOrchestration {
+  rag_chunk_count: number
+  mcp_segment_count: number
+  mcp_ok: boolean
+}
+
 export interface PhaseGateBrief {
   issue: string
   recommendation: string
@@ -15,6 +21,7 @@ export interface PhaseGateBrief {
   decision_owner: string
   decision_by: string
   rationale: string
+  orchestration: BriefOrchestration | null
   sources: BriefSource[]
   raw: string
 }
@@ -35,11 +42,29 @@ function extractField(text: string, label: string): string {
 }
 
 function extractRationale(text: string): string {
-  // Stop at end-of-text OR at the SOURCES marker (appended by the agent after model output)
-  const re = /(?:\*{1,2}|#{1,3}\s*)?RATIONALE:\*{0,2}\s*([\s\S]+?)(?=\n\s*SOURCES:|$)/i
+  // Stop at end-of-text OR at any of the agent-appended tail markers
+  const re = /(?:\*{1,2}|#{1,3}\s*)?RATIONALE:\*{0,2}\s*([\s\S]+?)(?=\n\s*(?:ORCHESTRATION|SOURCES):|$)/i
   const m = text.match(re)
   if (!m) return ''
   return stripMarkdown(m[1]).replace(/\n+/g, ' ').trim()
+}
+
+function extractOrchestration(text: string): BriefOrchestration | null {
+  const m = text.match(/\n\s*ORCHESTRATION:\s*(\{[\s\S]*?\})\s*(?:\n|$)/i)
+  if (!m) return null
+  try {
+    const parsed = JSON.parse(m[1]) as unknown
+    if (parsed === null || typeof parsed !== 'object') return null
+    const o = parsed as Record<string, unknown>
+    return {
+      rag_chunk_count: typeof o.rag_chunk_count === 'number' ? o.rag_chunk_count : 0,
+      mcp_segment_count:
+        typeof o.mcp_segment_count === 'number' ? o.mcp_segment_count : 0,
+      mcp_ok: typeof o.mcp_ok === 'boolean' ? o.mcp_ok : false,
+    }
+  } catch {
+    return null
+  }
 }
 
 function extractSources(text: string): BriefSource[] {
@@ -77,6 +102,7 @@ export function parseBrief(
     decision_owner: extractField(text, 'DECISION OWNER') || fallback?.owner || 'TBD',
     decision_by: extractField(text, 'DECISION BY') || fallback?.target_date || 'TBD',
     rationale: extractRationale(text),
+    orchestration: extractOrchestration(text),
     sources: extractSources(text),
     raw: text,
   }

@@ -2,6 +2,11 @@ import Anthropic from '@anthropic-ai/sdk'
 import { loadPhaseGate } from '@/lib/director/load-target'
 import { parseBrief, type PhaseGateBrief } from '@/lib/director/phase-gate-brief-parser'
 import { retrieveChunks, chunksToSources, type RagChunk } from '@/lib/director/rag'
+import {
+  listSegmentsTool,
+  getSegmentTool,
+} from '@/lib/director/mcp/segments-server'
+import type { Segment, SegmentId } from '@/lib/director/types'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -29,10 +34,39 @@ function findMatchingDecision(
   )
 }
 
+function relevantSegmentsForCell(
+  cell: ReturnType<typeof loadPhaseGate>['states'][number],
+  decision: ReturnType<typeof findMatchingDecision>,
+): SegmentId[] {
+  const text = [
+    cell.lane,
+    cell.phase,
+    cell.detail ?? '',
+    decision?.title ?? '',
+    decision?.detail ?? '',
+  ]
+    .join(' ')
+    .toLowerCase()
+  const result: SegmentId[] = []
+  if (/federal|doe|nnsa|llnl|snl|lanl/.test(text)) result.push('federal-hpc')
+  if (/sovereign|france|allied|eurohpc|mistral/.test(text))
+    result.push('sovereign-ai')
+  if (/enterprise|automotive|oem|fortune/.test(text))
+    result.push('enterprise-ai')
+  if (/neocloud|coreweave|lambda|crusoe|runpod/.test(text))
+    result.push('neoclouds')
+  if (/academic|university|nsf|campus/.test(text)) result.push('academic-hpc')
+  // Default for critical-path NPI cells without explicit segment hints:
+  // the two segments most exposed to schedule risk on a CN6000 GA miss.
+  if (result.length === 0) return ['federal-hpc', 'sovereign-ai']
+  return result
+}
+
 function buildPrompt(
   cell: ReturnType<typeof loadPhaseGate>['states'][number],
   decision: ReturnType<typeof findMatchingDecision>,
   chunks: RagChunk[],
+  segmentImpact: Segment[],
 ): string {
   const productContextBlock =
     chunks.length > 0
@@ -45,6 +79,24 @@ ${chunks
         ? ` — p.${c.page}`
         : ''
     return `[${i + 1}] ${c.title}${loc}\n${c.text}`
+  })
+  .join('\n\n')}
+
+`
+      : ''
+
+  const segmentImpactBlock =
+    segmentImpact.length > 0
+      ? `CUSTOMER SEGMENT IMPACT (live data from MCP segments server — production stand-in for Salesforce/ERP):
+${segmentImpact
+  .map((s, i) => {
+    const buyingCriteria = Array.isArray(s.workload.buying_criteria)
+      ? s.workload.buying_criteria
+      : [s.workload.buying_criteria]
+    return `[${i + 1}] ${s.name} — ${s.subtitle}
+Value position: ${s.value_proposition.statement}
+Top buying criteria: ${buyingCriteria.slice(0, 3).join('; ')}
+Day-1 ISV priority: ${Array.isArray(s.channel.day1_isv_priority) ? s.channel.day1_isv_priority.join('; ') : s.channel.day1_isv_priority}`
   })
   .join('\n\n')}
 
@@ -77,7 +129,7 @@ PROGRAM CONTEXT:
 - This cell sits on the critical path; downstream impacts include sampling phase compression, GA commitment slip, and customer-segment ship risk
 - Major customer commitments anchored: federal HPC (DOE, LLNL, SNL), enterprise AI automotive Tier-1, sovereign AI France pilot
 
-${productContextBlock}Write the brief in this exact format. Be terse, executive-grade, decision-forcing. The decision owner will skim this in 30 seconds.
+${segmentImpactBlock}${productContextBlock}Write the brief in this exact format. Be terse, executive-grade, decision-forcing. The decision owner will skim this in 30 seconds.
 
 ISSUE: [one sentence — what the slip/risk is and why it matters now]
 RECOMMENDATION: [one sentence — pick Option A or Option B from the registered decision detail, with the tradeoff stated explicitly]
@@ -138,7 +190,24 @@ export async function runPhaseGateBriefAgent(
     .trim()
   const retrievedChunks = retrieveChunks(ragQuery, 3)
 
-  const prompt = buildPrompt(cell, decision, retrievedChunks)
+  let segmentImpact: Segment[] = []
+  let mcpOk = false
+  try {
+    await listSegmentsTool.invoke({})
+    const relevantIds = relevantSegmentsForCell(cell, decision)
+    segmentImpact = await Promise.all(
+      relevantIds.map((id) => getSegmentTool.invoke({ segment_id: id })),
+    )
+    mcpOk = true
+  } catch (e) {
+    console.warn(
+      '[MCP] segments-server call failed; brief will generate without segment data:',
+      e instanceof Error ? e.message : e,
+    )
+    mcpOk = false
+  }
+
+  const prompt = buildPrompt(cell, decision, retrievedChunks, segmentImpact)
 
   let full: string
   try {
@@ -153,16 +222,24 @@ export async function runPhaseGateBriefAgent(
   }
 
   const sources = chunksToSources(retrievedChunks)
-  let tailMarker = ''
-  if (sources.length > 0) {
-    tailMarker = `\nSOURCES: ${JSON.stringify(sources)}`
-    onStream?.(tailMarker)
+  const orchestration = {
+    rag_chunk_count: retrievedChunks.length,
+    mcp_segment_count: segmentImpact.length,
+    mcp_ok: mcpOk,
   }
+
+  let tailMarker = ''
+  tailMarker += `\nORCHESTRATION: ${JSON.stringify(orchestration)}`
+  if (sources.length > 0) {
+    tailMarker += `\nSOURCES: ${JSON.stringify(sources)}`
+  }
+  if (tailMarker) onStream?.(tailMarker)
 
   const parsed = parseBrief(full + tailMarker, {
     owner: decision?.owner,
     target_date: decision?.target_date,
   })
   parsed.sources = sources
+  parsed.orchestration = orchestration
   return parsed
 }
