@@ -444,10 +444,10 @@
     "tco": {
       "deployment_scenario": "800-NIC sovereign AI pilot deployment — Atos / NTT-led regional integration, CN6000 RoCEv2, multi-year national program commitment",
       "baseline_size": 800,
-      "default_horizon_years": 5,
-      "cornelis_3yr_tco_M": 6.8,
-      "nvidia_3yr_tco_M": 9.4,
-      "broadcom_3yr_tco_M": 7.6,
+      "default_horizon_years": 3,
+      "cornelis_3yr_tco_M": 4.1,
+      "nvidia_3yr_tco_M": 5.6,
+      "broadcom_3yr_tco_M": 4.6,
       "advantage_drivers": [
         "NDAA-clean US supply chain meets allied-nation procurement where Chinese alternatives are excluded",
         "Vendor independence from NVIDIA — EU sovereign (Mistral/EuroHPC) strategic ask",
