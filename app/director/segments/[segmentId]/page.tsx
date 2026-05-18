@@ -8,6 +8,7 @@ import { ChannelEcosystemCard } from '@/components/director/channel-ecosystem-ca
 import { TCOCard } from '@/components/director/tco-card'
 import { ValuePropCard } from '@/components/director/value-prop-card'
 import { SourcesSidebar } from '@/components/director/sources-sidebar'
+import { SegmentBriefExportButton } from '@/components/director/segment-brief-export-button'
 
 const UNIT_BY_SEGMENT: Record<string, string> = {
   'federal-hpc': 'nodes',
@@ -34,9 +35,12 @@ export default function SegmentPage({ params }: { params: { segmentId: string } 
       <SegmentTabs tabs={tabs} />
       <div className="max-w-7xl mx-auto px-4 py-6">
         {segment.is_stub && <StubBanner />}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-white">{segment.name}</h1>
-          <p className="text-sm text-gray-400 mt-1">{segment.subtitle}</p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">{segment.name}</h1>
+            <p className="text-sm text-gray-400 mt-1">{segment.subtitle}</p>
+          </div>
+          <SegmentBriefExportButton segmentId={segment.id} />
         </div>
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2 space-y-4">

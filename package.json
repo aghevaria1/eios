@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
+    "@react-pdf/renderer": "^4.5.1",
     "better-sqlite3": "^12.8.0",
     "events": "^3.3.0",
     "exceljs": "^4.4.0",
