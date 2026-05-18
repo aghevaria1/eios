@@ -15,7 +15,7 @@ The v2 section below covers the Director PM application. The v1 documentation th
 
 ## Status
 
-**Demo spine complete.** Three primary views, two live agents, and three exports (stakeholder triad: external customer / internal engineering / sales-BD-partner). Branch `v2-cornelis` at `7bc3683`, 28 commits ahead of `origin/main`, all pushed to `origin/v2-cornelis`. This README update will advance the HEAD.
+**Demo spine complete.** Three primary views, two live agents (Phase-Gate Brief Agent now augmented with RAG retrieval and MCP-style tool invocation — see *AI Architecture* below), and three exports (stakeholder triad: external customer / internal engineering / sales-BD-partner). Branch `v2-cornelis` at `706fe1c`, 31 commits ahead of `origin/main`, all pushed to `origin/v2-cornelis`. This README update will advance the HEAD.
 
 ## What it is
 
@@ -33,6 +33,22 @@ Three layers, target-driven:
 2. **Agents** — Async functions in `agents/director/` following v1's `runXAgent(input, onStream?) → Promise<Output>` convention. Stream from Anthropic SDK via `claude-sonnet-4-5` with fallback to `claude-sonnet-4-20250514`. Two live agents shipped (see *Two live agents* below).
 3. **Data** — Per-target JSON in `data/targets/<active>/` (segments, products, roadmap, phase-gate, target metadata, RAG corpus). Active target read from `data/targets/config.json`. Loaded via typed readers in `lib/director/load-target.ts`.
 
+## AI Architecture
+
+Three AI-stack patterns are demonstrated in the Phase-Gate Brief Agent's live cell flow. The Roadmap Comms Generator uses the streaming pattern only; RAG retrieval and MCP tool invocation are scoped to the Phase-Gate Brief Agent for this build.
+
+### Claude streaming
+
+Phase-Gate Brief Agent and Roadmap Comms Agent both stream responses via the Anthropic SDK, pinned at `claude-sonnet-4-5` with `claude-sonnet-4-20250514` as a fallback when the primary returns a model error. Server-side Route Handlers wrap each agent's streaming output in a `ReadableStream` body returned to the client. The client panel reads token-by-token from the response body, accumulating into a `<pre>` block for the streaming view and parsing the final buffer into structured fields for the done view. Both panels use the `AbortController` + `cancelled` flag pattern inside `useEffect` cleanup to handle React 18 Strict Mode double-mounts — no ref-based debounce, no stranded fetches on remount.
+
+### RAG (Retrieval-Augmented Generation)
+
+The Phase-Gate Brief Agent retrieves from a 54-chunk local corpus spanning four source documents: three real Cornelis CN5000 product briefs (PDFs ingested via `pdf-parse`) and one simulated CN6000 NPI Program Brief (markdown, clearly labeled as a pre-GA internal draft). Per request the agent builds a query from the clicked cell's lane + phase + detail + matched exec decision title + a product-family context tail, then scores corpus chunks by length-normalized keyword overlap (`overlap / sqrt(chunk_token_count)`). Source-diversity selection returns the top-scoring chunk per source rather than top-K raw chunks — preventing a single-document retrieval echo chamber when one document dominates scoring. Retrieved chunks are injected as a `PROGRAM AND PRODUCT CONTEXT` block before the brief format spec in the prompt. Retrieval is visible to the demo viewer in the agent panel's Orchestration section as `✓ RAG · N chunks`, with the contributing document filenames listed in the Sources section below the brief.
+
+### MCP-style tool invocation
+
+The Phase-Gate Brief Agent invokes an in-process MCP-shaped segments-server (`lib/director/mcp/segments-server.ts`) with two tools: `list_segments` returns all five segment IDs + names + subtitles, `get_segment(segment_id)` returns a full segment profile (workload, architecture, channel, TCO, value proposition). The server stands in for what would be a Salesforce or ERP connection in production — the MCP abstraction means the agent doesn't care where the data lives. A small heuristic identifies affected customer segments per phase-gate cell from cell + decision context (default Federal HPC + Sovereign AI for critical-path NPI cells without explicit segment hints), then the agent calls `get_segment` per affected ID and injects the result as a `CUSTOMER SEGMENT IMPACT` block in the prompt. The MCP path is wrapped in `try`/`catch` — if it fails the brief still generates from RAG + program context alone, no regression. Tool invocations are visible in the agent panel's Orchestration section as `✓ MCP → Segments Server · N segments (Salesforce stand-in)` and logged to the dev server console (`[MCP] list_segments() → 5 segments` etc.) for demo visibility.
+
 ## Three primary views
 
 - **Customer Segments** (`/director/segments/[segmentId]`) — five segments populated with demo-narratable content across multiple editorial passes. Each segment renders workload profile, reference architecture, channel & partner ecosystem (OEM/ODM + HPC ISVs + AI/ML ISVs), interactive TCO model with deployment-size and supply-lead-time sliders, value proposition with named competitive positioning, and a persistent sources sidebar with inferences flagged and Day-1 PM open questions. Visual section differentiation via muted left-border color accents across the five primary card types. **Header button:** Export Partner Brief (PDF).
@@ -45,7 +61,7 @@ Plus **About** (`/director/about`) — scaffolded route, content not yet drafted
 
 Both follow v1's agent function-convention, stream from Anthropic SDK pinned at `claude-sonnet-4-5` with fallback to `claude-sonnet-4-20250514`. UI uses Strict-Mode-safe `AbortController` + `cancelled` flag pattern (no ref-based debounce).
 
-- **Phase-Gate Brief Agent** (`agents/director/phasegate-brief-agent.ts`) — clicking the live phase-gate cell streams a structured executive brief: Issue / Recommendation / Confidence pill / Decision Owner / Decision By / Rationale. Cross-references customer segments and the phase-gate exec decisions register. Selects between Option A and Option B with explicit tradeoff reasoning.
+- **Phase-Gate Brief Agent** (`agents/director/phasegate-brief-agent.ts`) — clicking the live phase-gate cell streams a structured executive brief: Issue / Recommendation / Confidence pill / Decision Owner / Decision By / Rationale. Cross-references customer segments and the phase-gate exec decisions register. Selects between Option A and Option B with explicit tradeoff reasoning. Augmented by RAG retrieval over a 54-chunk Cornelis corpus and MCP-style segments-server tool invocation — see *AI Architecture* above. Both data sources surface to the demo viewer in the panel's Orchestration section alongside the brief.
 - **Roadmap Comms Generator** (`agents/director/roadmap-comms-agent.ts`) — clicking a live commitment-register row streams a customer-facing comms register entry: Subject / To / From / Re / Situation / Impact / Mitigation / Escalation Path / Sign-off. Status-calibrated tone (formal acknowledgment for SLIP, preventive "wanted to surface early" framing for AT RISK). Role-based sign-offs only (no personal names, emails, or phone numbers). Brevity discipline — each prose section is exactly one sentence.
 
 ## Three exports live — stakeholder triad
@@ -68,10 +84,7 @@ Items intentionally out of scope for the demo spine but tracked for follow-up se
 
 - **About view content** — scaffolded route, content not yet drafted
 - **10-minute demo script** — allocates airtime per view + agent + export, anchors each on its most distinctive moment
-- **Phase-Gate interactivity beyond the one live cell** — methodology callout component, exec decisions panel, what-if scenario sliders, additional live cells
-- **RAG corpus assembly** — corpus directory exists at `data/targets/cornelis/rag-corpus/` with README placeholder only; public-source docs not yet ingested
 - **v1 hygiene fixes** — three pre-existing TS errors in v1 scaffold files (`agents/placement-agent.ts`, `lib/rag.ts`, `lib/simulator.ts`) block `npm run build`; held off the v2-cornelis branch to preserve clean interview-artifact history. Dev mode is unaffected.
-- **Cosmetic items** — section icons, Arista 7800R dated reference, Trainium framing, TCO differential band
 
 ## Tech stack (v2 additions to v1)
 
@@ -85,7 +98,7 @@ v2 deliberately reuses v1's conventions to keep the codebase coherent:
 
 - **Agent function-convention** — `runXAgent(input, onStream?: (token: string) => void): Promise<Output>` exactly as in `agents/{telemetry,placement,sla}-agent.ts`
 - **Server components for read paths, client components for interactivity** — established by the v2 scaffold
-- **RAG retrieval pattern** — `lib/rag.ts` keyword-overlap retrieval is available for `retrieveTargetContext(query, targetId)` target-scoped corpus lookups (corpus not yet ingested)
+- **RAG retrieval pattern** — v2 ships its own `lib/director/rag.ts` (keyword-overlap retrieval with source-diversity selection over a local JSON corpus) rather than extending v1's `lib/rag.ts`. v1's RAG module remains untouched. See *AI Architecture* for the v2 retrieval mechanics.
 
 ## How to run v2
 
