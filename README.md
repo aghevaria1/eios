@@ -49,6 +49,71 @@ The Phase-Gate Brief Agent retrieves from a 54-chunk local corpus spanning four 
 
 The Phase-Gate Brief Agent invokes an in-process MCP-shaped segments-server (`lib/director/mcp/segments-server.ts`) with two tools: `list_segments` returns all five segment IDs + names + subtitles, `get_segment(segment_id)` returns a full segment profile (workload, architecture, channel, TCO, value proposition). The server stands in for what would be a Salesforce or ERP connection in production — the MCP abstraction means the agent doesn't care where the data lives. A small heuristic identifies affected customer segments per phase-gate cell from cell + decision context (default Federal HPC + Sovereign AI for critical-path NPI cells without explicit segment hints), then the agent calls `get_segment` per affected ID and injects the result as a `CUSTOMER SEGMENT IMPACT` block in the prompt. The MCP path is wrapped in `try`/`catch` — if it fails the brief still generates from RAG + program context alone, no regression. Tool invocations are visible in the agent panel's Orchestration section as `✓ MCP → Segments Server · N segments (Salesforce stand-in)` and logged to the dev server console (`[MCP] list_segments() → 5 segments` etc.) for demo visibility.
 
+## End-to-end workflow
+
+The Director PM journey traverses the three primary views in sequence. Each view surfaces a different lens on the same target program; agents fire at the appropriate stage when the Director clicks a live element. Unlike v1's continuous telemetry tick, v2 is user-triggered — there is no automatic A2A handoff; the Director walks the chain by navigating between views.
+
+```
+  ┌────────────────────────────────────────────────────────────┐
+  │  /director/segments/[segmentId]    — Customer demand lens  │
+  │                                                            │
+  │  Workload · Reference architecture · Channel · TCO model · │
+  │  Value proposition · Sources sidebar                       │
+  │                                                            │
+  │  ► Export Partner Brief (PDF, @react-pdf/renderer)         │
+  │    Audience: Sales / BD / Partner                          │
+  └──────────────────────────┬─────────────────────────────────┘
+                             │  Director identifies customer-anchored
+                             │  commitments and navigates to phase-gate
+                             ▼
+  ┌────────────────────────────────────────────────────────────┐
+  │  /director/phase-gate              — Program execution lens │
+  │                                                            │
+  │  7-lane × 6-phase status grid · methodology framing        │
+  │                                                            │
+  │  Click validation × development (one live cell):           │
+  │    ┌────────────────────────────────────────────────────┐  │
+  │    │ Phase-Gate Brief Agent (claude-sonnet-4-5)         │  │
+  │    │  ← RAG retrieval (54-chunk Cornelis corpus,        │  │
+  │    │     source-diversity selection)                    │  │
+  │    │  ← MCP get_segment(...) per affected segment       │  │
+  │    │     (Salesforce stand-in)                          │  │
+  │    │  → streams structured exec brief: Issue /          │  │
+  │    │     Recommendation / Confidence / Owner / By /     │  │
+  │    │     Rationale + Sources + Orchestration footer     │  │
+  │    └────────────────────────────────────────────────────┘  │
+  │                                                            │
+  │  ► Export Status Grid (Excel, exceljs)                     │
+  │    Audience: Internal engineering / program managers       │
+  └──────────────────────────┬─────────────────────────────────┘
+                             │  Brief identifies at-risk customer
+                             │  commitments; Director navigates to roadmap
+                             ▼
+  ┌────────────────────────────────────────────────────────────┐
+  │  /director/roadmap         — Customer commitments lens     │
+  │                                                            │
+  │  Timeline (CN5000/6000/7000) · CN5000 EOL methodology ·    │
+  │  Commitment Register                                       │
+  │                                                            │
+  │  Click SLIP or AT-RISK row (3 live: SNL · Neocloud A ·     │
+  │  Enterprise Auto):                                         │
+  │    ┌────────────────────────────────────────────────────┐  │
+  │    │ Roadmap Comms Generator (claude-sonnet-4-5)        │  │
+  │    │  → streams customer comms register entry: Subject  │  │
+  │    │    / To / From / Re / Situation / Impact /         │  │
+  │    │    Mitigation / Escalation Path / Sign-off         │  │
+  │    │  Status-calibrated tone (SLIP formal, AT RISK      │  │
+  │    │  preventive); brevity discipline (one sentence per │  │
+  │    │  prose section); role-based sign-offs only         │  │
+  │    └────────────────────────────────────────────────────┘  │
+  │                                                            │
+  │  ► Export for Customer Review (PPT, pptxgenjs)             │
+  │    Audience: External customer (QBR)                       │
+  └────────────────────────────────────────────────────────────┘
+```
+
+A Director walking the chain end-to-end on one cell exercises every architectural pattern in this build: Claude streaming (both agents), RAG retrieval (Phase-Gate Brief Agent), MCP-style tool invocation (Phase-Gate Brief Agent), and the stakeholder-triad exports (one per view).
+
 ## Three primary views
 
 - **Customer Segments** (`/director/segments/[segmentId]`) — five segments populated with demo-narratable content across multiple editorial passes. Each segment renders workload profile, reference architecture, channel & partner ecosystem (OEM/ODM + HPC ISVs + AI/ML ISVs), interactive TCO model with deployment-size and supply-lead-time sliders, value proposition with named competitive positioning, and a persistent sources sidebar with inferences flagged and Day-1 PM open questions. Visual section differentiation via muted left-border color accents across the five primary card types. **Header button:** Export Partner Brief (PDF).
