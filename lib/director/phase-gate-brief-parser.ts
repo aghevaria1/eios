@@ -3,6 +3,11 @@
 
 export type BriefConfidence = 'high' | 'medium' | 'low'
 
+export interface BriefSource {
+  source: string
+  title: string
+}
+
 export interface PhaseGateBrief {
   issue: string
   recommendation: string
@@ -10,6 +15,7 @@ export interface PhaseGateBrief {
   decision_owner: string
   decision_by: string
   rationale: string
+  sources: BriefSource[]
   raw: string
 }
 
@@ -29,10 +35,29 @@ function extractField(text: string, label: string): string {
 }
 
 function extractRationale(text: string): string {
-  const re = /(?:\*{1,2}|#{1,3}\s*)?RATIONALE:\*{0,2}\s*([\s\S]+?)$/i
+  // Stop at end-of-text OR at the SOURCES marker (appended by the agent after model output)
+  const re = /(?:\*{1,2}|#{1,3}\s*)?RATIONALE:\*{0,2}\s*([\s\S]+?)(?=\n\s*SOURCES:|$)/i
   const m = text.match(re)
   if (!m) return ''
   return stripMarkdown(m[1]).replace(/\n+/g, ' ').trim()
+}
+
+function extractSources(text: string): BriefSource[] {
+  const m = text.match(/\n\s*SOURCES:\s*(\[[\s\S]*\])\s*$/i)
+  if (!m) return []
+  try {
+    const parsed = JSON.parse(m[1]) as unknown
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .filter((x): x is BriefSource =>
+        x !== null &&
+        typeof x === 'object' &&
+        typeof (x as BriefSource).source === 'string' &&
+        typeof (x as BriefSource).title === 'string',
+      )
+  } catch {
+    return []
+  }
 }
 
 export function parseBrief(
@@ -52,6 +77,7 @@ export function parseBrief(
     decision_owner: extractField(text, 'DECISION OWNER') || fallback?.owner || 'TBD',
     decision_by: extractField(text, 'DECISION BY') || fallback?.target_date || 'TBD',
     rationale: extractRationale(text),
+    sources: extractSources(text),
     raw: text,
   }
 }

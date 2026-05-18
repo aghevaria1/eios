@@ -132,6 +132,7 @@ export function PhaseGateBriefPanel({
 }
 
 function StreamingView({ text }: { text: string }) {
+  const display = text.replace(/\n\s*SOURCES:[\s\S]*$/i, '').trimEnd()
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
@@ -141,7 +142,7 @@ function StreamingView({ text }: { text: string }) {
         </span>
       </div>
       <pre className="text-[12px] text-gray-200 leading-relaxed whitespace-pre-wrap font-mono">
-        {text || ' '}
+        {display || ' '}
       </pre>
     </div>
   )
@@ -173,6 +174,21 @@ function DoneView({ brief }: { brief: PhaseGateBrief }) {
             Rationale
           </div>
           <p className="text-xs text-gray-300 leading-relaxed">{brief.rationale}</p>
+        </div>
+      )}
+      {brief.sources.length > 0 && (
+        <div className="pt-2 border-t border-gray-800">
+          <div className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">
+            Sources · Cornelis program + product docs
+          </div>
+          <ul className="text-[11px] text-gray-400 leading-relaxed space-y-0.5">
+            {brief.sources.map((s) => (
+              <li key={s.source}>
+                <span className="text-gray-300">{s.title}</span>
+                <span className="text-gray-600 ml-2 font-mono text-[10px]">{s.source}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { loadPhaseGate } from '@/lib/director/load-target'
 import { parseBrief, type PhaseGateBrief } from '@/lib/director/phase-gate-brief-parser'
+import { retrieveChunks, chunksToSources, type RagChunk } from '@/lib/director/rag'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -31,7 +32,25 @@ function findMatchingDecision(
 function buildPrompt(
   cell: ReturnType<typeof loadPhaseGate>['states'][number],
   decision: ReturnType<typeof findMatchingDecision>,
+  chunks: RagChunk[],
 ): string {
+  const productContextBlock =
+    chunks.length > 0
+      ? `PROGRAM AND PRODUCT CONTEXT (background reference from Cornelis CN5000 product briefs and CN6000 NPI program docs — use as supporting context, do not cite line-by-line):
+${chunks
+  .map((c, i) => {
+    const loc = c.section
+      ? ` — ${c.section}`
+      : c.page != null
+        ? ` — p.${c.page}`
+        : ''
+    return `[${i + 1}] ${c.title}${loc}\n${c.text}`
+  })
+  .join('\n\n')}
+
+`
+      : ''
+
   return `You are the Phase-Gate Brief Generator for the Cornelis Networks CN6000 SuperNIC program. A Director PM has clicked an at-risk phase-gate cell. Write an executive escalation brief for the decision owner.
 
 PHASE-GATE CELL:
@@ -58,7 +77,7 @@ PROGRAM CONTEXT:
 - This cell sits on the critical path; downstream impacts include sampling phase compression, GA commitment slip, and customer-segment ship risk
 - Major customer commitments anchored: federal HPC (DOE, LLNL, SNL), enterprise AI automotive Tier-1, sovereign AI France pilot
 
-Write the brief in this exact format. Be terse, executive-grade, decision-forcing. The decision owner will skim this in 30 seconds.
+${productContextBlock}Write the brief in this exact format. Be terse, executive-grade, decision-forcing. The decision owner will skim this in 30 seconds.
 
 ISSUE: [one sentence — what the slip/risk is and why it matters now]
 RECOMMENDATION: [one sentence — pick Option A or Option B from the registered decision detail, with the tradeoff stated explicitly]
@@ -105,7 +124,21 @@ export async function runPhaseGateBriefAgent(
     input.lane,
     input.phase,
   )
-  const prompt = buildPrompt(cell, decision)
+
+  const PRODUCT_FAMILY_TAIL =
+    'CN5000 CN6000 SuperNIC director class switch Omni-Path fabric'
+  const ragQuery = [
+    cell.lane.replace(/_/g, ' '),
+    cell.phase,
+    cell.detail ?? '',
+    decision?.title ?? '',
+    PRODUCT_FAMILY_TAIL,
+  ]
+    .join(' ')
+    .trim()
+  const retrievedChunks = retrieveChunks(ragQuery, 3)
+
+  const prompt = buildPrompt(cell, decision, retrievedChunks)
 
   let full: string
   try {
@@ -119,8 +152,17 @@ export async function runPhaseGateBriefAgent(
     }
   }
 
-  return parseBrief(full, {
+  const sources = chunksToSources(retrievedChunks)
+  let tailMarker = ''
+  if (sources.length > 0) {
+    tailMarker = `\nSOURCES: ${JSON.stringify(sources)}`
+    onStream?.(tailMarker)
+  }
+
+  const parsed = parseBrief(full + tailMarker, {
     owner: decision?.owner,
     target_date: decision?.target_date,
   })
+  parsed.sources = sources
+  return parsed
 }
