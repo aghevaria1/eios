@@ -1,47 +1,44 @@
-# Cornelis RAG Corpus
+# Cornelis RAG corpus
 
-This directory holds the public-source document corpus used by the Director PM agents (Phase-Gate Brief Agent, Roadmap Comms Agent) for retrieval-augmented generation.
+Lightweight, single-file corpus that the Phase-Gate Brief agent retrieves from before generating its brief. 18 chunks across 4 Cornelis product pages.
 
-## Status
+## Source URLs
 
-**Pre-staged on Day 2.** Corpus assembly happens on Day 4 morning per the build plan. This README locks the directory structure now so Day 4 work drops files in without touching `lib/rag.ts` plumbing.
+1. https://www.cornelis.com/product/cornelis-cn5000-omni-path-director-class-switch
+2. https://www.cornelis.com/product/cornelis-omni-path-express-director-class-switches
+3. https://www.cornelis.com/product/cornelis-omni-path-express-edge-switches
+4. https://www.cornelis.com/product/cornelis-cn5000-omni-path-switch
 
-## File format
+## Schema
 
-- One file per source document, `.txt` extension (matches v1's `loadDirectory` extension filter — no loader change needed)
-- First line of each file: `Source: <human-readable citation>` followed by URL on line 2
-- Remainder: full or excerpted text content
+`corpus.json` is a flat array of chunks:
 
-Example:
+```json
+{
+  "id": "stable-slug",
+  "url": "https://...",
+  "title": "Product page title",
+  "section": "Section heading within the page",
+  "text": "Chunked prose (200-500 chars)"
+}
 ```
-Source: Cornelis CN6000 Product Announcement (Nov 2025)
-https://www.cornelisnetworks.com/...
 
-[document body...]
-```
+## Retrieval
 
-## Day 4 corpus target — 15 documents
+Loaded once at module init by `lib/director/rag.ts`. Per request, the Phase-Gate Brief agent tokenizes a query string built from the clicked cell's `lane`, `phase`, `detail`, and matched `decision.title`, then scores each chunk via length-normalized token overlap and returns the top 3 with stable tiebreak by insertion order.
 
-1. Cornelis CN6000 product announcement (Nov 2025)
-2. Cornelis CN5000 product page
-3. Spelman keynote / public talk transcript
-4. Hays interview on protocol selection (HPCwire or similar)
-5. UEC consortium technical overview
-6. ServeTheHome CN6000 deep-dive coverage
-7. HPE Cray + Cornelis partnership announcement
-8. DOE / federal HPC procurement public materials
-9. NCCL / NVIDIA collective communications technical overview
-10. Slurm topology-aware scheduling documentation
-11. PyTorch distributed training / RDMA documentation
-12. Broadcom Tomahawk + UEC announcements
-13. Penguin Solutions / federal HPC integration materials
-14. Cornelis "65% GPU idle" public statement / GPU utilization context
-15. Industry supply lead time benchmarks (analyst content)
+If no chunks score above 0, retrieval returns an empty array and the `PRODUCT CONTEXT` block is omitted from the prompt and the `Sources` section is omitted from the brief.
 
-## Loader integration
+## Regeneration
 
-`lib/rag.ts` will be extended on Day 4 to:
-1. Add a `loadDirectory(path.join(process.cwd(), 'data', 'targets', activeTarget, 'rag-corpus'), 'targets/<activeTarget>')` call inside `initRAG()`
-2. Add a new `retrieveTargetContext(query: string, targetId: string, topK = 3): RAGResult[]` function that filters corpus by source prefix `targets/<targetId>/`
+The corpus was generated once via WebFetch on the 4 URLs above (WebFetch internally converts HTML to markdown and uses a small model to extract structured content). The output sections were then hand-chunked into `corpus.json` entries. To refresh:
 
-v1's keyword-based retrieval (Jaccard-style token overlap) handles this corpus without an embedding API. If retrieval quality reads thin during Day 4 testing, the Day 5 contingency is to swap in Voyage AI embeddings — `sqlite-vec` is already a project dependency and `lib/db.ts` has an unused `embeddings` table ready to wire up.
+1. Re-fetch each URL via WebFetch with a prompt asking for section-organized technical content
+2. Split each page's output into ~4 chunks per section
+3. Replace `corpus.json` with the new chunks (keep the schema)
+
+Note: WebFetch is not deterministic since it uses a model for summarization. For production RAG you would replace this with a deterministic HTML→text extractor (e.g., readability.js, boilerpipe, or trafilatura).
+
+## Design history (superseded plan)
+
+An earlier Day-2 plan called for ~15 `.txt` files (one per source document) loaded via `lib/rag.ts`'s existing `loadDirectory()`. The lightweight single-JSON approach shipped instead — fewer moving parts, isolated under `lib/director/rag.ts` to keep v1's `lib/rag.ts` untouched per the v1-isolation working agreement.
