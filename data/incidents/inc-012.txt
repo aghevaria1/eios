@@ -1,8 +1,0 @@
-INCIDENT-012 | pod-gamma | 2026-02-09 | MEDIUM
-Node: pod-gamma (AMD MI300X) | Customer: Hippocratic AI
-Anomaly: Memory utilization spiked to 188GB during multi-model serving configuration.
-Two models loaded simultaneously exceeded memory envelope.
-Root Cause: Model deployment pipeline allowed concurrent model load without memory availability check.
-Action Taken: Secondary model offloaded to pod-delta. Memory released within 90 seconds.
-SLA Impact: No SLA breach. Brief latency elevation during model offload.
-Resolution: Deployment pipeline now checks available memory before allowing concurrent model loads.

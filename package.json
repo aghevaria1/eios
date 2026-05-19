@@ -11,23 +11,17 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",
     "@react-pdf/renderer": "^4.5.1",
-    "better-sqlite3": "^12.8.0",
-    "events": "^3.3.0",
     "exceljs": "^4.4.0",
     "next": "14.2.35",
     "pdf-parse": "^2.4.5",
     "pptxgenjs": "^4.0.1",
     "react": "^18",
-    "react-dom": "^18",
-    "sqlite-vec": "^0.1.9",
-    "uuid": "^13.0.0"
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/uuid": "^10.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",

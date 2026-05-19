@@ -1,8 +1,0 @@
-INCIDENT-008 | pod-alpha | 2026-01-12 | HIGH
-Node: pod-alpha (NVIDIA B200) | Customer: Cisco
-Anomaly: HBM memory used jumped from 140GB to 191GB in under 2 minutes.
-Token throughput held briefly then collapsed to 180 tokens/sec.
-Root Cause: Runaway context window accumulation in multi-turn session. No context truncation limit set.
-Action Taken: Session terminated. Context limits enforced at API gateway layer.
-SLA Impact: Cisco latency SLA breached for 9 minutes. Penalty: $9,000.
-Resolution: API gateway updated with hard context window cap. Incident playbook added to RAG corpus.

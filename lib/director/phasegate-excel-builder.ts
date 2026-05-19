@@ -49,7 +49,6 @@ const STATUS_STYLE: Record<PhaseGateStatus | 'slip', StatusStyle> = {
 
 const HEADER_FILL_ARGB = 'FF1F2937'
 const HEADER_FONT_ARGB = 'FFFFFFFF'
-const SHEET_BG_FILL_ARGB = 'FFFFFFFF'
 const FOOTER_FONT_ARGB = 'FF6B7280'
 const CELL_BORDER: Partial<ExcelJS.Borders> = {
   top: { style: 'thin', color: { argb: 'FFD1D5DB' } },

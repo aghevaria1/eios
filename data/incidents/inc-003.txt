@@ -1,8 +1,0 @@
-INCIDENT-003 | pod-epsilon | 2025-12-03 | MEDIUM
-Node: pod-epsilon (NVIDIA RTX PRO) | Customer: OpenColo
-Anomaly: Memory utilization reached 94GB of 96GB. System began swapping.
-Token throughput degraded from 280 to 190 tokens/sec over 40 minutes.
-Root Cause: Long-running inference session not releasing memory after completion. Memory leak in model serving layer.
-Action Taken: Session terminated and restarted. Memory cleared. Throughput restored.
-SLA Impact: OpenColo throughput SLA approached threshold but not breached.
-Resolution: Incident auto-resolved after session restart. No reroute needed.

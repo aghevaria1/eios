@@ -53,14 +53,14 @@
   },
   "commitment_register": [
     {
-      "customer": "DOE / Lynx Cluster",
+      "customer": "DOE flagship deployment (illustrative)",
       "commitment": "CN6000 800G upgrade path",
       "date": "Q4 2026",
       "status": "on_track"
     },
     {
-      "customer": "LLNL / CTS-3 procurement",
-      "commitment": "CN6000 fabric option in EX-series bid",
+      "customer": "NNSA lab / CTS-class procurement (illustrative)",
+      "commitment": "CN6000 fabric option (illustrative bid)",
       "date": "Q1 2027",
       "status": "on_track"
     },
