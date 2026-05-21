@@ -19,7 +19,7 @@
 import { applySwap, buildConfig, loadKnowledge } from '../lib/factory/kpi'
 import type { KpiValue, SwapImpact, UnverifiedFlag } from '../lib/factory/kpi'
 
-function fmtValue(v: KpiValue | undefined): string {
+function fmtValue(v: KpiValue | null | undefined): string {
   if (!v) return '(no value in knowledge layer)'
   const parts: string[] = []
   if (v.range) {
@@ -43,7 +43,7 @@ function fmtValue(v: KpiValue | undefined): string {
   return parts.length ? parts.join(' ') : '(empty value)'
 }
 
-function fmtProvenance(v: KpiValue | undefined, indent: string = '        '): string {
+function fmtProvenance(v: KpiValue | null | undefined, indent: string = '        '): string {
   if (!v) return ''
   const p = v.provenance
   const lines: string[] = [`${indent}[${p.status}]${p.flag ? ' ⚑ ' + p.flag : ''}`]
