@@ -1,13 +1,13 @@
 {
-  "version": "0.1.0",
-  "last_verified": "2026-05-20",
+  "version": "0.2.0",
+  "last_verified": "2026-05-21",
   "architectures": [
     {
       "id": "NVL72",
       "name": "GB200 NVL72",
-      "positioning": "frontier — liquid-cooled rack-scale, 72 Blackwell GPUs + 36 Grace CPUs in 1 rack",
+      "positioning": "frontier — liquid-cooled rack-scale, 36 GB200 Grace-Blackwell superchips = 72 Blackwell GPUs + 36 Grace CPUs in 1 rack",
       "default_components": {
-        "gpu": "blackwell_b200",
+        "gpu": "gb200",
         "fabric": "nvidia_spectrum_x",
         "software": "nvaie",
         "oem": "dell_xe9680",
@@ -15,10 +15,10 @@
       },
       "provenance": {
         "status": "cited",
-        "source": "NVIDIA GB200 NVL72 product page — 72 Blackwell GPUs, 36 Grace CPUs, NVLink 5, liquid-cooled rack.",
+        "source": "NVIDIA GB200 NVL72 product page — 36 GB200 superchips per rack, each combining 1 Grace CPU and 2 Blackwell B200 GPUs via NVLink-C2C; rack-scale NVLink 5 domain.",
         "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
-        "last_verified": "2026-05-20",
-        "notes": "Defaults are the canonical NVIDIA-integrated configuration; OEM/ISV choices are illustrative for swap testing."
+        "last_verified": "2026-05-21",
+        "notes": "Default GPU is the GB200 superchip (the deployable unit at the rack), NOT a standalone B200 baseboard. Per-GPU figures inherit from the underlying B200 (192 GB HBM3e, 8 TB/s, 9 PFLOPS FP4 dense per GPU); per-superchip aggregate is 2x that across its 2 Blackwell GPUs. OEM/ISV choices are illustrative for swap testing."
       }
     },
     {

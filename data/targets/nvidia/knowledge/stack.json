@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "last_verified": "2026-05-20",
+  "version": "0.2.0",
+  "last_verified": "2026-05-21",
   "layers": [
     {
       "id": "L1",
@@ -74,6 +74,48 @@
             "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
             "last_verified": "2026-05-20",
             "notes": "Datasheet column read — confirm dense/sparse attribution before promoting to cited. NOTE: the prior value (4.5 PFLOPS) was the FP16/BF16 figure, mislabeled as FP8; corrected."
+          }
+        }
+      }
+    },
+    {
+      "id": "gb200",
+      "name": "NVIDIA GB200 Grace-Blackwell Superchip",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 192, "max": 192, "unit": "GB HBM3e per Blackwell GPU (superchip = 2 GPUs, ~384 GB combined)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 superchip positioning — Grace CPU + 2x Blackwell B200 GPUs interconnected via NVLink-C2C. Per-GPU HBM3e inherits from the standalone B200 datasheet (192 GB nominal).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "notes": "Per-GPU figure inherits from standalone B200 (192 GB HBM3e nominal); per-superchip aggregate is 2x that. Verify per-GPU vs per-superchip framing against the GB200 datasheet before promoting to cited.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 8, "max": 8, "unit": "TB/s per Blackwell GPU (HBM3e)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 per-GPU HBM3e bandwidth inherits from the B200 datasheet (8 TB/s).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "notes": "Per-GPU; the GB200 superchip adds NVLink-C2C bandwidth between Grace CPU and Blackwell GPUs that is separate from HBM bandwidth. Verify against the GB200 datasheet before promoting to cited.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense, per Blackwell GPU)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 per-GPU FP4 dense throughput inherits from the B200 datasheet (9 PFLOPS dense / 18 PFLOPS sparse per GPU).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "notes": "Per-GPU dense; sparse is 2x. Per-superchip total is ~18 PFLOPS dense across 2 Blackwell GPUs. Verify against the GB200 datasheet before promoting to cited.",
+            "last_verified": "2026-05-21"
           }
         }
       }
