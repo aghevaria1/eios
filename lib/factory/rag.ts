@@ -34,38 +34,54 @@ function tokenize(s: string): string[] {
     .filter((t) => t.length >= 2 && !STOPWORDS.has(t))
 }
 
-let cachedIndex: IndexedChunk[] | null = null
+const indexCache = new Map<string, IndexedChunk[]>()
 
-function loadIndex(): IndexedChunk[] {
-  if (cachedIndex) return cachedIndex
-
-  const corpusPath = path.join(
+function resolveCorpusPath(targetId: string): string {
+  // v3 nvidia target keeps corpus.json at the target root.
+  // v2 cornelis target keeps corpus.json under rag-corpus/. Resolve either.
+  const rootCandidate = path.join(
     process.cwd(),
     'data',
     'targets',
-    loadActiveTargetId(),
+    targetId,
+    'corpus.json',
+  )
+  if (fs.existsSync(rootCandidate)) return rootCandidate
+  return path.join(
+    process.cwd(),
+    'data',
+    'targets',
+    targetId,
     'rag-corpus',
     'corpus.json',
   )
+}
 
+function loadIndex(targetId?: string): IndexedChunk[] {
+  const resolvedTarget = targetId ?? loadActiveTargetId()
+  const cached = indexCache.get(resolvedTarget)
+  if (cached) return cached
+
+  const corpusPath = resolveCorpusPath(resolvedTarget)
   let raw: string
   try {
     raw = fs.readFileSync(corpusPath, 'utf-8')
   } catch {
-    cachedIndex = []
-    return cachedIndex
+    indexCache.set(resolvedTarget, [])
+    return []
   }
 
   const chunks = JSON.parse(raw) as RagChunk[]
-  cachedIndex = chunks.map((c) => {
+  const indexed = chunks.map((c) => {
     const tokens = new Set(tokenize(c.text))
     return { ...c, tokens, tokenCount: tokens.size }
   })
-  return cachedIndex
+  indexCache.set(resolvedTarget, indexed)
+  return indexed
 }
 
-export function retrieveChunks(query: string, topK = 3): RagChunk[] {
-  const index = loadIndex()
+export function retrieveChunks(query: string, topK = 3, targetId?: string): RagChunk[] {
+  const index = loadIndex(targetId)
   if (index.length === 0) return []
 
   const queryTokens = new Set(tokenize(query))
