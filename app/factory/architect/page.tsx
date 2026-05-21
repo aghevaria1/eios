@@ -1,8 +1,22 @@
-import { buildConfig, loadKnowledge } from '@/lib/factory/kpi'
+import {
+  buildConfig,
+  loadKnowledge,
+  lookupKpiValue,
+  KPI_DEFINITIONS,
+  type KpiDefinition,
+} from '@/lib/factory/kpi'
 import { AIFactoryCake } from '@/components/factory/ai-factory-cake'
+import {
+  DeliveredKpisPanel,
+  type KpiResult,
+} from '@/components/factory/delivered-kpis-panel'
+import { TcoBars } from '@/components/factory/tco-bars'
 
 const SEGMENT_ID = 'fortune-500'
 const ARCHITECTURE_ID = 'HGX'
+
+const TCO_CAPEX_ID = 'ops_tco_capex_directional'
+const TCO_OPEX_ID = 'ops_tco_opex_directional'
 
 export default function ArchitectPage() {
   const config = buildConfig(SEGMENT_ID, ARCHITECTURE_ID)
@@ -18,16 +32,32 @@ export default function ArchitectPage() {
     )
   }
 
-  const lookup = (id: string, slot: string) => {
+  const lookupComponent = (id: string, slot: string) => {
     const c = knowledge.components.get(id)
-    if (!c) throw new Error(`architect: component '${id}' (${slot}) not in knowledge`)
+    if (!c)
+      throw new Error(
+        `architect: component '${id}' (${slot}) not in knowledge`,
+      )
     return c
   }
-  const chosenGpu = lookup(config.gpu, 'gpu')
-  const chosenFabric = lookup(config.fabric, 'fabric')
-  const chosenIsv = lookup(config.isv, 'isv')
-  const softwareWrapper = lookup(config.software, 'software')
-  const oem = lookup(config.oem, 'oem')
+  const chosenGpu = lookupComponent(config.gpu, 'gpu')
+  const chosenFabric = lookupComponent(config.fabric, 'fabric')
+  const chosenIsv = lookupComponent(config.isv, 'isv')
+  const softwareWrapper = lookupComponent(config.software, 'software')
+  const oem = lookupComponent(config.oem, 'oem')
+
+  const resolveKpi = (id: string): KpiResult => {
+    const kpi: KpiDefinition | undefined = KPI_DEFINITIONS.find(
+      (k) => k.id === id,
+    )
+    if (!kpi) throw new Error(`architect: KPI '${id}' not in KPI_DEFINITIONS`)
+    return { kpi, value: lookupKpiValue(kpi, config) }
+  }
+
+  const northStar = segment.north_star_kpis.map(resolveKpi)
+  const supporting = segment.supporting_kpis.map(resolveKpi)
+  const tcoCapex = resolveKpi(TCO_CAPEX_ID)
+  const tcoOpex = resolveKpi(TCO_OPEX_ID)
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -63,8 +93,13 @@ export default function ArchitectPage() {
         </span>
         . Highlighted slots (GPU, FABRIC, ISV) are the swappable choices the
         Solution Architect agent composes; layers L4/L5 are NVIDIA ecosystem
-        descriptors at this phase. KPI bars + rationale arrive in Phase 2c.
+        descriptors at this phase.
       </p>
+
+      <div className="mt-10 space-y-6">
+        <DeliveredKpisPanel northStar={northStar} supporting={supporting} />
+        <TcoBars capex={tcoCapex} opex={tcoOpex} />
+      </div>
     </div>
   )
 }

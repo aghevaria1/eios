@@ -32,10 +32,72 @@
       "subtitle": "Production AI workloads in regulated enterprises (e.g., JPMorgan-class)",
       "north_star_kpis": ["compute_production_roi"],
       "supporting_kpis": ["compute_inference_p99", "ops_deployment_cycle_time", "ops_compliance_audit_time"],
+      "delivered_kpis": {
+        "compute_production_roi": {
+          "band": "tbd",
+          "text": "positive but deployment-specific; driven by automation value vs infra+ops cost",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "no universal benchmark — ROI is deployment-specific and varies by use-case automation value, regulatory regime, and existing ops maturity",
+            "notes": "no universal benchmark — ROI is deployment-specific; do NOT present as a cited figure",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_inference_p99": {
+          "text": "TTFT P95/P99 target ~300-500ms for interactive enterprise workloads (use-case dependent: chatbot ~500ms, code-completion ~100ms, batch/report tolerant to seconds)",
+          "provenance": {
+            "status": "cited",
+            "source": "industry LLM inference SLO conventions, 2026 (Spheron, Rafay, BentoML, Mirantis published targets for interactive enterprise inference)",
+            "notes": "SLA convention/range, not a single benchmark — keep the use-case-dependent caveat in the value",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_deployment_cycle_time": {
+          "text": "weeks-to-months, depends on org MLops maturity and ISV fit",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "deployment-cycle bands characterized by enterprise MLops surveys; no single canonical number",
+            "notes": "directional band — depends on org MLops maturity and ISV platform fit",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_compliance_audit_time": {
+          "text": "depends on regulation + existing controls; ISV/software certification path is the main lever",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "compliance-cycle characterization varies by regulatory regime (SOC2 / HIPAA / FedRAMP / EU AI Act) and the maturity of the customer's control inventory",
+            "notes": "directional — regulation-dependent and control-state-dependent",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_capex_directional": {
+          "band": "high",
+          "text": "factors: GPU count, system (HGX baseboard + chassis), networking, facility readiness",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class analyst characterization for HGX-class Fortune-500 deployments; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with OpEx by this module. High band reflects the iron-spend concentration of HGX-class buildouts (8x Blackwell baseboards + Spectrum-X networking + facility prep).",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_opex_directional": {
+          "band": "medium",
+          "text": "factors: power / PUE, MFU-realized utilization, MLops headcount, re-certification, downtime — moderated by NVAIE ecosystem maturity",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class analyst characterization for HGX-class Fortune-500 operations; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with CapEx by this module. Medium band (vs CapEx high) reflects the moat thesis: NVAIE ecosystem maturity moderates OpEx — TensorRT-LLM / NIM / Dynamo are battle-tested vs alternative stacks, reducing MLops headcount and re-cert overhead.",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from Fortune 500 enterprise AI deployment patterns (private cloud, regulated, audit-driven).",
-        "last_verified": "2026-05-20"
+        "last_verified": "2026-05-21"
       }
     },
     {

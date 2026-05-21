@@ -17,6 +17,7 @@ import {
   buildConfig,
   KPI_DEFINITIONS,
   loadKnowledge,
+  lookupKpiValue,
 } from '@/lib/factory/kpi'
 import type {
   Architecture,
@@ -77,18 +78,9 @@ export interface SolutionArchitectReport {
 // ──────────────────────────────────────────────────────────────────
 // Engine-side helpers — produce KPI rows with values + provenance.
 // The agent does not compute or modify any of these.
+// (lookupKpiValue is imported from the engine; segment-scoped values win,
+//  component-scoped values are the fallback. The agent never invents values.)
 // ──────────────────────────────────────────────────────────────────
-
-function lookupKpiValue(
-  kpi: KpiDefinition,
-  config: ConfigState,
-): KpiValue | null {
-  const knowledge = loadKnowledge()
-  const primarySlot = kpi.dependencies[0]
-  const componentId = config[primarySlot as keyof ConfigState] as string
-  const component = knowledge.components.get(componentId)
-  return component?.kpi_values?.[kpi.id] ?? null
-}
 
 function collectSegmentKpis(
   segment: Segment,

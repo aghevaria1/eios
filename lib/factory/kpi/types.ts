@@ -65,6 +65,10 @@ export interface Segment {
   subtitle?: string
   north_star_kpis: string[]
   supporting_kpis: string[]
+  // Segment-scoped KPI values — outcome KPIs, SLO conventions, and TCO bands
+  // that semantically live at the segment level, not on a component.
+  // Engine resolution checks here first; falls back to component.kpi_values.
+  delivered_kpis?: Record<string, KpiValue>
   provenance: Provenance
 }
 
@@ -101,8 +105,8 @@ export interface ComponentSwap {
 export interface SwapImpact {
   kpi: KpiDefinition
   status: 'changed' | 'held'
-  before?: KpiValue
-  after?: KpiValue
+  before: KpiValue | null
+  after: KpiValue | null
   why: string
 }
 

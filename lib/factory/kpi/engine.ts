@@ -68,21 +68,33 @@ export function buildConfig(
 }
 
 /**
- * Look up the KPI value for a given KPI in the current config.
+ * Resolve a KPI value for the given config.
  *
- * Resolution: the KPI value is read from the component occupying the KPI's
- * PRIMARY (first) dependency slot. Multi-dependency KPIs are resolved by their
- * first declared dependency for now; richer composition is a later phase.
+ * Resolution precedence:
+ *   1. Segment-scoped — `segment.delivered_kpis[kpi.id]`. For outcome KPIs
+ *      (production ROI), SLO conventions (inference p99 SLA), operational
+ *      bands (deployment cycle, audit time), and TCO bands that
+ *      semantically live at the segment level rather than on a component.
+ *   2. Component-scoped — `component.kpi_values[kpi.id]` on the component
+ *      occupying the KPI's PRIMARY dependency slot. For physics KPIs that
+ *      depend on the chosen hardware/software.
+ *
+ * Returns null when neither path yields a value.
  */
-function lookupKpiValue(
+export function lookupKpiValue(
   kpi: KpiDefinition,
   config: ConfigState,
-): KpiValue | undefined {
+): KpiValue | null {
   const knowledge = loadKnowledge()
+
+  const segment = knowledge.segments.find((s) => s.id === config.segment)
+  const segmentValue = segment?.delivered_kpis?.[kpi.id]
+  if (segmentValue) return segmentValue
+
   const primarySlot = kpi.dependencies[0]
   const componentId = config[primarySlot as keyof ConfigState] as string
   const component = knowledge.components.get(componentId)
-  return component?.kpi_values?.[kpi.id]
+  return component?.kpi_values?.[kpi.id] ?? null
 }
 
 /**
@@ -107,7 +119,7 @@ function buildWhy(
 function collectUnverified(
   config: ConfigState,
   kpi: KpiDefinition,
-  value: KpiValue | undefined,
+  value: KpiValue | null,
 ): UnverifiedFlag | null {
   if (!value) return null
   if (value.provenance.flag !== 'verify-needed') return null

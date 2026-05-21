@@ -2,7 +2,7 @@
 
 export { KPI_DEFINITIONS, getKpiById } from './definitions'
 export { loadKnowledge, clearKnowledgeCache } from './knowledge'
-export { applySwap, buildConfig } from './engine'
+export { applySwap, buildConfig, lookupKpiValue } from './engine'
 export type {
   ProvenanceStatus,
   Provenance,
