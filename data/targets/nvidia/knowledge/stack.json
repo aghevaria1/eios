@@ -1,0 +1,278 @@
+{
+  "version": "0.1.0",
+  "last_verified": "2026-05-20",
+  "layers": [
+    {
+      "id": "L1",
+      "name": "Land / Power / Shell",
+      "description": "Datacenter site, power capacity, cooling, physical envelope. Provided by hyperscaler or colo partner; not a NVIDIA product slot."
+    },
+    {
+      "id": "L2",
+      "name": "Chips",
+      "description": "NVIDIA silicon: Blackwell GPUs, networking (ConnectX, BlueField DPU, Spectrum-X, Quantum-X800)."
+    },
+    {
+      "id": "L3",
+      "name": "ISV Platform",
+      "description": "Enterprise AI platforms: Red Hat OpenShift AI, VMware Private AI Foundation, Nutanix Enterprise AI, VAST Data."
+    },
+    {
+      "id": "L4",
+      "name": "Models / Microservices",
+      "description": "NIM (microservices), Nemotron (foundation models), Dynamo (orchestration), NeMo Guardrails."
+    },
+    {
+      "id": "L5",
+      "name": "Applications",
+      "description": "Snowflake Cortex, custom agents, vertical applications. Wrapped under NVIDIA AI Enterprise (NVAIE)."
+    }
+  ],
+  "components": [
+    {
+      "id": "blackwell_b200",
+      "name": "NVIDIA Blackwell B200",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 192, "max": 192, "unit": "GB HBM3e (nominal)" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA HGX B200 datasheet (8-GPU baseboard, HBM3e)",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "192 GB HBM3e nominal per datasheet. Practical figures: ~186 GB shown on detailed datasheet entries, ~180 GB usable in cloud consoles (vendor-overhead). Keep the nominal figure as the canonical value; the 186/180 deltas are documentation/usable-overhead nuances, not separate SKUs."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 8, "max": 8, "unit": "TB/s" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA HGX B200 datasheet (per-GPU HBM3e bandwidth, confirmed directly — not derived).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense)" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA HGX B200 datasheet (per-GPU FP4 Tensor Core).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "9 PFLOPS dense / 18 PFLOPS sparse per GPU. The widely-quoted marketing figure '20 PFLOPS FP4' is the sparse 2:1 number — keep dense/sparse distinction explicit when comparing across vendors."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense, approx)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA HGX B200 datasheet individual-GPU column read at ~9 PFLOPS FP8 dense.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "Datasheet column read — confirm dense/sparse attribution before promoting to cited. NOTE: the prior value (4.5 PFLOPS) was the FP16/BF16 figure, mislabeled as FP8; corrected."
+          }
+        }
+      }
+    },
+    {
+      "id": "blackwell_b300",
+      "name": "NVIDIA Blackwell Ultra (B300)",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 262.5, "max": 262.5, "unit": "GB" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA HGX product page: HGX B300 8-GPU = 2.1 TB total ÷ 8 = 262.5 GB/GPU.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "Memory type not explicit on HGX page; likely HBM3e but unverified. Non-round figure (262.5) is unusual — verify against B300 datasheet."
+          }
+        }
+      }
+    },
+    {
+      "id": "rtx_pro_6000",
+      "name": "NVIDIA RTX PRO 6000",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 96, "max": 96, "unit": "GB GDDR7" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "User-specified per NVIDIA RTX PRO 6000 product announcement; not independently fetched in this build pass.",
+            "last_verified": "2026-05-20",
+            "notes": "Verify against NVIDIA RTX PRO product page before promoting to 'cited'."
+          }
+        }
+      }
+    },
+    {
+      "id": "nvidia_spectrum_x",
+      "name": "NVIDIA Spectrum-X Ethernet",
+      "layer": "L2",
+      "slot": "fabric",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA Spectrum-X public positioning for 800 Gbps AI Ethernet (announced 2023, widely covered in analyst materials).",
+            "last_verified": "2026-05-20",
+            "notes": "Verify per-port figure and current SKU coverage against NVIDIA Spectrum-X product page."
+          }
+        },
+        "fabric_latency": {
+          "band": "low",
+          "provenance": {
+            "status": "directional",
+            "source": "NVIDIA does not publish a single Spectrum-X latency number publicly; positioning is sub-microsecond AI fabric.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band only. NVIDIA's strength is collective performance at scale, not raw per-hop latency."
+          }
+        },
+        "fabric_message_rate": {
+          "band": "high",
+          "provenance": {
+            "status": "directional",
+            "source": "NVIDIA does not publish a single message-rate number publicly for Spectrum-X.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band reflects Spectrum-X's positioning for high-throughput AI workloads."
+          }
+        },
+        "fabric_collective_op": {
+          "scale_conditional": {
+            "small_scale": "parity (no decisive advantage at small node counts)",
+            "large_scale": "NVIDIA wins via SHARP / NCCL — in-network compute collapses AllReduce overhead at scale",
+            "breakpoint": "advantage emerges as cluster scales beyond ~64-128 nodes; SHARP / NCCL gap widens with node count"
+          },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA SHARP (Scalable Hierarchical Aggregation and Reduction Protocol) documentation; NCCL collective communication library public docs.",
+            "source_url": "https://developer.nvidia.com/nccl",
+            "last_verified": "2026-05-20",
+            "notes": "Scale-conditional outcome — direction of effect is cited; breakpoint estimate is directional."
+          }
+        },
+        "fabric_cost_capex_directional": {
+          "band": "high",
+          "provenance": {
+            "status": "directional",
+            "source": "Analyst coverage (SemiAnalysis, IDC) consistently characterizes NVIDIA integrated networking as premium-priced vs disaggregated Ethernet.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band only. No published per-port CapEx number from NVIDIA."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "integration / risk-mitigation",
+          "provenance": {
+            "status": "directional",
+            "source": "Characterization synthesized from NVIDIA's positioning of Spectrum-X + Quantum-X800 as the integrated NVIDIA stack option.",
+            "last_verified": "2026-05-20",
+            "notes": "Customer-archetype framing, not a measured number."
+          }
+        }
+      }
+    },
+    {
+      "id": "nvidia_quantum_x800",
+      "name": "NVIDIA Quantum-X800 InfiniBand",
+      "layer": "L2",
+      "slot": "fabric",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA Quantum-X800 InfiniBand positioning (800 Gbps NDR-class).",
+            "last_verified": "2026-05-20",
+            "notes": "Verify per-port figure and product availability against NVIDIA Quantum-X800 product page."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "integration / risk-mitigation",
+          "provenance": {
+            "status": "directional",
+            "source": "Same NVIDIA-integrated-stack positioning as Spectrum-X.",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "connectx_8",
+      "name": "NVIDIA ConnectX-8 SuperNIC",
+      "layer": "L2",
+      "slot": "nic",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "nic_throughput": {
+          "range": { "min": 1600, "max": 1600, "unit": "Gb/s (1.6 Tb/s)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "User-specified per NVIDIA ConnectX-8/9 product positioning (1.6 Tb/s).",
+            "last_verified": "2026-05-20",
+            "notes": "Verify against NVIDIA ConnectX product page."
+          }
+        }
+      }
+    },
+    {
+      "id": "nvaie",
+      "name": "NVIDIA AI Enterprise (NVAIE)",
+      "layer": "L5",
+      "slot": "software",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "software_ecosystem_depth": {
+          "band": "high",
+          "provenance": {
+            "status": "directional",
+            "source": "NVAIE wraps CUDA, cuDNN, TensorRT-LLM, NeMo, NIM, Dynamo, NeMo Guardrails — broadest enterprise AI software portfolio on the market.",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "software_tensorrt_llm_availability": {
+          "text": "NVIDIA-only — does not run on AMD ROCm",
+          "provenance": {
+            "status": "cited",
+            "source": "TensorRT-LLM is a CUDA-only library by design; ROCm has no compatible re-implementation as of writing.",
+            "source_url": "https://developer.nvidia.com/tensorrt",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "dell_xe9680",
+      "name": "Dell PowerEdge XE9680 (HGX-class server)",
+      "layer": "L3",
+      "slot": "oem",
+      "vendor": "dell",
+      "kpi_values": {}
+    },
+    {
+      "id": "red_hat_openshift_ai",
+      "name": "Red Hat OpenShift AI",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "red_hat",
+      "kpi_values": {}
+    }
+  ]
+}

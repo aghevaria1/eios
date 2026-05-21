@@ -1,0 +1,66 @@
+{
+  "version": "0.1.0",
+  "last_verified": "2026-05-20",
+  "segments": [
+    {
+      "id": "frontier-ai-labs",
+      "name": "Frontier AI Labs",
+      "subtitle": "Anthropic, xAI, other model-training labs at the frontier",
+      "north_star_kpis": ["compute_mfu", "compute_time_to_train"],
+      "supporting_kpis": ["compute_checkpoint_resume_latency", "fabric_interconnect_throughput"],
+      "provenance": {
+        "status": "directional",
+        "notes": "Segment definition synthesized from public observations of frontier-lab infrastructure preferences (NVL72, very large scale).",
+        "last_verified": "2026-05-20"
+      }
+    },
+    {
+      "id": "hyperscalers",
+      "name": "Hyperscalers",
+      "subtitle": "Azure, GCP, AWS hyperscale cloud operators",
+      "north_star_kpis": ["compute_tco_per_token"],
+      "supporting_kpis": ["ops_pue", "ops_fleet_availability", "compute_hardware_density"],
+      "provenance": {
+        "status": "directional",
+        "notes": "Segment definition synthesized from hyperscaler public infrastructure disclosures and analyst coverage.",
+        "last_verified": "2026-05-20"
+      }
+    },
+    {
+      "id": "fortune-500",
+      "name": "Fortune 500 Enterprise",
+      "subtitle": "Production AI workloads in regulated enterprises (e.g., JPMorgan-class)",
+      "north_star_kpis": ["compute_production_roi"],
+      "supporting_kpis": ["compute_inference_p99", "ops_deployment_cycle_time", "ops_compliance_audit_time"],
+      "provenance": {
+        "status": "directional",
+        "notes": "Segment definition synthesized from Fortune 500 enterprise AI deployment patterns (private cloud, regulated, audit-driven).",
+        "last_verified": "2026-05-20"
+      }
+    },
+    {
+      "id": "sovereign-ai",
+      "name": "Sovereign AI",
+      "subtitle": "Nation-state and regional AI programs (G42 UAE, EU sovereign, etc.)",
+      "north_star_kpis": ["ops_data_residency_pct"],
+      "supporting_kpis": ["ops_air_gap_capability", "ops_portability_index", "ops_security_perimeter"],
+      "provenance": {
+        "status": "directional",
+        "notes": "Segment definition synthesized from G42/Inception, EU AI Factory, and BIS export-control program public materials.",
+        "last_verified": "2026-05-20"
+      }
+    },
+    {
+      "id": "industry-verticals",
+      "name": "Industry Verticals",
+      "subtitle": "Domain-specific deployments (e.g., Mayo Clinic healthcare AI)",
+      "north_star_kpis": ["compute_domain_accuracy", "compute_safety_latency"],
+      "supporting_kpis": ["compute_edge_efficiency", "compute_digital_twin_sync", "ops_safety_certification"],
+      "provenance": {
+        "status": "directional",
+        "notes": "Segment definition synthesized from vertical AI program disclosures (healthcare, manufacturing digital twins, robotics).",
+        "last_verified": "2026-05-20"
+      }
+    }
+  ]
+}

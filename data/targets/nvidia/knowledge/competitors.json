@@ -1,0 +1,208 @@
+{
+  "version": "0.1.0",
+  "last_verified": "2026-05-20",
+  "categories": {
+    "full_cake_replacement": {
+      "description": "Replaces the NVIDIA stack end-to-end. Examples: AMD Helios, hyperscaler custom silicon (where applicable).",
+      "members": ["amd_helios_mi455x", "hyperscaler_custom_silicon"]
+    },
+    "fabric_alternatives": {
+      "description": "Replaces ONLY the fabric layer within the cake. The rest of the NVIDIA stack remains.",
+      "members": ["nvidia_spectrum_x", "nvidia_quantum_x800", "broadcom_jericho_tomahawk", "arista_ethernet", "cornelis_cn5000"]
+    },
+    "uec_coalition": {
+      "description": "Ultra Ethernet Consortium members — open-standard fabric coalition. Includes AMD, Cornelis, Broadcom, hyperscalers. Broadcom designs hyperscaler chips, making them a double enabler.",
+      "members_summary": "AMD + Cornelis + Broadcom + major hyperscalers",
+      "provenance": {
+        "status": "cited",
+        "source": "Ultra Ethernet Consortium public member roster.",
+        "source_url": "https://ultraethernet.org",
+        "last_verified": "2026-05-20"
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "amd_helios_mi455x",
+      "name": "AMD Helios (MI455X / MI450)",
+      "category": "full_cake_replacement",
+      "slot": "gpu",
+      "vendor": "amd",
+      "positioning": "Full-stack replacement. Helios rack = 72x MI455X (analogous to NVL72), targeting Q3 2026.",
+      "moat_framing": "AMD has hardware parity / a memory-bandwidth edge, but ROCm has NOT reached CUDA's ecosystem maturity, and TensorRT-LLM is NVIDIA-only and won't run on ROCm.",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 432, "max": 432, "unit": "GB HBM4" },
+          "provenance": {
+            "status": "cited",
+            "source": "AMD MI455X / Helios announcement materials (per user-supplied competitor brief).",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-20",
+            "notes": "AMD's own announcement figures; treat as cited from vendor."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 19.6, "max": 19.6, "unit": "TB/s" },
+          "provenance": {
+            "status": "cited",
+            "source": "AMD MI455X announcement materials.",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 40, "max": 40, "unit": "PFLOPS FP4" },
+          "provenance": {
+            "status": "cited",
+            "source": "AMD MI455X announcement materials.",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "hyperscaler_custom_silicon",
+      "name": "Hyperscaler Custom Silicon (TPU v7 / Trainium 3 / Maia 200 / MTIA 400)",
+      "category": "full_cake_replacement",
+      "slot": "gpu",
+      "vendor": "various",
+      "positioning_scope": "Hyperscaler segment ONLY — internal workloads. ADDITIVE to NVIDIA, not replacement: hyperscalers use custom silicon for internal training/inference and NVIDIA for MERCHANT cloud (external customers want CUDA).",
+      "kpi_values": {
+        "compute_tco_per_token_internal": {
+          "band": "wins",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "hyperscalers (Google, AWS, Microsoft, Meta)",
+            "source": "Per-query inference savings cited at ~30-60% for internal workloads on custom silicon vs NVIDIA.",
+            "last_verified": "2026-05-20",
+            "notes": "Vendor-claimed figure on internal workloads only. Does not transfer to merchant cloud."
+          }
+        },
+        "compute_tco_per_token_merchant": {
+          "band": "loses",
+          "provenance": {
+            "status": "cited",
+            "source": "Merchant cloud customers want CUDA — NVIDIA wins this slice. Hyperscaler custom silicon does not address external customers.",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "deployment_adoption_internal": {
+          "range": { "min": 15, "max": 20, "unit": "% of hyperscaler internal-workload share" },
+          "provenance": {
+            "status": "cited",
+            "source": "Analyst coverage of hyperscaler internal-workload adoption of custom silicon (additive to NVIDIA).",
+            "last_verified": "2026-05-20",
+            "notes": "Range estimate from public analyst coverage; verify against specific reports."
+          }
+        }
+      }
+    },
+    {
+      "id": "broadcom_jericho_tomahawk",
+      "name": "Broadcom Jericho / Tomahawk Ethernet",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "broadcom",
+      "positioning": "Within-cake fabric swap. Broadcom also designs hyperscaler custom chips — double enabler.",
+      "kpi_values": {
+        "fabric_buying_philosophy": {
+          "text": "disaggregation / flexibility",
+          "provenance": {
+            "status": "directional",
+            "source": "Broadcom positioning emphasizes merchant-silicon Ethernet flexibility vs NVIDIA's integrated stack.",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "arista_ethernet",
+      "name": "Arista Ethernet (7800R-class)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "arista",
+      "positioning": "Within-cake fabric swap. Standard high-density Ethernet leaf-spine.",
+      "kpi_values": {
+        "fabric_buying_philosophy": {
+          "text": "disaggregation / flexibility",
+          "provenance": {
+            "status": "directional",
+            "source": "Arista positioning emphasizes open Ethernet vs vendor-locked fabric.",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "cornelis_cn5000",
+      "name": "Cornelis CN5000 (Omni-Path, current gen)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "cornelis",
+      "positioning": "Within-cake fabric swap. CN5000 400G Omni-Path → CN6000 800G RoCEv2 (2026) → CN7000 1.6T UEC (2027).",
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 400, "max": 400, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "cited",
+            "source": "Cornelis CN5000 Omni-Path Switch Product Brief.",
+            "source_url": "https://www.cornelis.com/product/cornelis-cn5000-omni-path-switch",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "fabric_latency": {
+          "band": "low",
+          "text": "Cornelis claims 45% lower latency vs 400G InfiniBand NDR",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN5000 positioning materials.",
+            "last_verified": "2026-05-20",
+            "notes": "Vendor benchmark — NOT a neutral measurement. Compare-against is NVIDIA Quantum-2 NDR 400G."
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 800, "max": 1600, "unit": "million msg/sec" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN5000 positioning materials (800M-1.6B msg/sec).",
+            "last_verified": "2026-05-20",
+            "notes": "Vendor figure."
+          }
+        },
+        "fabric_collective_op": {
+          "scale_conditional": {
+            "small_scale": "Cornelis wins — small-node HPC. Vendor cites 2x application speedup on 8-node HPC.",
+            "large_scale": "NVIDIA wins via SHARP / NCCL — in-network compute advantages emerge at large scale.",
+            "breakpoint": "Cornelis advantage erodes as cluster scales beyond ~16-32 nodes; SHARP/NCCL gap widens with node count."
+          },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis (small-scale claim); cited (large-scale via NVIDIA SHARP docs)",
+            "source": "Cornelis 2x app speedup on 8-node HPC is vendor-claimed. NVIDIA SHARP/NCCL large-scale advantage is documented public knowledge.",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "fabric_cost_capex_directional": {
+          "band": "medium",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis pricing positioning — typically below NVIDIA per-port at director-class scale, above merchant Ethernet.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band only."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "extreme-performance-tuning",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis positioning emphasizes tail-latency determinism and MPI tightly-coupled HPC — buyers chose Cornelis when raw collective-op performance at small/medium scale is the priority.",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    }
+  ]
+}

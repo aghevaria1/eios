@@ -1,0 +1,24 @@
+{
+  "corpus_version": "0.1.0",
+  "last_verified": "2026-05-20",
+  "files": [
+    "segments.json",
+    "stack.json",
+    "architectures.json",
+    "competitors.json",
+    "roadmap.json"
+  ],
+  "honesty_boundary": {
+    "tags": {
+      "cited": "verified against a public source — include source + date",
+      "claimed": "vendor's own benchmark, not neutral — include claimed_by",
+      "directional": "reasoned read, not a measured number — never present as truth"
+    },
+    "rules": [
+      "Every datum carries a provenance object.",
+      "Numerical KPIs are RANGES or directional bands, never single computed point values.",
+      "TCO is split into capex_directional and opex_directional, NEVER summed.",
+      "Values flagged with `flag: 'verify-needed'` must be confirmed by a human before being tagged `cited`."
+    ]
+  }
+}

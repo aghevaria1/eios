@@ -1,0 +1,62 @@
+{
+  "version": "0.1.0",
+  "last_verified": "2026-05-20",
+  "architectures": [
+    {
+      "id": "NVL72",
+      "name": "GB200 NVL72",
+      "positioning": "frontier — liquid-cooled rack-scale, 72 Blackwell GPUs + 36 Grace CPUs in 1 rack",
+      "default_components": {
+        "gpu": "blackwell_b200",
+        "fabric": "nvidia_spectrum_x",
+        "software": "nvaie",
+        "oem": "dell_xe9680",
+        "isv": "red_hat_openshift_ai"
+      },
+      "provenance": {
+        "status": "cited",
+        "source": "NVIDIA GB200 NVL72 product page — 72 Blackwell GPUs, 36 Grace CPUs, NVLink 5, liquid-cooled rack.",
+        "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+        "last_verified": "2026-05-20",
+        "notes": "Defaults are the canonical NVIDIA-integrated configuration; OEM/ISV choices are illustrative for swap testing."
+      }
+    },
+    {
+      "id": "HGX",
+      "name": "HGX (8-GPU baseboard)",
+      "positioning": "workhorse — air or liquid, 8-GPU HGX B200/B300 baseboards in OEM servers; widely deployed for train + inference",
+      "default_components": {
+        "gpu": "blackwell_b200",
+        "fabric": "nvidia_spectrum_x",
+        "software": "nvaie",
+        "oem": "dell_xe9680",
+        "isv": "red_hat_openshift_ai"
+      },
+      "provenance": {
+        "status": "cited",
+        "source": "NVIDIA HGX product page — HGX B200 8-GPU and HGX B300 8-GPU baseboards.",
+        "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+        "last_verified": "2026-05-20"
+      }
+    },
+    {
+      "id": "RTX_PRO",
+      "name": "RTX PRO (enterprise / edge)",
+      "positioning": "enterprise / edge — RTX PRO 6000 96GB GDDR7, single-server or small-cluster deployments",
+      "default_components": {
+        "gpu": "rtx_pro_6000",
+        "fabric": "nvidia_spectrum_x",
+        "software": "nvaie",
+        "oem": "dell_xe9680",
+        "isv": "red_hat_openshift_ai"
+      },
+      "provenance": {
+        "status": "directional",
+        "flag": "verify-needed",
+        "source": "RTX PRO 6000 positioning per NVIDIA RTX PRO product line; specific OEM/ISV defaults for this architecture not yet researched.",
+        "last_verified": "2026-05-20",
+        "notes": "Verify RTX PRO 6000 spec against NVIDIA product page before promoting to 'cited'."
+      }
+    }
+  ]
+}
