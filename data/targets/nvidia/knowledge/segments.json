@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "last_verified": "2026-05-20",
+  "version": "0.2.0",
+  "last_verified": "2026-05-21",
   "segments": [
     {
       "id": "frontier-ai-labs",
@@ -8,10 +8,105 @@
       "subtitle": "Anthropic, xAI, other model-training labs at the frontier",
       "north_star_kpis": ["compute_mfu", "compute_time_to_train"],
       "supporting_kpis": ["compute_checkpoint_resume_latency", "fabric_interconnect_throughput"],
+      "delivered_kpis": {
+        "compute_mfu": {
+          "text": "industry range ~35-50% for large transformer training; varies by parallelism strategy, fabric, and software stack",
+          "provenance": {
+            "status": "cited",
+            "source": "industry MFU range published in academic and infra papers (Megatron-LM, PaLM, Llama training reports, 2022-2024); operational targets, not a single benchmark",
+            "notes": "MFU is workload-and-parallelism dependent — no single point value applies across labs; range is the honest representation",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_time_to_train": {
+          "text": "wall-clock time depends on model size, parallelism strategy, fabric, and software stack; no universal comparable benchmark across frontier labs",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "TTT is reported in scattered ways across frontier labs (Anthropic Claude, OpenAI GPT-4, xAI Grok) and not as a directly comparable figure",
+            "notes": "directional — TTT comparisons require apples-to-apples model + parallelism + token-count specifications that frontier labs typically do not publish",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_checkpoint_resume_latency": {
+          "text": "fabric-bound at frontier scale; checkpoint write + resume cycles dominate cluster downtime windows when training models past the trillion-parameter mark",
+          "provenance": {
+            "status": "directional",
+            "source": "checkpoint-resume characterization for frontier-scale training — depends on fabric bisection bandwidth, parallel-write strategy, and storage tier; SHARP / NCCL collective ops are the structural lever",
+            "notes": "directional — exact figures are workload-specific; cluster-design and storage-tier choices dominate",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "fabric_interconnect_throughput": {
+          "text": "effective bisection bandwidth across the cluster, not per-port; frontier scale (multi-thousand-GPU) requires aggregate fabric coordination",
+          "provenance": {
+            "status": "directional",
+            "source": "effective bisection bandwidth at frontier scale depends on topology (fat-tree, dragonfly, rail-optimized) and collective-op performance; per-port line rate is necessary but not sufficient",
+            "notes": "directional — frontier labs evaluate aggregate fabric performance under collective-op load, not nameplate per-port throughput",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_inference_p99": {
+          "text": "TTFT P95/P99 target ~300-500ms for interactive enterprise workloads (use-case dependent: chatbot ~500ms, code-completion ~100ms, batch/report tolerant to seconds)",
+          "provenance": {
+            "status": "cited",
+            "source": "industry LLM inference SLO conventions, 2026 (Spheron, Rafay, BentoML, Mirantis) — frontier labs typically self-host inference and inherit similar SLO targets for their API endpoints",
+            "notes": "SLA convention/range — frontier inference at scale optimizes for cost-per-token vs latency; SLO inherited from the enterprise consumer context",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_capex_directional": {
+          "band": "high",
+          "text": "factors: GPU count at multi-thousand-cluster scale, NVL72 rack-scale buildouts, fabric (Spectrum-X / Quantum-X800), facility power+cooling at multi-MW scale",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class characterization for frontier-scale training clusters; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with OpEx. High band reflects multi-billion-dollar frontier-cluster buildouts (xAI Colossus, Anthropic compute commitments, Meta Llama training stack).",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_opex_directional": {
+          "band": "high",
+          "text": "factors: continuous multi-MW power draw, MLops + research-engineering headcount, fabric tuning overhead, downtime cost (a single failed run can lose weeks of compute)",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class characterization for frontier-scale operations; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with CapEx. High band reflects continuous power draw plus research-engineering headcount; frontier OpEx is structurally dominated by power and elite-talent costs.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_lead_time": {
+          "text": "frontier labs pre-commit capacity contracts with NVIDIA and cloud partners; effective lead-time is allocation-priority, not standard order-to-rack procurement",
+          "provenance": {
+            "status": "directional",
+            "source": "lead-time characterization for frontier labs — capacity is typically pre-purchased on multi-quarter or multi-year contracts; allocation queues are the binding constraint",
+            "notes": "directional — frontier procurement is capacity-allocation-based, not order-to-rack; standard lead-time metrics do not apply",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_service_footprint": {
+          "text": "direct vendor engineering partnership; frontier labs work with NVIDIA's top systems-engineering team, not regional sales",
+          "provenance": {
+            "status": "directional",
+            "source": "service-footprint characterization for frontier labs — direct engineering partnership model bypasses standard service channels",
+            "notes": "directional — frontier labs receive concierge-level support; standard service-footprint metrics don't apply",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_skills_fit": {
+          "text": "deep CUDA / collective-comm / parallelism expertise required; frontier labs hire ahead of the curve and contribute back to NVIDIA's stack (NCCL, Megatron, FlashAttention)",
+          "provenance": {
+            "status": "directional",
+            "source": "skills-fit characterization for frontier labs — engineering teams at Anthropic / OpenAI / xAI / Meta have NVIDIA-stack expertise that often exceeds NVIDIA's own application teams",
+            "notes": "directional — frontier labs are talent-saturated on NVIDIA stack; skills-fit is high but for a narrow elite-engineer cohort, not broadly transferable",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from public observations of frontier-lab infrastructure preferences (NVL72, very large scale).",
-        "last_verified": "2026-05-20"
+        "last_verified": "2026-05-21"
       }
     },
     {
@@ -20,10 +115,106 @@
       "subtitle": "Azure, GCP, AWS hyperscale cloud operators",
       "north_star_kpis": ["compute_tco_per_token"],
       "supporting_kpis": ["ops_pue", "ops_fleet_availability", "compute_hardware_density"],
+      "delivered_kpis": {
+        "compute_tco_per_token": {
+          "text": "highly workload-dependent; industry estimates vary by an order of magnitude depending on model size, batch utilization, quantization strategy, and hardware amortization period",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "no universal benchmark — TCO-per-token varies dramatically by workload mix and MFU realization; published external estimates (SemiAnalysis, A16z, Together AI) span roughly an order of magnitude; hyperscaler-internal figures are confidential",
+            "notes": "no universal benchmark — TCO-per-token is workload-defined; do NOT present as a cited point value",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_pue": {
+          "text": "hyperscale PUE typically in the ~1.10-1.20 range (Google publishes the lowest, AWS / Azure publish in the same band); design ceiling near 1.0 with adiabatic cooling",
+          "provenance": {
+            "status": "cited",
+            "source": "public PUE disclosures — Google annual sustainability reports, AWS sustainability dashboard, Microsoft Azure sustainability calculator. Auditor-verified for sustainability reporting.",
+            "source_url": "https://sustainability.google/operating-sustainably/",
+            "notes": "PUE is one of the few hyperscaler operational metrics with reliable public citation; vendor numbers are externally verified",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_fleet_availability": {
+          "text": "fleet availability targets typically 99.9-99.95% at hyperscale; failure budgets baked into the SLA tier sold to customers (Bedrock, Vertex, Azure OpenAI)",
+          "provenance": {
+            "status": "directional",
+            "source": "fleet availability characterized by hyperscaler SLA disclosures and incident post-mortems; realized availability varies by region and service tier",
+            "notes": "directional — published SLA targets are the floor; realized availability often exceeds but is workload-and-region dependent",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_hardware_density": {
+          "text": "rack density bound by power-and-cooling envelope; hyperscalers typically operate at 30-50 kW/rack with custom power distribution, vs ~15 kW for typical enterprise",
+          "provenance": {
+            "status": "directional",
+            "source": "hardware-density characterization for hyperscaler racks — Open Compute Project (OCP) reference designs, hyperscaler datacenter disclosures, Uptime Institute analyses",
+            "notes": "directional — exact figures are facility-and-region specific; the 30-50 kW band is widely reported in OCP / industry analyses",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_inference_p99": {
+          "text": "TTFT P95/P99 target ~300-500ms for interactive enterprise workloads (use-case dependent: chatbot ~500ms, code-completion ~100ms, batch/report tolerant to seconds)",
+          "provenance": {
+            "status": "cited",
+            "source": "industry LLM inference SLO conventions, 2026 (Spheron, Rafay, BentoML, Mirantis) — hyperscalers expose this as the SLA target on their inference APIs (Bedrock, Vertex, Azure OpenAI)",
+            "notes": "SLA convention/range — hyperscalers publish SLO targets on their inference services; this is the customer-facing ceiling",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_capex_directional": {
+          "band": "high",
+          "text": "factors: GPU count at multi-hundred-thousand cluster scale, custom-designed racks, fabric (NVIDIA stack and/or custom silicon — Trainium, TPU, Maia), facility buildouts at GW scale",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class characterization for hyperscaler buildouts; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with OpEx. High band reflects multi-billion-dollar GPU procurement at hyperscale; volume discounts apply but absolute CapEx remains dominant.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_opex_directional": {
+          "band": "medium",
+          "text": "factors: power-cost arbitrage (renewable PPAs), low PUE, automated MLops at scale, internal-customer monetization offsetting per-GPU OpEx",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class characterization for hyperscaler operations; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with CapEx. Medium band (vs sovereign high / verticals high) reflects hyperscaler operational efficiency: renewable PPAs, automated MLops, and revenue offset from re-selling the same capacity to customers.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_lead_time": {
+          "text": "hyperscalers operate on multi-quarter committed-volume contracts with NVIDIA; effective lead-time is allocation-priority, not order-to-rack",
+          "provenance": {
+            "status": "directional",
+            "source": "lead-time characterization for hyperscalers — committed-volume agreements with NVIDIA shape allocation priority; standard lead-time metrics do not apply",
+            "notes": "directional — hyperscalers compete for allocation, not for delivery slots; the binding constraint is NVIDIA capacity allocation",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_service_footprint": {
+          "text": "global vendor partnership; hyperscalers maintain dedicated NVIDIA engineering relationships at the systems-engineering and roadmap level",
+          "provenance": {
+            "status": "directional",
+            "source": "service-footprint characterization for hyperscalers — global presence plus dedicated roadmap-level engineering partnership",
+            "notes": "directional — hyperscalers operate as strategic partners, not standard customers; service-footprint metrics are not the relevant lens",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_skills_fit": {
+          "text": "deep in-house CUDA / NVAIE expertise; hyperscalers maintain large platform-engineering teams optimized for the NVIDIA stack and increasingly contribute upstream",
+          "provenance": {
+            "status": "directional",
+            "source": "skills-fit characterization for hyperscalers — internal teams have multi-year operational experience with NVIDIA at scale; some hyperscalers contribute upstream to CUDA / NCCL / Triton",
+            "notes": "directional — hyperscaler skills-fit is structurally high but increasingly bifurcated as some pursue custom silicon (Trainium, TPU, Maia)",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from hyperscaler public infrastructure disclosures and analyst coverage.",
-        "last_verified": "2026-05-20"
+        "last_verified": "2026-05-21"
       }
     },
     {
@@ -105,11 +296,115 @@
       "name": "Sovereign AI",
       "subtitle": "Nation-state and regional AI programs (G42 UAE, EU sovereign, etc.)",
       "north_star_kpis": ["ops_data_residency_pct"],
-      "supporting_kpis": ["ops_air_gap_capability", "ops_portability_index", "ops_security_perimeter"],
+      "supporting_kpis": ["ops_air_gap_capability", "ops_portability_index", "ops_compliance_audit_time", "ops_security_perimeter"],
+      "delivered_kpis": {
+        "ops_data_residency_pct": {
+          "text": "target 100% in-jurisdiction execution; depends on deployment topology and air-gap posture",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "no universal benchmark — data residency is a compliance posture, not a measured number; depends on national data-sovereignty law + deployment topology + air-gap discipline",
+            "notes": "no universal benchmark — compliance posture, not a measured percentage; do NOT present as a cited figure",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_air_gap_capability": {
+          "text": "full offline operation including updates and monitoring; depends on architecture",
+          "provenance": {
+            "status": "directional",
+            "source": "air-gap capability characterized by deployment topology; ISV platform support for offline update channels and isolated monitoring is the structural lever",
+            "notes": "directional — architecture-dependent; ISV platform choice (OpenShift AI / VMware Private AI / Nutanix) sets the offline-operation ceiling",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_portability_index": {
+          "text": "effort to migrate models / data across national clouds without lock-in; ISV platform choice is the main lever",
+          "provenance": {
+            "status": "directional",
+            "source": "portability characterized by ISV abstraction layer — Kubernetes / OCI containerization and open model formats are the structural enablers across sovereign jurisdictions",
+            "notes": "directional — ISV platform choice is the structural lever; CUDA/NVAIE lock-in shifts the portability ceiling",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_compliance_audit_time": {
+          "text": "regulation-dependent (national data-sovereignty law + sectoral); control-inventory maturity dependent",
+          "provenance": {
+            "status": "directional",
+            "source": "compliance-cycle characterization varies by national regime (UAE PDPL, EU AI Act + GDPR, regional data-sovereignty laws) and sectoral overlay; control-inventory maturity is the dominant variable",
+            "notes": "directional — regulation-regime-dependent and control-state-dependent",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_security_perimeter": {
+          "text": "unauthorized-access attempt frequency at infrastructure level; directional posture, not a measured rate",
+          "provenance": {
+            "status": "directional",
+            "source": "perimeter posture characterized by defense-in-depth architecture — physical, network, identity, and crypto layers; metrics surface at audit cadence, not as live counters",
+            "notes": "directional — posture is architecture-bound; numerical attempt-rate metrics are organization-specific and not publicly comparable",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_inference_p99": {
+          "text": "TTFT P95/P99 target ~300-500ms for interactive enterprise workloads (use-case dependent: chatbot ~500ms, code-completion ~100ms, batch/report tolerant to seconds)",
+          "provenance": {
+            "status": "cited",
+            "source": "industry LLM inference SLO conventions, 2026 (Spheron, Rafay, BentoML, Mirantis published targets for interactive enterprise inference) — applies to sovereign deployments serving interactive workloads within their jurisdiction",
+            "notes": "SLA convention/range, not a single benchmark — keep the use-case-dependent caveat; sovereign deployments inherit the same SLO ceiling for interactive workloads",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_capex_directional": {
+          "band": "high",
+          "text": "factors: GPU count, system (HGX baseboard + chassis), networking, facility readiness, in-jurisdiction siting, sovereign procurement overhead",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class analyst characterization for sovereign AI buildouts; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with OpEx. High band reflects sovereign-program scale (frontier-class deployments at national level) plus the procurement overhead from in-jurisdiction siting and supply-chain export-control review.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_opex_directional": {
+          "band": "high",
+          "text": "factors: power / PUE, MFU-realized utilization, sovereign-clearance MLops headcount, re-certification (national + sectoral), air-gap operational overhead, downtime",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class analyst characterization for sovereign AI operations; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with CapEx. High band (vs Fortune-500 medium) reflects the sovereign cost stack: clearance-vetted MLops headcount, multi-regime re-certification cadence, and air-gap operational discipline are structural OpEx multipliers not present in commercial enterprise deployments.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_lead_time": {
+          "text": "extended vs commercial; sovereign-program procurement gates + export-control review (BIS / national authority) typically add quarters to the order-to-power-up cycle",
+          "provenance": {
+            "status": "directional",
+            "source": "lead-time characterization for sovereign-class deployments — procurement-gate sequence (national + export-control) is the dominant variable, not vendor manufacturing capacity",
+            "notes": "directional — procurement-gate + export-control sequence dominates; not a single bookable lead-time figure",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_service_footprint": {
+          "text": "in-jurisdiction service / support presence required; vendor depth-of-coverage in the sovereign region is the main lever",
+          "provenance": {
+            "status": "directional",
+            "source": "service-footprint characterization for sovereign deployments — in-jurisdiction local-staff requirement narrows the OEM/ISV vendor short-list and is a structural eligibility filter",
+            "notes": "directional — vendor regional presence acts as a structural eligibility filter, often before technical evaluation",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_skills_fit": {
+          "text": "national talent pipeline + clearance-vetted operators; CUDA / NVAIE skills depth in the sovereign jurisdiction is the structural variable",
+          "provenance": {
+            "status": "directional",
+            "source": "skills-fit characterization for sovereign programs — national pipeline + clearance vetting are the structural constraints, not pure technical training availability",
+            "notes": "directional — sovereign skills-fit is constrained by jurisdiction-resident talent + clearance pipeline; commercial CUDA/NVAIE training programs do not solve the eligibility-vetting bottleneck",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from G42/Inception, EU AI Factory, and BIS export-control program public materials.",
-        "last_verified": "2026-05-20"
+        "last_verified": "2026-05-21"
       }
     },
     {
@@ -118,10 +413,115 @@
       "subtitle": "Domain-specific deployments (e.g., Mayo Clinic healthcare AI)",
       "north_star_kpis": ["compute_domain_accuracy", "compute_safety_latency"],
       "supporting_kpis": ["compute_edge_efficiency", "compute_digital_twin_sync", "ops_safety_certification"],
+      "delivered_kpis": {
+        "compute_domain_accuracy": {
+          "text": "domain-and-dataset specific; no universal benchmark across verticals (healthcare imaging vs manufacturing visual inspection vs robotics action-prediction)",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "domain accuracy is vertical-specific and dataset-specific — Mayo Clinic clinical-decision-support benchmarks differ structurally from manufacturing defect-detection or robotics action-prediction",
+            "notes": "no universal benchmark — each vertical has its own ground-truth set; do NOT present as a single cited figure",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_safety_latency": {
+          "text": "vertical-defined ceiling: surgical robotics targets sub-50ms closed-loop control, medical imaging tolerates seconds in the radiologist workflow, industrial safety-stop varies by jurisdiction",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "safety-latency requirements are codified per vertical (IEC 60601 for medical devices, ISO 13482 for personal-care robotics, ISO 26262 for automotive); enforcement varies by regulator",
+            "notes": "directional — vertical-defined; numerical ceilings are workload-specific, not generalizable across the industry-verticals segment",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_edge_efficiency": {
+          "text": "performance-per-watt at the edge depends on deployment topology; RTX PRO 6000 and Jetson-class edge deployments operate in single-digit-to-low-double-digit TOPS/W bands for inference",
+          "provenance": {
+            "status": "directional",
+            "source": "edge-efficiency characterization for inference workloads — NVIDIA Jetson Orin family and RTX PRO product positioning materials",
+            "notes": "directional — TOPS/W figures vary by precision (INT8, FP16) and workload; not a single comparable metric across vertical deployments",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_digital_twin_sync": {
+          "text": "real-world → simulation update latency; bound by sensor cadence plus network latency plus simulator step time; varies by application (manufacturing line digital-twin tighter than factory-floor strategy simulation)",
+          "provenance": {
+            "status": "directional",
+            "source": "digital-twin sync characterization for manufacturing + robotics applications — NVIDIA Omniverse positioning materials, Siemens / GE / Rockwell digital-twin disclosures",
+            "notes": "directional — synchronization tolerance is application-defined; numerical targets vary widely across vertical use-cases",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_safety_certification": {
+          "text": "vertical-and-jurisdiction-specific certification path: FDA 510(k) or De Novo for medical devices, IEC 61508 for industrial safety, ISO 26262 for automotive ASIL levels",
+          "provenance": {
+            "status": "directional",
+            "source": "safety-certification characterization for industry verticals — FDA medical-device pathway (510(k), De Novo), IEC 61508 (functional safety), ISO 26262 (automotive)",
+            "notes": "directional — certification time and cost are vertical-and-jurisdiction-specific; the ISV platform's certification track record is the dominant variable",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_inference_p99": {
+          "text": "TTFT P95/P99 target ~300-500ms for interactive text-AI workloads in vertical applications (use-case dependent: chatbot ~500ms, code-completion ~100ms, batch/report tolerant to seconds). Safety-critical paths have stricter vertical-specific ceilings — see compute_safety_latency.",
+          "provenance": {
+            "status": "cited",
+            "source": "industry LLM inference SLO conventions, 2026 (Spheron, Rafay, BentoML, Mirantis) — applies to interactive text-AI in vertical deployments; safety-critical latency budgets are a separate stricter ceiling per vertical",
+            "notes": "SLA convention/range — interactive text-AI only; the safety-critical latency budget is governed by compute_safety_latency and its codified vertical ceilings",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_capex_directional": {
+          "band": "medium",
+          "text": "factors: smaller cluster scale than hyperscaler/frontier; vertical-specific hardware mix (HGX plus RTX PRO 6000 edge plus Jetson plus DGX where applicable); facility readiness varies by vertical",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class characterization for industry-vertical AI buildouts; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with OpEx. Medium band (vs Fortune-500 high / hyperscaler high) reflects smaller cluster scale and the vertical-specific hardware mix.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_tco_opex_directional": {
+          "band": "high",
+          "text": "factors: domain-vetted MLops talent (rare), safety-certification cadence (recurring), vertical-specific re-validation on every model update, downtime cost in safety-critical paths",
+          "provenance": {
+            "status": "directional",
+            "source": "deployment-class characterization for industry-vertical AI operations; not a computed point value",
+            "notes": "ALWAYS a directional band; never summed with CapEx. High band (despite medium CapEx) reflects that vertical-AI OpEx is dominated by certification cadence and domain-vetted talent costs — the CapEx-OpEx ratio inverts vs hyperscaler.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_lead_time": {
+          "text": "compliance-gated procurement: hardware lead-times are layered with vertical-specific certification dependencies (FDA review, ISO audit windows)",
+          "provenance": {
+            "status": "directional",
+            "source": "lead-time characterization for vertical deployments — hardware procurement is rarely the binding constraint; vertical compliance gates dominate the timeline",
+            "notes": "directional — vertical compliance cycle is the dominant lead-time driver, not hardware procurement",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_service_footprint": {
+          "text": "vendor depth in the vertical (NVIDIA Clara for healthcare, Omniverse for manufacturing, DRIVE for automotive, BioNeMo for life-sciences) is more important than geographic footprint",
+          "provenance": {
+            "status": "directional",
+            "source": "service-footprint characterization for vertical deployments — vendor vertical-specific product line and reference customers are the relevant lens",
+            "notes": "directional — vertical-specific vendor depth matters more than geographic coverage",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "ops_skills_fit": {
+          "text": "narrow talent pool combining domain expertise (clinical, manufacturing, regulatory) with CUDA / NVAIE engineering; ISV platforms (Clara, Omniverse, BioNeMo) reduce the engineering depth required",
+          "provenance": {
+            "status": "directional",
+            "source": "skills-fit characterization for vertical deployments — talent must combine domain depth with NVIDIA-stack proficiency; ISV abstraction layers mitigate the engineering depth requirement",
+            "notes": "directional — talent scarcity is structural at the domain × technical intersection; ISV platform choice is the main mitigation",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from vertical AI program disclosures (healthcare, manufacturing digital twins, robotics).",
-        "last_verified": "2026-05-20"
+        "last_verified": "2026-05-21"
       }
     }
   ]
