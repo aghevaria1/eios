@@ -50,8 +50,15 @@ export interface Component {
   slot?: string
   layer?: string
   vendor?: string
+  // Optional sub-classification. Currently used by ISV components to split
+  // storage ISVs (VAST Data) from orchestration ISVs (Red Hat OpenShift AI,
+  // VMware Private AI Foundation, Nutanix Enterprise AI). Other slots may
+  // adopt category-style grouping later.
+  category?: IsvCategory
   kpi_values?: Record<string, KpiValue>
 }
+
+export type IsvCategory = 'storage' | 'orchestration'
 
 export interface Layer {
   id: string
@@ -86,6 +93,12 @@ export interface Segment {
   delivered_kpis?: Record<string, KpiValue>
   // Per-segment RA blend — ordered list of architectures the segment deploys.
   architecture_blend?: ArchitectureBlend
+  // Per-segment ISV blend — ordered list of ISV component ids, lead-first.
+  // Wins over architecture.default_components.isv when present (segment-first
+  // resolution, same pattern as delivered_kpis). Step 2 will render the full
+  // list at L3; the engine's buildConfig resolves the LEAD (isv_blend[0]).
+  isv_blend?: string[]
+  isv_rationale?: string
   // Partner-PM battleground flag. Marks segments where flawless multi-OEM
   // execution (Dell / HPE / Lenovo / Cisco / Supermicro) is the critical
   // commercial axis. Currently: Fortune 500 + Sovereign AI.

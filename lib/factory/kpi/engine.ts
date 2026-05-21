@@ -63,7 +63,10 @@ export function buildConfig(
     fabric: overrides?.fabric ?? arch.default_components.fabric,
     software: overrides?.software ?? arch.default_components.software,
     oem: overrides?.oem ?? arch.default_components.oem,
-    isv: overrides?.isv ?? arch.default_components.isv,
+    // ISV precedence: explicit override → segment.isv_blend lead → architecture
+    // default. Mirrors the segment-first KPI resolver — segment data takes
+    // priority over architecture defaults.
+    isv: overrides?.isv ?? seg.isv_blend?.[0] ?? arch.default_components.isv,
   }
 }
 

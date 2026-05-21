@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "last_verified": "2026-05-21",
   "segments": [
     {
@@ -107,6 +107,8 @@
         "ras": [{"id": "NVL72"}],
         "note": "Heavy NVL72 — trillion-parameter training requires unified 72-GPU NVLink domain"
       },
+      "isv_blend": ["vast_data"],
+      "isv_rationale": "Scale-out parallel file system for trillion-parameter training; orchestration ISVs stripped away in favor of bare-metal/custom schedulers",
       "partner_intensity": "low-medium",
       "partner_intensity_rationale": "buys frontier NVL72 relatively directly, but still needs OEM integration + service at scale",
       "provenance": {
@@ -224,6 +226,8 @@
         ],
         "note": "Blended NVL72 + HGX — direct co-engineering; OEM presence minimal"
       },
+      "isv_blend": ["vast_data"],
+      "isv_rationale": "Scale-out storage performance; orchestration self-built",
       "partner_intensity": "low",
       "partner_intensity_rationale": "co-engineers directly with NVIDIA, OEM presence minimal (per matrix); largely self-integrates",
       "provenance": {
@@ -307,6 +311,8 @@
         ],
         "note": "The classic blended portfolio: HGX for training, RTX PRO for inference"
       },
+      "isv_blend": ["red_hat_openshift_ai", "vmware_private_ai_foundation", "nutanix_enterprise_ai"],
+      "isv_rationale": "New servers in the data center — apply existing corporate policy/IAM/compliance; cloud-native favors OpenShift, infra-first favors VMware/Nutanix",
       "is_battleground": true,
       "battleground_note": "critical battleground for the Partner-PM — flawless execution across Dell, HPE, Lenovo, Cisco, Supermicro.",
       "partner_intensity": "high",
@@ -435,6 +441,8 @@
         ],
         "note": "Full-spectrum deployment for digital autonomy"
       },
+      "isv_blend": ["red_hat_openshift_ai", "vast_data"],
+      "isv_rationale": "Control (portable secure control plane for jurisdictional compliance) + capacity (national-scale datasets)",
       "is_battleground": true,
       "battleground_note": "critical battleground for the Partner-PM — flawless execution across Dell, HPE, Lenovo, Cisco, Supermicro.",
       "partner_intensity": "high",
@@ -563,6 +571,8 @@
         ],
         "note": "Inference-heavy edge paired with specialized training"
       },
+      "isv_blend": ["nutanix_enterprise_ai", "vmware_private_ai_foundation"],
+      "isv_rationale": "Turn-key layer for limited-AI-staff orgs (hospital/factory) to deploy inference without GPU-clustering expertise",
       "partner_intensity": "medium-high",
       "partner_intensity_rationale": "OEM/ISV-served (edge + regional deployments via Dell/HPE/Lenovo/Supermicro + domain ISVs), but not one of the matrix's two critical battlegrounds",
       "provenance": {

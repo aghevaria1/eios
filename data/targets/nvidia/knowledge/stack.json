@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "last_verified": "2026-05-21",
   "layers": [
     {
@@ -314,6 +314,34 @@
       "layer": "L3",
       "slot": "isv",
       "vendor": "red_hat",
+      "category": "orchestration",
+      "kpi_values": {}
+    },
+    {
+      "id": "vmware_private_ai_foundation",
+      "name": "VMware Private AI Foundation",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "vmware",
+      "category": "orchestration",
+      "kpi_values": {}
+    },
+    {
+      "id": "nutanix_enterprise_ai",
+      "name": "Nutanix Enterprise AI",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "nutanix",
+      "category": "orchestration",
+      "kpi_values": {}
+    },
+    {
+      "id": "vast_data",
+      "name": "VAST Data",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "vast_data",
+      "category": "storage",
       "kpi_values": {}
     }
   ]

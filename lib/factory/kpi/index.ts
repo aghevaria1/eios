@@ -16,6 +16,7 @@ export type {
   Architecture,
   ArchitectureBlend,
   PartnerIntensity,
+  IsvCategory,
   ConfigState,
   ComponentSwap,
   SwapImpact,
