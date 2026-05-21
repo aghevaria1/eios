@@ -8,7 +8,7 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import type { Architecture, Component, Segment } from './types'
+import type { Architecture, Component, Layer, Segment } from './types'
 
 const KNOWLEDGE_DIR = path.join(
   process.cwd(),
@@ -25,6 +25,7 @@ export interface KnowledgeBase {
   }
   segments: Segment[]
   architectures: Architecture[]
+  layers: Layer[]
   components: Map<string, Component>
 }
 
@@ -44,7 +45,9 @@ export function loadKnowledge(): KnowledgeBase {
   const architecturesFile = readJson<{ architectures: Architecture[] }>(
     'architectures.json',
   )
-  const stackFile = readJson<{ components: Component[] }>('stack.json')
+  const stackFile = readJson<{ layers: Layer[]; components: Component[] }>(
+    'stack.json',
+  )
   const competitorsFile = readJson<{ components: Component[] }>(
     'competitors.json',
   )
@@ -57,6 +60,7 @@ export function loadKnowledge(): KnowledgeBase {
     manifest,
     segments: segmentsFile.segments,
     architectures: architecturesFile.architectures,
+    layers: stackFile.layers,
     components,
   }
   return cache

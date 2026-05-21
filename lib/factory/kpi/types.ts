@@ -53,6 +53,12 @@ export interface Component {
   kpi_values?: Record<string, KpiValue>
 }
 
+export interface Layer {
+  id: string
+  name: string
+  description: string
+}
+
 export interface Segment {
   id: string
   name: string
