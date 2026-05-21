@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "last_verified": "2026-05-21",
   "segments": [
     {
@@ -103,6 +103,12 @@
           }
         }
       },
+      "architecture_blend": {
+        "ras": [{"id": "NVL72"}],
+        "note": "Heavy NVL72 — trillion-parameter training requires unified 72-GPU NVLink domain"
+      },
+      "partner_intensity": "low-medium",
+      "partner_intensity_rationale": "buys frontier NVL72 relatively directly, but still needs OEM integration + service at scale",
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from public observations of frontier-lab infrastructure preferences (NVL72, very large scale).",
@@ -211,6 +217,15 @@
           }
         }
       },
+      "architecture_blend": {
+        "ras": [
+          {"id": "NVL72"},
+          {"id": "HGX"}
+        ],
+        "note": "Blended NVL72 + HGX — direct co-engineering; OEM presence minimal"
+      },
+      "partner_intensity": "low",
+      "partner_intensity_rationale": "co-engineers directly with NVIDIA, OEM presence minimal (per matrix); largely self-integrates",
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from hyperscaler public infrastructure disclosures and analyst coverage.",
@@ -285,6 +300,17 @@
           }
         }
       },
+      "architecture_blend": {
+        "ras": [
+          {"id": "HGX", "role": "training"},
+          {"id": "RTX_PRO", "role": "inference"}
+        ],
+        "note": "The classic blended portfolio: HGX for training, RTX PRO for inference"
+      },
+      "is_battleground": true,
+      "battleground_note": "critical battleground for the Partner-PM — flawless execution across Dell, HPE, Lenovo, Cisco, Supermicro.",
+      "partner_intensity": "high",
+      "partner_intensity_rationale": "channel-served — Dell/HPE/Lenovo/Cisco/Supermicro integrate, certify, support; the partner ecosystem wins or loses the deal",
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from Fortune 500 enterprise AI deployment patterns (private cloud, regulated, audit-driven).",
@@ -401,6 +427,18 @@
           }
         }
       },
+      "architecture_blend": {
+        "ras": [
+          {"id": "NVL72"},
+          {"id": "HGX"},
+          {"id": "RTX_PRO"}
+        ],
+        "note": "Full-spectrum deployment for digital autonomy"
+      },
+      "is_battleground": true,
+      "battleground_note": "critical battleground for the Partner-PM — flawless execution across Dell, HPE, Lenovo, Cisco, Supermicro.",
+      "partner_intensity": "high",
+      "partner_intensity_rationale": "channel-served + in-country integration/certification requirements; national procurement runs through certified OEM partners",
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from G42/Inception, EU AI Factory, and BIS export-control program public materials.",
@@ -518,6 +556,15 @@
           }
         }
       },
+      "architecture_blend": {
+        "ras": [
+          {"id": "HGX", "role": "specialized training"},
+          {"id": "RTX_PRO", "role": "edge inference"}
+        ],
+        "note": "Inference-heavy edge paired with specialized training"
+      },
+      "partner_intensity": "medium-high",
+      "partner_intensity_rationale": "OEM/ISV-served (edge + regional deployments via Dell/HPE/Lenovo/Supermicro + domain ISVs), but not one of the matrix's two critical battlegrounds",
       "provenance": {
         "status": "directional",
         "notes": "Segment definition synthesized from vertical AI program disclosures (healthcare, manufacturing digital twins, robotics).",

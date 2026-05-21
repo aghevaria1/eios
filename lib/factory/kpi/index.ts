@@ -14,6 +14,8 @@ export type {
   Layer,
   Segment,
   Architecture,
+  ArchitectureBlend,
+  PartnerIntensity,
   ConfigState,
   ComponentSwap,
   SwapImpact,

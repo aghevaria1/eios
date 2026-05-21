@@ -59,6 +59,21 @@ export interface Layer {
   description: string
 }
 
+// Per-segment reference-architecture blend. Most NVIDIA segments deploy more
+// than one RA (e.g., HGX for training + RTX PRO for inference). The blend is
+// the honest description of that reality; single-RA segments use a one-item ras.
+//
+// The FIRST entry in `ras` is the lead RA (used as the cake's primary reference
+// and for buildConfig fallback). Per-RA `role` is set ONLY where the matrix
+// specifies one (FT500: training/inference; Verticals: specialized
+// training/edge inference). For segments whose matrix gives a segment-level
+// descriptor ("co-engineered", "full-spectrum"), `role` stays absent and the
+// rationale lives entirely in `note`.
+export interface ArchitectureBlend {
+  ras: { id: string; role?: string }[]
+  note: string
+}
+
 export interface Segment {
   id: string
   name: string
@@ -69,8 +84,28 @@ export interface Segment {
   // that semantically live at the segment level, not on a component.
   // Engine resolution checks here first; falls back to component.kpi_values.
   delivered_kpis?: Record<string, KpiValue>
+  // Per-segment RA blend — ordered list of architectures the segment deploys.
+  architecture_blend?: ArchitectureBlend
+  // Partner-PM battleground flag. Marks segments where flawless multi-OEM
+  // execution (Dell / HPE / Lenovo / Cisco / Supermicro) is the critical
+  // commercial axis. Currently: Fortune 500 + Sovereign AI.
+  is_battleground?: boolean
+  battleground_note?: string
+  // Partner-channel intensity gradient — finer-grained companion to
+  // is_battleground. The binary flag marks the matrix's two headline
+  // battlegrounds; this gradient ranks ALL segments by how partner-served
+  // they are (hyperscaler direct ↔ channel-saturated enterprise).
+  partner_intensity?: PartnerIntensity
+  partner_intensity_rationale?: string
   provenance: Provenance
 }
+
+export type PartnerIntensity =
+  | 'low'
+  | 'low-medium'
+  | 'medium'
+  | 'medium-high'
+  | 'high'
 
 export interface Architecture {
   id: string
