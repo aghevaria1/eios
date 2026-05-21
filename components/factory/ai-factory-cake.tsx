@@ -2,14 +2,22 @@ import type {
   Architecture,
   Component,
   Layer,
-  Segment,
 } from '@/lib/factory/kpi'
+
+// One L2 compute tile = one RA in the segment's architecture blend.
+// `role` is set only where the matrix specifies it (FT500: training/inference;
+// Verticals: specialized training/edge inference). Hyperscaler/Sovereign/Frontier
+// have no per-RA roles — their rationale lives in the segment-level matrix note,
+// rendered as the page header by the parent component, not here.
+export interface L2Tile {
+  ra: Architecture
+  gpu: Component
+  role?: string
+}
 
 interface AIFactoryCakeProps {
   layers: Layer[]
-  segment: Segment
-  architecture: Architecture
-  chosenGpu: Component
+  l2Tiles: L2Tile[]
   chosenFabric: Component
   chosenIsv: Component
   softwareWrapper: Component
@@ -18,7 +26,7 @@ interface AIFactoryCakeProps {
 
 export function AIFactoryCake({
   layers,
-  chosenGpu,
+  l2Tiles,
   chosenFabric,
   chosenIsv,
   softwareWrapper,
@@ -32,6 +40,9 @@ export function AIFactoryCake({
   const L5 = layerById.get('L5')
   if (!L1 || !L2 || !L3 || !L4 || !L5) {
     throw new Error('AIFactoryCake: missing one of L1-L5 in layers prop')
+  }
+  if (l2Tiles.length === 0) {
+    throw new Error('AIFactoryCake: l2Tiles must have at least one entry')
   }
 
   return (
@@ -50,7 +61,7 @@ export function AIFactoryCake({
         <LayerDescription>{L4.description}</LayerDescription>
       </LayerContent>
 
-      {/* Row 3 — L3 ISV Platform (Red Hat OpenShift AI selected) */}
+      {/* Row 3 — L3 ISV Platform */}
       <LayerLabel id="L3" tag="ISV" row={3} />
       <LayerContent row={3}>
         <LayerTitle>{L3.name}</LayerTitle>
@@ -63,18 +74,22 @@ export function AIFactoryCake({
       {/* NVAIE wrapper rail — spans rows 1-3 in col 3 */}
       <NvaieRail name={softwareWrapper.name} />
 
-      {/* Row 4 — L2 Chips (Blackwell B200 + Spectrum-X selected) */}
+      {/* Row 4 — L2 Chips: one tile per RA in the segment blend */}
       <LayerLabel id="L2" tag="CHIPS" row={4} />
       <LayerContent row={4} colSpan={2}>
         <LayerTitle>{L2.name}</LayerTitle>
         <LayerDescription>{L2.description}</LayerDescription>
         <div className="mt-3 flex flex-wrap gap-2">
-          <SelectedChip slot="GPU">{chosenGpu.name}</SelectedChip>
+          {l2Tiles.map((tile) => (
+            <L2RaTile key={tile.ra.id} tile={tile} />
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-2">
           <SelectedChip slot="FABRIC">{chosenFabric.name}</SelectedChip>
         </div>
       </LayerContent>
 
-      {/* Row 5 — Dell PowerEdge XE9680 chassis divider (between L2 and L1) */}
+      {/* Row 5 — Dell chassis divider (between L2 and L1) */}
       <OemDivider name={oem.name} row={5} />
 
       {/* Row 6 — L1 Land / Power / Shell */}
@@ -83,6 +98,22 @@ export function AIFactoryCake({
         <LayerTitle>{L1.name}</LayerTitle>
         <LayerDescription>{L1.description}</LayerDescription>
       </LayerContent>
+    </div>
+  )
+}
+
+function L2RaTile({ tile }: { tile: L2Tile }) {
+  return (
+    <div className="flex min-w-[170px] flex-1 basis-[200px] flex-col rounded border border-[#76B900] bg-[#76B900]/[0.05] px-3 py-2">
+      <div className="text-[10px] font-mono font-semibold uppercase tracking-widest text-[#76B900]/80">
+        {tile.ra.id}
+        {tile.role && (
+          <span className="text-[#76B900]/60"> · {tile.role}</span>
+        )}
+      </div>
+      <div className="mt-1 text-xs font-medium leading-snug text-[#76B900]">
+        {tile.gpu.name}
+      </div>
     </div>
   )
 }
