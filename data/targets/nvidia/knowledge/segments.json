@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "last_verified": "2026-05-21",
   "segments": [
     {
@@ -109,6 +109,22 @@
       },
       "isv_blend": ["vast_data"],
       "isv_rationale": "Scale-out parallel file system for trillion-parameter training; orchestration ISVs stripped away in favor of bare-metal/custom schedulers",
+      "l1_profile": {
+        "text": "Dedicated liquid-cooled facility — GB200 NVL72 at ~120 kW/rack (~3,000 kg/rack), mandatory direct liquid cooling. Purpose-built AI-factory datacenter; cannot retrofit into air-cooled space.",
+        "provenance": {
+          "status": "cited",
+          "source": "multiple DC infra sources 2025-2026 (Schneider, Vertiv, Sunbird, Introl): GB200 NVL72 ~120kW/rack, liquid mandatory",
+          "last_verified": "2026-05-21"
+        },
+        "trajectory_note": {
+          "text": "Density trajectory: Vera Rubin NVL144 → ~600 kW/rack — facility power/cooling planning, not chips, becomes the strategic constraint.",
+          "provenance": {
+            "status": "directional",
+            "notes": "roadmap projection — Vera Rubin NVL144 not yet shipping; density figure is forward-looking",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "partner_intensity": "low-medium",
       "partner_intensity_rationale": "buys frontier NVL72 relatively directly, but still needs OEM integration + service at scale",
       "provenance": {
@@ -228,6 +244,22 @@
       },
       "isv_blend": ["vast_data"],
       "isv_rationale": "Scale-out storage performance; orchestration self-built",
+      "l1_profile": {
+        "text": "Hyperscale owned datacenter — liquid cooling for NVL72 racks, air/hybrid for HGX. PUE-optimized (~1.1 band; see PUE KPI). Self-operated facility.",
+        "provenance": {
+          "status": "cited",
+          "source": "GB200 NVL72 liquid + HGX air-cooled split; hyperscale PUE ~1.1 (sustainability reports)",
+          "last_verified": "2026-05-21"
+        },
+        "trajectory_note": {
+          "text": "Density trajectory: Vera Rubin NVL144 → ~600 kW/rack — facility power/cooling planning, not chips, becomes the strategic constraint.",
+          "provenance": {
+            "status": "directional",
+            "notes": "roadmap projection — Vera Rubin NVL144 not yet shipping; density figure is forward-looking",
+            "last_verified": "2026-05-21"
+          }
+        }
+      },
       "partner_intensity": "low",
       "partner_intensity_rationale": "co-engineers directly with NVIDIA, OEM presence minimal (per matrix); largely self-integrates",
       "provenance": {
@@ -313,6 +345,14 @@
       },
       "isv_blend": ["red_hat_openshift_ai", "vmware_private_ai_foundation", "nutanix_enterprise_ai"],
       "isv_rationale": "New servers in the data center — apply existing corporate policy/IAM/compliance; cloud-native favors OpenShift, infra-first favors VMware/Nutanix",
+      "l1_profile": {
+        "text": "Enterprise datacenter or colo — air-cooled or rear-door heat exchanger; retrofit into existing facility. Air-cooling ceiling ~10-15 kW/rack is the planning constraint.",
+        "provenance": {
+          "status": "cited",
+          "source": "air cooling practical ceiling 10-15 kW/rack (multiple DC infra sources 2025-2026)",
+          "last_verified": "2026-05-21"
+        }
+      },
       "is_battleground": true,
       "battleground_note": "critical battleground for the Partner-PM — flawless execution across Dell, HPE, Lenovo, Cisco, Supermicro.",
       "partner_intensity": "high",
@@ -443,6 +483,14 @@
       },
       "isv_blend": ["red_hat_openshift_ai", "vast_data"],
       "isv_rationale": "Control (portable secure control plane for jurisdictional compliance) + capacity (national-scale datasets)",
+      "l1_profile": {
+        "text": "In-country / sovereign datacenter, often new-build — mixed cooling per RA blend; energy-sovereignty considerations; sometimes air-gapped facility.",
+        "provenance": {
+          "status": "directional",
+          "notes": "no single source — jurisdictional siting and sovereignty constraints vary by national regime; reasoned read of sovereign-AI program patterns",
+          "last_verified": "2026-05-21"
+        }
+      },
       "is_battleground": true,
       "battleground_note": "critical battleground for the Partner-PM — flawless execution across Dell, HPE, Lenovo, Cisco, Supermicro.",
       "partner_intensity": "high",
@@ -573,6 +621,14 @@
       },
       "isv_blend": ["nutanix_enterprise_ai", "vmware_private_ai_foundation"],
       "isv_rationale": "Turn-key layer for limited-AI-staff orgs (hospital/factory) to deploy inference without GPU-clustering expertise",
+      "l1_profile": {
+        "text": "Edge / on-prem distributed — space- and power-constrained sites (hospital server room, factory floor); air-cooled at lower density.",
+        "provenance": {
+          "status": "directional",
+          "notes": "no single source — edge facility constraints vary widely by vertical and site; reasoned read of edge deployment patterns",
+          "last_verified": "2026-05-21"
+        }
+      },
       "partner_intensity": "medium-high",
       "partner_intensity_rationale": "OEM/ISV-served (edge + regional deployments via Dell/HPE/Lenovo/Supermicro + domain ISVs), but not one of the matrix's two critical battlegrounds",
       "provenance": {

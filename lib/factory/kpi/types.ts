@@ -66,6 +66,22 @@ export interface Layer {
   description: string
 }
 
+// Per-segment L1 (Land/Power/Shell) facility profile. The RA blend at L2
+// drives the facility requirement — NVL72 mandates liquid cooling at ~120 kW/
+// rack; HGX runs air or hybrid; RTX PRO/edge stays air-cooled at lower
+// density. `text` is the verbatim per-segment facility description. The
+// optional `trajectory_note` carries a forward-looking density projection
+// (currently the Vera Rubin NVL144 ~600 kW/rack note for Frontier and
+// Hyperscaler) with its OWN provenance tag — roadmap, not current shipping.
+export interface L1Profile {
+  text: string
+  provenance: Provenance
+  trajectory_note?: {
+    text: string
+    provenance: Provenance
+  }
+}
+
 // Per-segment reference-architecture blend. Most NVIDIA segments deploy more
 // than one RA (e.g., HGX for training + RTX PRO for inference). The blend is
 // the honest description of that reality; single-RA segments use a one-item ras.
@@ -95,10 +111,15 @@ export interface Segment {
   architecture_blend?: ArchitectureBlend
   // Per-segment ISV blend — ordered list of ISV component ids, lead-first.
   // Wins over architecture.default_components.isv when present (segment-first
-  // resolution, same pattern as delivered_kpis). Step 2 will render the full
-  // list at L3; the engine's buildConfig resolves the LEAD (isv_blend[0]).
+  // resolution, same pattern as delivered_kpis). The engine's buildConfig
+  // resolves the LEAD (isv_blend[0]); the cake renders the full list at L3.
   isv_blend?: string[]
   isv_rationale?: string
+  // Per-segment L1 (Land/Power/Shell) facility profile. Replaces the uniform
+  // stack.json L1 description with segment-specific facility physics driven
+  // by the RA blend (liquid-mandatory for NVL72, air-cooled ceiling for HGX,
+  // edge constraints for RTX PRO).
+  l1_profile?: L1Profile
   // Partner-PM battleground flag. Marks segments where flawless multi-OEM
   // execution (Dell / HPE / Lenovo / Cisco / Supermicro) is the critical
   // commercial axis. Currently: Fortune 500 + Sovereign AI.

@@ -15,6 +15,7 @@ export type {
   Segment,
   Architecture,
   ArchitectureBlend,
+  L1Profile,
   PartnerIntensity,
   IsvCategory,
   ConfigState,
