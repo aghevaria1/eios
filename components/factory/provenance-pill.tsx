@@ -1,7 +1,7 @@
-import type { KpiValue } from '@/lib/factory/kpi'
+import type { Provenance } from '@/lib/factory/kpi'
 
-export function ProvenancePill({ value }: { value: KpiValue }) {
-  const { label, classes } = pillFromValue(value)
+export function ProvenancePill({ provenance }: { provenance: Provenance }) {
+  const { label, classes } = pillFromProvenance(provenance)
   return (
     <span
       className={`inline-flex items-center whitespace-nowrap rounded border px-2 py-0.5 text-[10px] font-mono font-semibold tracking-widest ${classes}`}
@@ -11,14 +11,16 @@ export function ProvenancePill({ value }: { value: KpiValue }) {
   )
 }
 
-function pillFromValue(v: KpiValue): { label: string; classes: string } {
-  if (v.provenance.flag === 'verify-needed') {
+function pillFromProvenance(
+  p: Provenance,
+): { label: string; classes: string } {
+  if (p.flag === 'verify-needed') {
     return {
       label: 'VERIFY-NEEDED',
       classes: 'bg-rose-500/10 border-rose-500/40 text-rose-300',
     }
   }
-  switch (v.provenance.status) {
+  switch (p.status) {
     case 'cited':
       return {
         label: 'CITED',

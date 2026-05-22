@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { Component, Layer, Segment } from '@/lib/factory/kpi'
+import type { Component, L1Profile, Layer, Segment } from '@/lib/factory/kpi'
 import { AIFactoryCake, type L2Tile } from './ai-factory-cake'
 import {
   DeliveredKpisPanel,
@@ -20,6 +20,9 @@ export interface SegmentView {
   chosenIsvs: Component[]
   softwareWrapper: Component
   oem: Component
+  // Per-segment L1 (Land/Power/Shell) facility profile when seeded; undefined
+  // segments fall back to the stack.json layer description at the cake's L1 band.
+  l1Profile?: L1Profile
   northStar: KpiResult[]
   supporting: KpiResult[]
   tcoCapex: KpiResult
@@ -72,6 +75,7 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
         chosenIsvs={active.chosenIsvs}
         softwareWrapper={active.softwareWrapper}
         oem={active.oem}
+        l1Profile={active.l1Profile}
       />
 
       <p className="mt-6 text-[10px] font-mono leading-relaxed text-gray-500">

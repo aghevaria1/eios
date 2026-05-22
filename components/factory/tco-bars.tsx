@@ -58,7 +58,7 @@ function TcoCard({ label, result }: { label: string; result: KpiResult }) {
           {label}{' '}
           <span className="text-gray-600">(directional)</span>
         </div>
-        <ProvenancePill value={v} />
+        <ProvenancePill provenance={v.provenance} />
       </div>
 
       <div className="mt-3">

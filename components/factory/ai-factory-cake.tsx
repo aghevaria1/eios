@@ -1,8 +1,10 @@
 import type {
   Architecture,
   Component,
+  L1Profile,
   Layer,
 } from '@/lib/factory/kpi'
+import { ProvenancePill } from './provenance-pill'
 
 // One L2 compute tile = one RA in the segment's architecture blend.
 // `role` is set only where the matrix specifies it (FT500: training/inference;
@@ -25,6 +27,11 @@ interface AIFactoryCakeProps {
   chosenIsvs: Component[]
   softwareWrapper: Component
   oem: Component
+  // Per-segment L1 (Land/Power/Shell) facility profile. When present, the L1
+  // band renders the per-segment text + provenance pill + optional trajectory
+  // note. When absent, falls back to the stack.json layer description (forward-
+  // compat for segments without a seeded l1_profile).
+  l1Profile?: L1Profile
 }
 
 export function AIFactoryCake({
@@ -34,6 +41,7 @@ export function AIFactoryCake({
   chosenIsvs,
   softwareWrapper,
   oem,
+  l1Profile,
 }: AIFactoryCakeProps) {
   const layerById = new Map(layers.map((l) => [l.id, l]))
   const L1 = layerById.get('L1')
@@ -100,11 +108,15 @@ export function AIFactoryCake({
       {/* Row 5 — Dell chassis divider (between L2 and L1) */}
       <OemDivider name={oem.name} row={5} />
 
-      {/* Row 6 — L1 Land / Power / Shell */}
+      {/* Row 6 — L1 Land / Power / Shell: per-segment facility profile when seeded */}
       <LayerLabel id="L1" tag="FOUNDATION" row={6} />
       <LayerContent row={6} colSpan={2}>
         <LayerTitle>{L1.name}</LayerTitle>
-        <LayerDescription>{L1.description}</LayerDescription>
+        {l1Profile ? (
+          <L1ProfileBody profile={l1Profile} />
+        ) : (
+          <LayerDescription>{L1.description}</LayerDescription>
+        )}
       </LayerContent>
     </div>
   )
@@ -123,6 +135,32 @@ function L2RaTile({ tile }: { tile: L2Tile }) {
         {tile.gpu.name}
       </div>
     </div>
+  )
+}
+
+function L1ProfileBody({ profile }: { profile: L1Profile }) {
+  return (
+    <>
+      <div className="mt-1 flex items-start justify-between gap-3">
+        <p className="text-xs leading-relaxed text-gray-300">{profile.text}</p>
+        <ProvenancePill provenance={profile.provenance} />
+      </div>
+      {profile.trajectory_note && (
+        <div className="mt-3 border-t border-gray-800 pt-2">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1">
+              <div className="text-[10px] font-mono tracking-widest text-gray-500">
+                TRAJECTORY
+              </div>
+              <p className="mt-1 text-[11px] leading-relaxed text-gray-400">
+                {profile.trajectory_note.text}
+              </p>
+            </div>
+            <ProvenancePill provenance={profile.trajectory_note.provenance} />
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

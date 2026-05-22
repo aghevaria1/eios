@@ -63,7 +63,7 @@ function NorthStarCard({ result }: { result: KpiResult }) {
         <h3 className="text-base font-semibold text-gray-100">
           {result.kpi.name}
         </h3>
-        {result.value && <ProvenancePill value={result.value} />}
+        {result.value && <ProvenancePill provenance={result.value.provenance} />}
       </div>
       <ValueBody value={result.value} prominent />
     </div>
@@ -75,7 +75,7 @@ function SupportingCard({ result }: { result: KpiResult }) {
     <div className="flex h-full flex-col rounded border border-gray-800 bg-gray-900/60 p-4">
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-sm font-semibold text-gray-100">{result.kpi.name}</h4>
-        {result.value && <ProvenancePill value={result.value} />}
+        {result.value && <ProvenancePill provenance={result.value.provenance} />}
       </div>
       <ValueBody value={result.value} />
     </div>

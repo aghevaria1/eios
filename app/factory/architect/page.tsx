@@ -105,6 +105,9 @@ export default function ArchitectPage() {
       chosenIsvs,
       softwareWrapper,
       oem,
+      // Per-segment L1 facility profile — optional; the cake falls back to the
+      // stack.json layer description when undefined.
+      l1Profile: segment.l1_profile,
       northStar,
       supporting,
       tcoCapex,
