@@ -29,7 +29,7 @@ function pillFromProvenance(
     case 'claimed':
       return {
         label: 'CLAIMED',
-        classes: 'bg-amber-500/10 border-amber-500/40 text-amber-300',
+        classes: 'bg-sky-500/10 border-sky-500/40 text-sky-300',
       }
     default:
       return {

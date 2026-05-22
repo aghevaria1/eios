@@ -1,6 +1,6 @@
 {
-  "version": "0.1.0",
-  "last_verified": "2026-05-20",
+  "version": "0.2.0",
+  "last_verified": "2026-05-21",
   "categories": {
     "full_cake_replacement": {
       "description": "Replaces the NVIDIA stack end-to-end. Examples: AMD Helios, hyperscaler custom silicon (where applicable).",
@@ -34,29 +34,31 @@
         "compute_memory_capacity_per_gpu": {
           "range": { "min": 432, "max": 432, "unit": "GB HBM4" },
           "provenance": {
-            "status": "cited",
+            "status": "claimed",
             "source": "AMD MI455X / Helios announcement materials (per user-supplied competitor brief).",
             "claimed_by": "amd",
-            "last_verified": "2026-05-20",
-            "notes": "AMD's own announcement figures; treat as cited from vendor."
+            "last_verified": "2026-05-21",
+            "notes": "AMD's own announcement figures for a pre-launch product (Helios targeting Q3 2026). Vendor-claim, not a shipping datasheet measurement — pill renders CLAIMED so the evidentiary weight reads honestly alongside cited NVIDIA datasheet specs in head-to-head views."
           }
         },
         "compute_memory_bandwidth_per_gpu": {
           "range": { "min": 19.6, "max": 19.6, "unit": "TB/s" },
           "provenance": {
-            "status": "cited",
+            "status": "claimed",
             "source": "AMD MI455X announcement materials.",
             "claimed_by": "amd",
-            "last_verified": "2026-05-20"
+            "last_verified": "2026-05-21",
+            "notes": "Pre-launch announcement figure; pill renders CLAIMED to distinguish from independent / datasheet citations."
           }
         },
         "compute_flops_fp4_per_gpu_dense": {
           "range": { "min": 40, "max": 40, "unit": "PFLOPS FP4" },
           "provenance": {
-            "status": "cited",
+            "status": "claimed",
             "source": "AMD MI455X announcement materials.",
             "claimed_by": "amd",
-            "last_verified": "2026-05-20"
+            "last_verified": "2026-05-21",
+            "notes": "Pre-launch announcement figure; pill renders CLAIMED to distinguish from independent / datasheet citations."
           }
         }
       }
@@ -82,9 +84,10 @@
         "compute_tco_per_token_merchant": {
           "band": "loses",
           "provenance": {
-            "status": "cited",
+            "status": "directional",
             "source": "Merchant cloud customers want CUDA — NVIDIA wins this slice. Hyperscaler custom silicon does not address external customers.",
-            "last_verified": "2026-05-20"
+            "last_verified": "2026-05-21",
+            "notes": "Re-tagged from cited to directional in phase 3c-0 — this is an analytical assertion about merchant-cloud preferences, not a specific independent citation or vendor benchmark. Directional band better matches the evidentiary shape."
           }
         },
         "deployment_adoption_internal": {
