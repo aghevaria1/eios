@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "last_verified": "2026-05-21",
   "categories": {
     "full_cake_replacement": {
@@ -8,7 +8,7 @@
     },
     "fabric_alternatives": {
       "description": "Replaces ONLY the fabric layer within the cake. The rest of the NVIDIA stack remains.",
-      "members": ["nvidia_spectrum_x", "nvidia_quantum_x800", "broadcom_jericho_tomahawk", "arista_ethernet", "cornelis_cn5000"]
+      "members": ["nvidia_spectrum_x", "nvidia_quantum_x800", "broadcom_jericho_tomahawk", "arista_ethernet", "cornelis_cn6000", "cornelis_cn5000"]
     },
     "uec_coalition": {
       "description": "Ultra Ethernet Consortium members — open-standard fabric coalition. Includes AMD, Cornelis, Broadcom, hyperscalers. Broadcom designs hyperscaler chips, making them a double enabler.",
@@ -58,7 +58,17 @@
             "source": "AMD MI455X announcement materials.",
             "claimed_by": "amd",
             "last_verified": "2026-05-21",
-            "notes": "Pre-launch announcement figure; pill renders CLAIMED to distinguish from independent / datasheet citations."
+            "notes": "Pre-launch announcement figure; pill renders CLAIMED to distinguish from independent / datasheet citations. AMD has not specified dense vs sparse in announcement materials — figure may not be apples-to-apples with NVIDIA B200's explicit dense/sparse split (9 PFLOPS dense / 18 PFLOPS sparse)."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 20, "max": 20, "unit": "PFLOPS FP8" },
+          "provenance": {
+            "status": "claimed",
+            "source": "AMD MI455X / CES 2026 announcement materials — 'up to 20 PFLOPS at FP8 precision' per GPU.",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-21",
+            "notes": "Pre-launch announcement figure (Helios H2 2026). Vendor-claim, pill CLAIMED. Note: AMD has not explicitly stated dense vs sparse; treat the comparison vs NVIDIA B200's 9 PFLOPS FP8 dense (verify-needed itself) with care."
           }
         }
       }
@@ -103,47 +113,191 @@
     },
     {
       "id": "broadcom_jericho_tomahawk",
-      "name": "Broadcom Jericho / Tomahawk Ethernet",
+      "name": "Broadcom Tomahawk Ultra (Ethernet for AI scale-up)",
       "category": "fabric_alternatives",
       "slot": "fabric",
       "vendor": "broadcom",
-      "positioning": "Within-cake fabric swap. Broadcom also designs hyperscaler custom chips — double enabler.",
+      "generation": "current",
+      "positioning": "Within-cake fabric swap. Tomahawk Ultra is Broadcom's AI-optimized merchant Ethernet switch chip (announced + shipping mid-2025) — 51.2 Tbps total switch capacity, 64x 800GbE ports, 250 ns port-to-port latency, 77 billion PPS. Pin-compatible with Tomahawk 5 for fast OEM time-to-market. Broadcom also designs hyperscaler custom AI chips and supplies the Jericho3-AI silicon inside Arista 7800R4/7700R4 — making Broadcom a double enabler (fabric chip + ODM silicon).",
       "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port (51.2 Tb/s total switch capacity)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Broadcom Tomahawk Ultra announcement materials + Broadcom investor release (2025): 51.2 Tbps switch, 64 ports of 800/400/200/100 GbE.",
+            "source_url": "https://www.broadcom.com/company/news/product-releases/63341",
+            "last_verified": "2026-05-21",
+            "notes": "Structured switch-chip nameplate spec, parallel to NVIDIA SN5600 datasheet."
+          }
+        },
+        "fabric_latency": {
+          "range": { "min": 250, "max": 250, "unit": "ns port-to-port" },
+          "provenance": {
+            "status": "cited",
+            "source": "Broadcom Tomahawk Ultra announcement + HPCwire coverage (2025) — explicit 250 ns port-to-port delay figure published as a structured product spec.",
+            "source_url": "https://www.hpcwire.com/off-the-wire/broadcom-ships-tomahawk-ultra-ethernet-switch-with-250ns-latency-for-ai-and-hpc/",
+            "last_verified": "2026-05-21",
+            "notes": "Rare among fabric vendors — Broadcom publishes a specific cited per-hop latency. NVIDIA Spectrum-X and Cornelis CN6000 do not publish single per-hop figures. Demo-narration framing: TRANSPARENCY, NOT NECESSARILY SUPERIORITY — head-to-head latency comparison favors Broadcom's evidence base over vendors whose per-hop latency is unpublished, but a missing number from NVIDIA/Cornelis is NOT evidence of worse performance. The honest read is 'Broadcom is the only one publishing the number,' not 'Broadcom is the fastest.'"
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 77000, "max": 77000, "unit": "million packets/sec (= 77 billion PPS)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Broadcom Tomahawk Ultra announcement materials — 77 billion packets per second wire-speed at 64-byte packets.",
+            "source_url": "https://www.broadcom.com/company/news/product-releases/63341",
+            "last_verified": "2026-05-21",
+            "notes": "Packet rate, not MPI-style message rate — NOT directly comparable to Cornelis's million-msg/sec figures (different methodology). Both are fabric-throughput-related but vendors measure different things; flagging the asymmetry in this note for honest heat-map rendering."
+          }
+        },
         "fabric_buying_philosophy": {
-          "text": "disaggregation / flexibility",
+          "text": "disaggregation / flexibility — merchant silicon Ethernet, customer chooses switch vendor and software independently",
           "provenance": {
             "status": "directional",
-            "source": "Broadcom positioning emphasizes merchant-silicon Ethernet flexibility vs NVIDIA's integrated stack.",
-            "last_verified": "2026-05-20"
+            "source": "Broadcom positioning emphasizes merchant-silicon Ethernet (UEC participant) vs NVIDIA's integrated stack. Tomahawk Ultra's pin-compatibility with Tomahawk 5 supports the disaggregated-ODM narrative.",
+            "last_verified": "2026-05-21"
           }
         }
       }
     },
     {
       "id": "arista_ethernet",
-      "name": "Arista Ethernet (7800R-class)",
+      "name": "Arista 7800R4 / 7700R4 Etherlink (AI fabric platform)",
       "category": "fabric_alternatives",
       "slot": "fabric",
       "vendor": "arista",
-      "positioning": "Within-cake fabric swap. Standard high-density Ethernet leaf-spine.",
+      "generation": "current",
+      "positioning": "Within-cake fabric swap. Etherlink is Arista's AI networking platform — 7800R4 AI Spine (up to 460 Tbps single chassis, 576x 800GbE ports) + 7700R4 Distributed Etherlink Switch (DES) scaling to 27,000+ 800GbE ports across 3-tier deployments. Built on Broadcom Jericho3-AI silicon with Arista EOS software differentiation. Co-developed with Meta. Shipping.",
       "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port (line-card up to 28.8 Tb/s; chassis up to 460 Tb/s)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Arista 7800R4 Series AI Spine + 7700R4 Distributed Etherlink Switch datasheets — 800GbE line cards, 10.8B PPS, 28.8 Tb/s per line card, 460 Tb/s per chassis.",
+            "source_url": "https://www.arista.com/assets/data/pdf/Datasheets/7800R4-Series-AI-Spine-Datasheet.pdf",
+            "last_verified": "2026-05-21",
+            "notes": "Structured datasheet nameplate spec. 800 Gbps per port matches NVIDIA SN5600 and Broadcom Tomahawk Ultra — not an Arista performance differentiator at port level; differentiation is at platform scale (3-tier DES → 27,000 ports) and EOS software."
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 10800, "max": 10800, "unit": "million packets/sec per line card (= 10.8 billion PPS)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Arista 7800R4 line-card datasheet — 10.8 billion PPS per line card.",
+            "source_url": "https://www.arista.com/assets/data/pdf/Datasheets/7800R4-Series-AI-Spine-Datasheet.pdf",
+            "last_verified": "2026-05-21",
+            "notes": "Per-line-card packet rate, not per-switch or per-port. Like Broadcom's figure, packet rate not MPI-style msg/sec — different methodology than Cornelis. Aggregate chassis rate scales with line-card count."
+          }
+        },
         "fabric_buying_philosophy": {
-          "text": "disaggregation / flexibility",
+          "text": "disaggregation / flexibility — open Ethernet platform, EOS software, scales via distributed DES architecture",
           "provenance": {
             "status": "directional",
-            "source": "Arista positioning emphasizes open Ethernet vs vendor-locked fabric.",
-            "last_verified": "2026-05-20"
+            "source": "Arista positioning emphasizes open Ethernet + EOS software vs vendor-locked fabric. Etherlink platform's 3-tier DES architecture is the platform-scale differentiator over leaf-spine.",
+            "last_verified": "2026-05-21"
+          }
+        }
+      }
+    },
+    {
+      "id": "cornelis_cn6000",
+      "name": "Cornelis CN6000 (800G RoCEv2 + UEC, current-gen announced)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "cornelis",
+      "generation": "current",
+      "positioning": "Current-generation announced fabric baseline. Announced Nov 18 2025; customer sampling mid-2026, production to follow. Multi-protocol single-platform fabric: Omni-Path + Ethernet RoCEv2 + Ultra Ethernet (UEC) on one switch. Cornelis co-developed libfabric and is a founding UEC member.",
+      "performance_vs_prior": {
+        "text": "2x the performance of CN5000",
+        "provenance": {
+          "status": "claimed",
+          "claimed_by": "cornelis",
+          "source": "Cornelis CN6000 announcement (Nov 18 2025) positioning vs prior-gen CN5000.",
+          "last_verified": "2026-05-21",
+          "notes": "Generation-jump vendor claim; pre-production. Component-level metadata (not a KPI) because relative-to-own-prior-gen is not a comparable dependency-graph metric."
+        }
+      },
+      "protocol": {
+        "text": "multi-protocol — Omni-Path + Ethernet RoCEv2 + Ultra Ethernet (UEC) compliant on a single platform",
+        "provenance": {
+          "status": "cited",
+          "source": "Cornelis CN6000 announcement materials (Nov 2025) — stated multi-protocol capability + UEC standard compliance.",
+          "last_verified": "2026-05-21",
+          "notes": "Structural product spec (capability declaration + standards compliance), not a performance claim — pill renders CITED."
+        }
+      },
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "cited",
+            "source": "Cornelis CN6000 announcement (Nov 18 2025) — 800 Gbps per port; structured product nameplate spec, parallel to NVIDIA SN5600 and Broadcom Tomahawk Ultra 800GbE.",
+            "last_verified": "2026-05-21",
+            "notes": "Nameplate port spec for a pre-production product. Cited consistent with how CN5000's 400G nameplate is cited and how NVIDIA Spectrum-X is cited."
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 1600, "max": 1600, "unit": "million msg/sec (vendor 'industry-highest' claim)" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN6000 announcement materials — 'up to 1.6 billion msg/sec, industry-highest.' Pre-production figure.",
+            "last_verified": "2026-05-21",
+            "notes": "Vendor pre-production claim, MPI-style message rate; sky-pill CLAIMED. Different methodology than Broadcom/Arista's packet-rate (PPS) figures — not directly comparable but both are fabric throughput metrics."
+          }
+        },
+        "fabric_latency": {
+          "band": "low",
+          "text": "ultra-low latency, deterministic at scale (lightweight QPs + RoCEv2 In-Flight table)",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN6000 positioning — qualitative claim; no published per-hop latency figure for CN6000 yet.",
+            "last_verified": "2026-05-21",
+            "notes": "Qualitative vendor positioning, not a numeric figure. Pill renders CLAIMED. Compare-against: Broadcom Tomahawk Ultra publishes specific 250 ns cited; CN6000 chose qualitative framing."
+          }
+        },
+        "fabric_collective_op": {
+          "scale_conditional": {
+            "small_scale": "Cornelis wins (carrying forward CN5000's small-node HPC strength — RoCEv2 + UEC architecture preserves the tail-latency-determinism profile)",
+            "large_scale": "verify-needed — CN6000's RoCEv2 / UEC design at large scale not yet independently measured; NVIDIA SHARP/NCCL large-scale advantage remains cited from CN5000-era comparison",
+            "breakpoint": "verify-needed — CN6000 breakpoint not yet established; CN5000's was ~16-32 nodes"
+          },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Carried forward from CN5000's scale-conditional framing; CN6000's RoCEv2/UEC redesign may shift the breakpoint but no independent benchmark exists pre-production.",
+            "last_verified": "2026-05-21",
+            "notes": "Directional + verify-needed honestly reflects that CN6000's collective-op shape is not yet measurable; do not assert CN5000-equivalent breakpoint without confirmation."
+          }
+        },
+        "fabric_cost_capex_directional": {
+          "band": "medium",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis CN6000 positioning — typically below NVIDIA per-port at director-class scale, above merchant Ethernet (carried forward from CN5000-era characterization; no pre-production list pricing).",
+            "last_verified": "2026-05-21",
+            "notes": "Directional band only. No published per-port CapEx for CN6000."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "extreme-performance-tuning + multi-protocol flexibility",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis CN6000 positioning extends the CN5000 'extreme-performance-tuning' archetype with multi-protocol single-platform flexibility (Omni-Path + RoCEv2 + UEC).",
+            "last_verified": "2026-05-21"
           }
         }
       }
     },
     {
       "id": "cornelis_cn5000",
-      "name": "Cornelis CN5000 (Omni-Path, current gen)",
+      "name": "Cornelis CN5000 (Omni-Path, prior-gen reference)",
       "category": "fabric_alternatives",
       "slot": "fabric",
       "vendor": "cornelis",
-      "positioning": "Within-cake fabric swap. CN5000 400G Omni-Path → CN6000 800G RoCEv2 (2026) → CN7000 1.6T UEC (2027).",
+      "generation": "prior",
+      "positioning": "Prior-generation reference. CN5000 400G Omni-Path → CN6000 800G RoCEv2 + UEC (current, announced Nov 2025) → CN7000 1.6T UEC (roadmap, 2027). Kept seeded as the comparison baseline showing Cornelis's 2x generation-jump claim.",
       "kpi_values": {
         "fabric_throughput": {
           "range": { "min": 400, "max": 400, "unit": "Gbps per port" },
@@ -171,8 +325,8 @@
             "status": "claimed",
             "claimed_by": "cornelis",
             "source": "Cornelis CN5000 positioning materials (800M-1.6B msg/sec).",
-            "last_verified": "2026-05-20",
-            "notes": "Vendor figure."
+            "last_verified": "2026-05-21",
+            "notes": "Vendor figure. MPI-style message rate — different methodology than Broadcom/Arista's packet-rate (PPS) figures; NOT directly comparable. Do not rank against PPS values in a head-to-head heat-map: msg/sec ≠ PPS (category-error risk). Both measure fabric throughput, but the vendor measurement frames are different."
           }
         },
         "fabric_collective_op": {

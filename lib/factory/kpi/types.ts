@@ -44,6 +44,18 @@ export interface KpiDefinition {
   honesty_note?: string
 }
 
+// Component-level descriptive metadata — NOT a KPI. Used by fabric components
+// (and any others where useful) to attach a generation-jump claim or a
+// protocol-stack capability description with its own provenance tag, without
+// polluting the KPI catalog (which is reserved for comparable metrics that
+// ripple through the dependency graph in applySwap).
+export interface ComponentNote {
+  text: string
+  provenance: Provenance
+}
+
+export type ComponentGeneration = 'current' | 'prior' | 'roadmap'
+
 export interface Component {
   id: string
   name: string
@@ -55,6 +67,15 @@ export interface Component {
   // VMware Private AI Foundation, Nutanix Enterprise AI). Other slots may
   // adopt category-style grouping later.
   category?: IsvCategory
+  // Generational marker — currently shipping vs prior-gen reference vs roadmap.
+  // 'roadmap' is reserved for not-yet-announced products (CN7000, Vera Rubin)
+  // and is unused in current seedings.
+  generation?: ComponentGeneration
+  // Component-level descriptive metadata fields (each with its own provenance).
+  // Currently used by Cornelis CN6000 to surface its "2x prior-gen" vendor
+  // claim and its multi-protocol product spec without making either a KPI.
+  performance_vs_prior?: ComponentNote
+  protocol?: ComponentNote
   kpi_values?: Record<string, KpiValue>
 }
 

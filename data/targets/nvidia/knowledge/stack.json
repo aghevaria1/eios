@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "last_verified": "2026-05-21",
   "layers": [
     {
@@ -169,11 +169,11 @@
         "fabric_throughput": {
           "range": { "min": 800, "max": 800, "unit": "Gbps per port" },
           "provenance": {
-            "status": "directional",
-            "flag": "verify-needed",
-            "source": "NVIDIA Spectrum-X public positioning for 800 Gbps AI Ethernet (announced 2023, widely covered in analyst materials).",
-            "last_verified": "2026-05-20",
-            "notes": "Verify per-port figure and current SKU coverage against NVIDIA Spectrum-X product page."
+            "status": "cited",
+            "source": "NVIDIA Spectrum SN5600 datasheet — 64 OSFP 800GbE ports, 51.2 Tb/s total switch throughput, Spectrum-4 silicon. SN5600 is the canonical Spectrum-X switch.",
+            "source_url": "https://www.nvidia.com/en-us/networking/ethernet/spectrum-x/",
+            "last_verified": "2026-05-21",
+            "notes": "Promoted from directional/verify-needed to cited in phase 3c-1a — SN5600 datasheet (Spectrum-X platform's flagship 800 GbE switch) confirms the 800 Gbps per-port figure as a structured product spec, parallel to how Cornelis CN5000 throughput is treated."
           }
         },
         "fabric_latency": {

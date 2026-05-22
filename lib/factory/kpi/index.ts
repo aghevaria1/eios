@@ -11,6 +11,8 @@ export type {
   KpiValue,
   KpiDefinition,
   Component,
+  ComponentGeneration,
+  ComponentNote,
   Layer,
   Segment,
   Architecture,
