@@ -15,7 +15,9 @@ export interface SegmentView {
   blendNote: string
   l2Tiles: L2Tile[]
   chosenFabric: Component
-  chosenIsv: Component
+  // Ordered list of ISV components from segment.isv_blend (lead-first).
+  // Rendered as the L3 multi-tile row in the cake.
+  chosenIsvs: Component[]
   softwareWrapper: Component
   oem: Component
   northStar: KpiResult[]
@@ -67,7 +69,7 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
         layers={layers}
         l2Tiles={active.l2Tiles}
         chosenFabric={active.chosenFabric}
-        chosenIsv={active.chosenIsv}
+        chosenIsvs={active.chosenIsvs}
         softwareWrapper={active.softwareWrapper}
         oem={active.oem}
       />

@@ -66,9 +66,16 @@ export default function ArchitectPage() {
       return c
     }
     const chosenFabric = lookupComponent(config.fabric, 'fabric')
-    const chosenIsv = lookupComponent(config.isv, 'isv')
     const softwareWrapper = lookupComponent(config.software, 'software')
     const oem = lookupComponent(config.oem, 'oem')
+
+    // L3 ISV blend — full ordered list from segment.isv_blend. Falls back to
+    // config.isv (= architecture default, resolved by buildConfig) when a
+    // segment has no blend, so the cake always has at least one tile at L3.
+    const chosenIsvs =
+      segment.isv_blend && segment.isv_blend.length > 0
+        ? segment.isv_blend.map((id) => lookupComponent(id, 'isv'))
+        : [lookupComponent(config.isv, 'isv')]
 
     // KPI resolution — segment-scoped delivered_kpis win (per the engine's
     // segment-first resolver from phase 2c).
@@ -95,7 +102,7 @@ export default function ArchitectPage() {
       blendNote: blend.note,
       l2Tiles,
       chosenFabric,
-      chosenIsv,
+      chosenIsvs,
       softwareWrapper,
       oem,
       northStar,

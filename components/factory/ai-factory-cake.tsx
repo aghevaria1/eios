@@ -19,7 +19,10 @@ interface AIFactoryCakeProps {
   layers: Layer[]
   l2Tiles: L2Tile[]
   chosenFabric: Component
-  chosenIsv: Component
+  // Ordered list of ISV components, lead-first — corresponds to the segment's
+  // isv_blend. Rendered at L3 as one tile per ISV (mirrors the L2 per-RA tile
+  // pattern). For segments with a single ISV the row collapses to one tile.
+  chosenIsvs: Component[]
   softwareWrapper: Component
   oem: Component
 }
@@ -28,7 +31,7 @@ export function AIFactoryCake({
   layers,
   l2Tiles,
   chosenFabric,
-  chosenIsv,
+  chosenIsvs,
   softwareWrapper,
   oem,
 }: AIFactoryCakeProps) {
@@ -43,6 +46,9 @@ export function AIFactoryCake({
   }
   if (l2Tiles.length === 0) {
     throw new Error('AIFactoryCake: l2Tiles must have at least one entry')
+  }
+  if (chosenIsvs.length === 0) {
+    throw new Error('AIFactoryCake: chosenIsvs must have at least one entry')
   }
 
   return (
@@ -61,13 +67,15 @@ export function AIFactoryCake({
         <LayerDescription>{L4.description}</LayerDescription>
       </LayerContent>
 
-      {/* Row 3 — L3 ISV Platform */}
+      {/* Row 3 — L3 ISV Platform: one tile per ISV in the segment blend */}
       <LayerLabel id="L3" tag="ISV" row={3} />
       <LayerContent row={3}>
         <LayerTitle>{L3.name}</LayerTitle>
         <LayerDescription>{L3.description}</LayerDescription>
         <div className="mt-3 flex flex-wrap gap-2">
-          <SelectedChip slot="ISV">{chosenIsv.name}</SelectedChip>
+          {chosenIsvs.map((isv) => (
+            <L3IsvTile key={isv.id} isv={isv} />
+          ))}
         </div>
       </LayerContent>
 
@@ -113,6 +121,19 @@ function L2RaTile({ tile }: { tile: L2Tile }) {
       </div>
       <div className="mt-1 text-xs font-medium leading-snug text-[#76B900]">
         {tile.gpu.name}
+      </div>
+    </div>
+  )
+}
+
+function L3IsvTile({ isv }: { isv: Component }) {
+  return (
+    <div className="flex min-w-[170px] flex-1 basis-[200px] flex-col rounded border border-[#76B900] bg-[#76B900]/[0.05] px-3 py-2">
+      <div className="text-[10px] font-mono font-semibold uppercase tracking-widest text-[#76B900]/80">
+        {isv.category ?? 'ISV'}
+      </div>
+      <div className="mt-1 text-xs font-medium leading-snug text-[#76B900]">
+        {isv.name}
       </div>
     </div>
   )
