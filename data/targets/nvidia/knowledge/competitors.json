@@ -1,10 +1,10 @@
 {
-  "version": "0.3.0",
-  "last_verified": "2026-05-21",
+  "version": "0.4.0",
+  "last_verified": "2026-05-25",
   "categories": {
     "full_cake_replacement": {
       "description": "Replaces the NVIDIA stack end-to-end. Examples: AMD Helios, hyperscaler custom silicon (where applicable).",
-      "members": ["amd_helios_mi455x", "hyperscaler_custom_silicon"]
+      "members": ["amd_mi355x", "amd_helios_mi455x", "hyperscaler_custom_silicon"]
     },
     "fabric_alternatives": {
       "description": "Replaces ONLY the fabric layer within the cake. The rest of the NVIDIA stack remains.",
@@ -23,12 +23,70 @@
   },
   "components": [
     {
+      "id": "amd_mi355x",
+      "name": "AMD Instinct MI355X (CDNA 4, current shipping)",
+      "category": "full_cake_replacement",
+      "slot": "gpu",
+      "vendor": "amd",
+      "generation": "current",
+      "positioning": "Current-shipping AMD AI accelerator (launched 12 June 2025, CDNA 4 / 3nm / 185B transistors, 1400W TBP liquid-cooled). The honest current-generation contemporary of NVIDIA Blackwell B200 — both shipping today, hardware close to parity. AMD's 2026 roadmap successor is Helios MI455X (separate component, generation: roadmap).",
+      "moat_framing": "Hardware is near-parity with B200 (memory capacity leads, bandwidth ties, FP4 essentially even, FP8 close). AMD's gap is ROCm vs CUDA — ROCm has been closing the gap but is not at parity, and TensorRT-LLM remains NVIDIA-only and won't run on ROCm. The moat conversation has moved from silicon to software; the 2026 generation (MI455X) extends the spec lead but does not bridge the ROCm-vs-CUDA gap.",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 288, "max": 288, "unit": "GB HBM3e" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "amd",
+            "source": "AMD Instinct MI355X product page + datasheet brief — 288 GB HBM3e per GPU, 4th Gen CDNA architecture. Confirmed across multiple sources (AMD product page, Wikipedia AMD Instinct table, Oracle OCI deployment blog, Flopper.io spec sheet).",
+            "source_url": "https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html",
+            "last_verified": "2026-05-25",
+            "notes": "Per-GPU figure — 50% larger than Blackwell B200 (192 GB). Vendor-claimed (AMD source materials); pill renders CLAIMED. Both products are shipping today (MI355X launched 12 June 2025) — the CITED-vs-CLAIMED distinction reflects evidence basis (NVIDIA datasheet-confirmed vs AMD vendor-stated), NOT announced-vs-shipping."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 8, "max": 8, "unit": "TB/s" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "amd",
+            "source": "AMD Instinct MI355X product brief — 8 TB/s memory bandwidth (HBM3e). Multiple sources confirm (AMD product page, Wikipedia, Flopper.io).",
+            "source_url": "https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html",
+            "last_verified": "2026-05-25",
+            "notes": "At parity with B200's 8 TB/s. Vendor-claimed (AMD source materials); both shipping today. The CITED-vs-CLAIMED pill split reflects evidence basis only."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 9.2, "max": 9.2, "unit": "PFLOPS FP4 (dense, vendor 'up to' figure)" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "amd",
+            "source": "AMD MI355X product materials cite 'up to 9.2 PetaFLOPS FP4' (per AMD product page summary). Consistent with Wikipedia's reported 20.1 PFLOPS FP4 (with sparsity) / 2x dense:sparse ratio = ~10 PFLOPS dense. Vendor figure-spread is within ~10% noise — 9.2 is the AMD-cited dense number.",
+            "source_url": "https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html",
+            "last_verified": "2026-05-25",
+            "notes": "DENSE / SPARSE caveat applies — AMD has not always explicitly stated dense vs sparse split in announcement materials; figure may not be apples-to-apples with NVIDIA B200's explicit dense/sparse split (9 PFLOPS dense / 18 PFLOPS sparse). Comparison vs B200's 9 PFLOPS FP4 dense is near-parity (~9.2 vs ~9, within ~2% — clean PARITY for the scorecard's ~5% tolerance). The parity finding holds regardless of small vendor-claim variance."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 5, "max": 5, "unit": "PFLOPS FP8 (dense, approx)" },
+          "provenance": {
+            "status": "claimed",
+            "flag": "verify-needed",
+            "claimed_by": "amd",
+            "source": "Tom's Hardware ISSCC 2026 article reports MI355X at 'five petaflops of FP8 compute, a 1.9x improvement over MI300X' (per-CU FP8 throughput doubled from 4,096 to 8,192 FLOPS/clock — implied dense matrix figure). Other published figures vary widely: Flopper.io lists 10.1 PFLOPS FP8; AMD platform materials cite 40.3 PFLOPS FP8 matrix dense and 80.5 PFLOPS with sparsity — these likely measure different scopes (per-GPU matrix vs scalar, OCP-FP8 vs general FP8).",
+            "source_url": "https://www.tomshardware.com/tech-industry/semiconductors/inside-the-instinct-mi355x",
+            "last_verified": "2026-05-25",
+            "notes": "DENSE/SPARSE caveat applies (AMD has not explicitly stated; figures depend on measurement methodology). Figure-spread across sources (5, 10.1, 40.3, 80.5 PFLOPS) reflects different measurement scopes — flagged VERIFY-NEEDED in addition to CLAIMED until reconciled against AMD's authoritative datasheet. Comparison vs B200's 9 PFLOPS FP8 dense (itself verify-needed) — BOTH sides low-confidence on this axis, scorecard renders UNRESOLVED rather than a winner."
+          }
+        }
+      }
+    },
+    {
       "id": "amd_helios_mi455x",
       "name": "AMD Helios (MI455X / MI450)",
       "category": "full_cake_replacement",
       "slot": "gpu",
       "vendor": "amd",
-      "positioning": "Full-stack replacement. Helios rack = 72x MI455X (analogous to NVL72), targeting Q3 2026.",
+      "generation": "roadmap",
+      "positioning": "Full-stack replacement. Helios rack = 72x MI455X (analogous to NVL72), targeting H2 2026 per AMD CES 2026 positioning.",
       "moat_framing": "AMD has hardware parity / a memory-bandwidth edge, but ROCm has NOT reached CUDA's ecosystem maturity, and TensorRT-LLM is NVIDIA-only and won't run on ROCm.",
       "kpi_values": {
         "compute_memory_capacity_per_gpu": {

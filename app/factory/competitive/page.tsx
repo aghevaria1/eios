@@ -3,22 +3,23 @@ import {
   buildConfig,
   loadKnowledge,
 } from '@/lib/factory/kpi'
-import {
-  FabricSwapView,
-  type SwapTarget,
-} from '@/components/factory/fabric-swap-view'
+import { type SwapTarget } from '@/components/factory/fabric-swap-view'
+import { CompetitiveModeSwitcher } from '@/components/factory/competitive-mode-switcher'
 
 const SEGMENT_ID = 'fortune-500'
 const ARCHITECTURE_ID = 'HGX'
-const BASELINE_FABRIC_ID = 'nvidia_spectrum_x'
-const DEFAULT_TARGET_ID = 'cornelis_cn6000'
 
-const TARGET_IDS = [
+const BASELINE_FABRIC_ID = 'nvidia_spectrum_x'
+const DEFAULT_FABRIC_TARGET_ID = 'cornelis_cn6000'
+const FABRIC_TARGET_IDS = [
   'cornelis_cn6000',
   'broadcom_jericho_tomahawk',
   'arista_ethernet',
   'nvidia_quantum_x800',
 ]
+
+const BASELINE_GPU_ID = 'blackwell_b200'
+const AMD_TARGET_GPU_ID = 'amd_mi355x'
 
 export default function CompetitivePage() {
   const knowledge = loadKnowledge()
@@ -35,7 +36,8 @@ export default function CompetitivePage() {
     )
   }
 
-  const targets: SwapTarget[] = TARGET_IDS.map((targetId) => {
+  // ── Fabric slot-swap mode (4 swap targets, existing behavior) ──
+  const fabricTargets: SwapTarget[] = FABRIC_TARGET_IDS.map((targetId) => {
     const targetFabric = knowledge.components.get(targetId)
     if (!targetFabric) {
       throw new Error(
@@ -50,34 +52,55 @@ export default function CompetitivePage() {
     return { component: targetFabric, report }
   })
 
+  // ── AMD full-stack replacement mode (GPU swap only this step) ──
+  const baselineGpu = knowledge.components.get(BASELINE_GPU_ID)
+  const amdTargetGpu = knowledge.components.get(AMD_TARGET_GPU_ID)
+  if (!baselineGpu || !amdTargetGpu) {
+    throw new Error(
+      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' or AMD target '${AMD_TARGET_GPU_ID}'`,
+    )
+  }
+  const amdGpuReport = applySwap(baseline, {
+    slot: 'gpu',
+    from: BASELINE_GPU_ID,
+    to: AMD_TARGET_GPU_ID,
+  })
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <header className="mb-8">
         <div className="text-[10px] font-mono tracking-widest text-gray-500">
-          AI FACTORY · COMPETITIVE VIEW · FABRIC SWAP
+          AI FACTORY · COMPETITIVE VIEW
         </div>
         <h1 className="mt-2 text-2xl font-semibold text-gray-100">
-          Fabric swap analysis
+          Competitive analysis
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-gray-400">
           Baseline:{' '}
+          <span className="font-mono text-[#76B900]">{segment.name}</span>
+          <span className="text-gray-500"> / {architecture.id}</span>
+          <span className="text-gray-500"> — </span>
+          <span className="font-mono text-[#76B900]">{baselineGpu.name}</span>
+          <span className="text-gray-500"> + </span>
           <span className="font-mono text-[#76B900]">
             {baselineFabric.name}
           </span>
-          <span className="text-gray-500"> · {segment.name} / {architecture.id} default fabric</span>
         </p>
         <p className="mt-1 text-xs leading-relaxed text-gray-500">
-          Select a target fabric. The dependency-graph engine recomposes the
-          KPI report — CHANGED rows are fabric-dependent; HELD rows are
-          insulated; UNVERIFIED flags are surfaced from both sides of the
-          swap. Engine output is deterministic; no LLM call on selection.
+          Two competitive modes encode the switching-cost spectrum: SLOT
+          SWAPS (low blast radius — fabric only) vs FULL-STACK REPLACEMENT
+          (broader blast radius — GPU now, software in step 2). Engine
+          output is deterministic; no LLM call on tab clicks.
         </p>
       </header>
 
-      <FabricSwapView
-        baseline={baselineFabric}
-        targets={targets}
-        defaultTargetId={DEFAULT_TARGET_ID}
+      <CompetitiveModeSwitcher
+        fabricBaseline={baselineFabric}
+        fabricTargets={fabricTargets}
+        fabricDefaultTargetId={DEFAULT_FABRIC_TARGET_ID}
+        amdBaselineGpu={baselineGpu}
+        amdTargetGpu={amdTargetGpu}
+        amdReport={amdGpuReport}
       />
     </div>
   )

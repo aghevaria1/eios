@@ -7,6 +7,14 @@ import type {
   UnverifiedFlag,
 } from '@/lib/factory/kpi'
 import { ProvenancePill } from './provenance-pill'
+import { BlastRadiusStrip } from './blast-radius-strip'
+
+// Fabric-swap framing for the inline blast-radius call site (FabricSwapView).
+// AMD GPU swap and future swaps build their own framing in their own views.
+const FABRIC_SWAP_LAYERS = ['L2']
+const FABRIC_SWAP_SLOT_LABEL = 'Fabric'
+const FABRIC_SWAP_FRAMING =
+  'single-layer swap, low switching cost — compute / software / OEM / ISV stack untouched'
 
 interface Props {
   baseline: Component
@@ -20,12 +28,18 @@ export function SwapReportCard({ baseline, target, report }: Props) {
   const heldWithValues = report.held.filter((h) => h.before || h.after)
   return (
     <div className="space-y-6">
-      <LayerBlastRadiusStrip report={report} />
+      <BlastRadiusStrip
+        highlightedLayers={FABRIC_SWAP_LAYERS}
+        slotLabel={FABRIC_SWAP_SLOT_LABEL}
+        changedCount={report.changed.length}
+        heldCount={report.held.length}
+        framingText={FABRIC_SWAP_FRAMING}
+      />
       <TargetMetaCard target={target} />
       <WithinVendorFramingCard baseline={baseline} target={target} />
-      <ChangedKpiSection impacts={report.changed} target={target} />
+      <ChangedKpiSection impacts={report.changed} target={target} slotLabel="fabric" />
       <StrategicFramingSection baseline={baseline} target={target} />
-      <HeldKpiSection impacts={heldWithValues} totalHeld={report.held.length} />
+      <HeldKpiSection impacts={heldWithValues} totalHeld={report.held.length} slotLabel="fabric" />
       {report.unverified.length > 0 && (
         <UnverifiedFlagsSection flags={report.unverified} />
       )}
@@ -33,74 +47,10 @@ export function SwapReportCard({ baseline, target, report }: Props) {
   )
 }
 
-// Lightweight blast-radius indicator for THIS phase (3c-1b, fabric-only swap).
-// The full reusable L1-L5 blast-radius component is deferred to 3c-2 where
-// the AMD multi-layer case (L2 + L4 + L5) forces the right multi-highlight
-// design. See V3_TODO.
-//
-// Insight encoded by the strip: a fabric swap lights up ONE layer (L2's
-// networking sub-slot) — small blast radius = low switching cost. The
-// compute / software / OEM / ISV stack is untouched. Sets up the contrast
-// for AMD full-cake later (deep multi-layer swap = high switching cost).
-const ALL_LAYERS = ['L1', 'L2', 'L3', 'L4', 'L5'] as const
-const FABRIC_SWAP_LAYER = 'L2'
-const FABRIC_SWAP_SLOT_LABEL = 'Fabric'
-
-function LayerBlastRadiusStrip({ report }: { report: SwapReport }) {
-  return (
-    <section className="rounded-md border border-gray-800 bg-gray-900/30 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex-1">
-          <div className="text-[10px] font-mono tracking-widest text-gray-500">
-            SWAPPING · {FABRIC_SWAP_LAYER} · {FABRIC_SWAP_SLOT_LABEL}
-          </div>
-          <div className="mt-1 text-xs leading-relaxed text-gray-400">
-            Blast radius:{' '}
-            <span className="font-mono text-emerald-300">
-              {report.changed.length} KPI{report.changed.length === 1 ? '' : 's'} changed
-            </span>
-            <span className="text-gray-600"> · </span>
-            <span className="font-mono text-gray-400">
-              {report.held.length} held
-            </span>
-            <span className="text-gray-600"> · </span>
-            <span className="text-gray-500">
-              single-layer swap, low switching cost — compute / software / OEM / ISV stack untouched
-            </span>
-          </div>
-        </div>
-        <LayerStrip swappedLayer={FABRIC_SWAP_LAYER} />
-      </div>
-    </section>
-  )
-}
-
-function LayerStrip({ swappedLayer }: { swappedLayer: string }) {
-  return (
-    <div className="flex items-center gap-1">
-      {ALL_LAYERS.map((layer) => {
-        const swapped = layer === swappedLayer
-        return (
-          <div
-            key={layer}
-            className={`flex h-9 w-9 items-center justify-center rounded border font-mono text-xs font-semibold ${
-              swapped
-                ? 'border-[#76B900] bg-[#76B900]/15 text-[#76B900]'
-                : 'border-gray-800 bg-gray-900/40 text-gray-600'
-            }`}
-            title={
-              swapped
-                ? `${layer} — swap target (fabric is the L2 networking sub-slot)`
-                : `${layer} — insulated from this swap`
-            }
-          >
-            {layer}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
+// Blast-radius strip moved to components/factory/blast-radius-strip.tsx in
+// phase 3c-2 step 1 — generalized for multi-layer highlighting (AMD step 2
+// will use L2 + L4 + L5) and arbitrary slot labels. SwapReportCard calls it
+// above with fabric-specific args.
 
 // Within-vendor swap framing — currently fires only for within-NVIDIA fabric
 // swaps (Spectrum-X ↔ Quantum-X800). The insight: NVIDIA offers BOTH Ethernet
@@ -229,23 +179,25 @@ function MetaRow({
 // ────────────────────────────────────────────────────────────────────────
 // CHANGED — fabric-dependent KPIs with before → after
 // ────────────────────────────────────────────────────────────────────────
-function ChangedKpiSection({
+export function ChangedKpiSection({
   impacts,
   target,
+  slotLabel = 'fabric',
 }: {
   impacts: SwapImpact[]
   target: Component
+  slotLabel?: string
 }) {
   return (
     <section className="rounded-md border border-gray-800 bg-gray-900/30">
       <header className="border-b border-gray-800 px-5 py-3">
         <div className="text-[10px] font-mono tracking-widest text-gray-500">
-          CHANGED  ·  {impacts.length} fabric-dependent KPI
+          CHANGED  ·  {impacts.length} {slotLabel}-dependent KPI
           {impacts.length === 1 ? '' : 's'}
         </div>
         <div className="mt-1 text-xs text-gray-400">
           These KPIs declare{' '}
-          <span className="font-mono text-gray-300">fabric</span> in their
+          <span className="font-mono text-gray-300">{slotLabel}</span> in their
           dependency set — the swap recomposes their before / after values.
         </div>
       </header>
@@ -338,7 +290,7 @@ function KpiSidePanel({
   )
 }
 
-function KpiValueDisplay({ value }: { value: KpiValue }) {
+export function KpiValueDisplay({ value }: { value: KpiValue }) {
   return (
     <div className="space-y-1 text-xs leading-relaxed text-gray-200">
       {value.range && (
@@ -477,12 +429,14 @@ function PhilosophyCard({
 // ────────────────────────────────────────────────────────────────────────
 // HELD — collapsible. Count always visible; list expands on click.
 // ────────────────────────────────────────────────────────────────────────
-function HeldKpiSection({
+export function HeldKpiSection({
   impacts,
   totalHeld,
+  slotLabel = 'fabric',
 }: {
   impacts: SwapImpact[]
   totalHeld: number
+  slotLabel?: string
 }) {
   return (
     <section className="overflow-hidden rounded-md border border-gray-800 bg-gray-900/30">
@@ -501,7 +455,7 @@ function HeldKpiSection({
               </div>
               <div className="mt-1 text-xs text-gray-400">
                 These KPIs do NOT declare{' '}
-                <span className="font-mono text-gray-300">fabric</span> in
+                <span className="font-mono text-gray-300">{slotLabel}</span> in
                 their dependency set — the swap&apos;s blast radius is
                 bounded. Click to expand.
               </div>
@@ -553,7 +507,7 @@ function HeldKpiRow({ impact }: { impact: SwapImpact }) {
 // ────────────────────────────────────────────────────────────────────────
 // UNVERIFIED flags — surfaced by either side of the swap
 // ────────────────────────────────────────────────────────────────────────
-function UnverifiedFlagsSection({ flags }: { flags: UnverifiedFlag[] }) {
+export function UnverifiedFlagsSection({ flags }: { flags: UnverifiedFlag[] }) {
   return (
     <section className="overflow-hidden rounded-md border border-rose-500/30 bg-rose-500/[0.03]">
       <header className="border-b border-rose-500/20 px-5 py-3">
@@ -591,7 +545,7 @@ function UnverifiedFlagsSection({ flags }: { flags: UnverifiedFlag[] }) {
 // on durable phrases baked into the seeded data; flagged as INTERIM —
 // a typed provenance.note_kind field would be more robust.
 // ────────────────────────────────────────────────────────────────────────
-function NotesBlock({ notes }: { notes: string | undefined }) {
+export function NotesBlock({ notes }: { notes: string | undefined }) {
   if (!notes) return null
   if (isCautionNote(notes)) {
     return (
@@ -611,7 +565,7 @@ function NotesBlock({ notes }: { notes: string | undefined }) {
   )
 }
 
-function isCautionNote(notes: string): boolean {
+export function isCautionNote(notes: string): boolean {
   const lower = notes.toLowerCase()
   return (
     lower.includes('not directly comparable') ||
@@ -619,6 +573,7 @@ function isCautionNote(notes: string): boolean {
     lower.includes('transparency, not necessarily superiority') ||
     lower.includes('dense vs sparse') ||
     lower.includes('dense or sparse') ||
+    lower.includes('dense/sparse') ||
     (lower.includes('msg/sec') && lower.includes('pps'))
   )
 }
