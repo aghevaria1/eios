@@ -1,5 +1,6 @@
-// EdgeInferenceOS v2 — Director PM Operating Framework
-// Data schemas for target-driven configuration.
+// Target-driven data schemas for the PM Operating Framework.
+// Serves both demo contexts (v2-cornelis: Director PM Operating Framework;
+// v3-nvidia: AI Factory Advisor) — phrasing kept neutral.
 // All target JSON in data/targets/<targetId>/ must conform to these types.
 
 export interface Target {
