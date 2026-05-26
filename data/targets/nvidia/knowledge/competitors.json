@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "last_verified": "2026-05-25",
   "categories": {
     "full_cake_replacement": {
@@ -23,6 +23,10 @@
         "source_url": "https://ultraethernet.org",
         "last_verified": "2026-05-20"
       }
+    },
+    "paradigm_alternative": {
+      "description": "Architecturally different machines that do NOT decompose into NVIDIA's L1-L5 layer model. Adopting them is a re-architecture, not a stack swap. Currently: Cerebras WSE-3 (wafer-scale inference appliance). Rendered via the layer-fight-map PARADIGM state across all bands + a cross-layer ParadigmContrast explainer panel.",
+      "members": ["cerebras_wse3"]
     }
   },
   "components": [
@@ -480,6 +484,47 @@
             "status": "directional",
             "source": "Cornelis positioning emphasizes tail-latency determinism and MPI tightly-coupled HPC — buyers chose Cornelis when raw collective-op performance at small/medium scale is the priority.",
             "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "cerebras_wse3",
+      "name": "Cerebras WSE-3 (wafer-scale inference appliance)",
+      "category": "paradigm_alternative",
+      "slot": "paradigm",
+      "vendor": "cerebras",
+      "generation": "current",
+      "positioning": "ALTERNATIVE PARADIGM. Cerebras does NOT decompose into NVIDIA's L1-L5 layer model — the WSE-3 is a single wafer with 900,000 cores, 4T transistors, 44GB on-chip SRAM, and ~21 PB/s on-chip bandwidth, packaged in the CS-3 appliance (~23 kW). The architectural thesis: by eliminating inter-chip communication entirely, the wafer removes the multi-GPU-cluster bottleneck that bounds NVIDIA distributed-GPU collective performance. Adopting Cerebras is a re-architecture, not a slot-swap. Public + validated (IPO May 2026, OpenAI 750 MW / $10-20B multi-year, AWS Bedrock Mar 2026) but narrow in workload-fit (inference-specific, Llama-class reasoning sweet spot) and small relative to NVIDIA (NVIDIA ~90% accelerator share, ~423× Cerebras revenue).",
+      "moat_framing": "Cerebras is the cleanest PARADIGM-state case in the demo: respect the architecture (real, novel, validated at the public-market level), size the scale honestly (fast-growing sliver, not imminent displacement), and locate NVIDIA's moat in the layers Cerebras structurally cannot fill — breadth, full training+inference range, the CUDA/NVAIE ecosystem, and the flexibility to deploy across the full workload spectrum. The 3-facet verdict (SERIOUS-BUT-NARROW + NICHE-SHARP + MARKET-ARC) all three must hold simultaneously — cherry-picking 'serious' alone would inflate the threat; cherry-picking 'niche' alone would dismiss real validation. The honest read is calibrated: precision strike on a specific inference niche, not a stack swap.",
+      "kpi_values": {
+        "paradigm_wafer_architecture": {
+          "text": "900,000 cores · 4 trillion transistors · 125 PF peak · 44 GB on-chip SRAM · ~21 PB/s on-chip bandwidth (~2,625× NVIDIA B200) · CS-3 appliance ~23 kW · NO inter-chip communication latency (the multi-GPU-cluster bottleneck — eliminated by the monolithic-wafer architecture)",
+          "provenance": {
+            "status": "cited",
+            "source": "Cerebras WSE-3 product specifications + CS-3 appliance datasheet, corroborated by independent semiconductor analyst coverage (SemiAnalysis, AnandTech, Tom's Hardware). The ~2,625× bandwidth comparison vs B200 is structurally derived from published per-component bandwidth figures.",
+            "last_verified": "2026-05-25",
+            "notes": "Architecture facts are CITED + structurally verifiable (transistor count, core count, on-chip memory, on-chip bandwidth) — the no-inter-chip-latency thesis is the architecturally real consequence of the wafer-scale design."
+          }
+        },
+        "paradigm_inference_claims": {
+          "text": "Up to 21× faster than NVIDIA DGX B200 on Llama 3 70B reasoning (specific token configuration) · ~32% lower TCO on the same workload · Meta Llama API integration showing 18× inference speedup · OpenAI deployments at 1,000+ tokens/sec",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cerebras",
+            "source": "Cerebras vendor benchmarks + customer-facing performance materials (Cerebras inference launch announcement; Meta Llama API performance disclosures; OpenAI deployment metrics released alongside the 750 MW partnership announcement).",
+            "last_verified": "2026-05-25",
+            "flag": "verify-needed",
+            "notes": "CAUTION — vendor-benchmarked, workload-specific. The 21× / 18× / 1,000+ tok/sec figures are bound to specific workloads (Llama-class reasoning, specific token configurations). NOT a general speedup. NEVER render as 'Cerebras is 21× faster' flat. Workload-fit + benchmark-scope caveats are mandatory framing — without them, the claim overreaches."
+          }
+        },
+        "paradigm_market_position": {
+          "text": "IPO May 2026 (valuation + raise figures vary across sources — note the spread, do not assert one number) · OpenAI 750 MW / $10-20B multi-year deal · AWS CS-3 access via Bedrock (Mar 2026) · G42 customer-concentration moderating 85% → 24% · SCALE CHECK: NVIDIA ~90% AI accelerator share, ~423× Cerebras revenue ratio · Note: the OpenAI deal temporarily restricts Cerebras sales to Anthropic (sourced market-dynamics, not editorializing)",
+          "provenance": {
+            "status": "cited",
+            "source": "Public S-1 / IPO filings + Cerebras press releases + OpenAI partnership announcement + AWS Bedrock availability announcement + analyst coverage (The Information, Reuters, CNBC, semiconductor-analyst reports for the share + revenue ratio).",
+            "last_verified": "2026-05-25",
+            "notes": "MANDATORY framing: the NVIDIA ~90% share + ~423× revenue scale-check is what keeps 'serious + validated' from inflating to 'imminent displacement.' Cerebras is a fast-growing sliver of a fast-growing market, NOT a stack-replacement threat. IPO valuation + raise figures are noted as a source-spread rather than asserted — sources do not agree on a single number. The OpenAI-restricts-to-Anthropic clause is sourced market-dynamics; surfaced as fact, not editorialized as competitive-warfare-strategy."
           }
         }
       }

@@ -343,6 +343,42 @@ export const KPI_DEFINITIONS: KpiDefinition[] = [
     honesty_note:
       'Synthesized characterization based on practitioner reports + analyst coverage; not a measured single value.',
   },
+  // ─────────────────────────────────────────────────────────
+  // Tier 1 — PARADIGM KPIs (no dependencies — PARADIGM is by
+  // definition outside the L1-L5 dependency graph; these KPIs
+  // exist to seed Cerebras-class wafer-scale competitors whose
+  // architecture doesn't decompose into NVIDIA's layer model).
+  // Text-valued only; rendered via the layer-fight-map PARADIGM
+  // state + the ParadigmContrast cross-layer explainer panel.
+  // ─────────────────────────────────────────────────────────
+  {
+    id: 'paradigm_wafer_architecture',
+    name: 'Wafer-scale architecture facts',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Architecturally CITED facts about the wafer-scale machine — core count, transistor count, on-chip SRAM, on-chip bandwidth, appliance power profile, and the no-inter-chip-latency thesis. Anchors the doesn\'t-decompose framing in measurable architecture, not marketing.',
+  },
+  {
+    id: 'paradigm_inference_claims',
+    name: 'Vendor inference benchmarks (workload-specific)',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Vendor-published inference speedup / TCO claims. CLAIMED-status; specific to supported workloads (e.g. Llama-class reasoning on specific token configs). Never a general speedup.',
+    honesty_note:
+      'Workload-specific by definition. Mandatory caveat: vendor-benchmarked + narrow workload-fit. Never render as a flat "Nx faster" claim.',
+  },
+  {
+    id: 'paradigm_market_position',
+    name: 'Market position + scale-check',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Public market position — IPO, anchor customer wins, hyperscaler deals, accelerator-share scale-check vs NVIDIA. Includes neutral market-dynamics notes where sources disagree (e.g. IPO valuation / raise figure spread) and sourced facts about deal restrictions, not editorializing.',
+    honesty_note:
+      'IPO valuation + raise figures vary across sources — note the spread, do not assert one number. Scale-check (NVIDIA share + revenue ratio) is mandatory framing to size validation correctly (fast-growing sliver vs imminent displacement).',
+  },
 ]
 
 export function getKpiById(id: string): KpiDefinition | undefined {

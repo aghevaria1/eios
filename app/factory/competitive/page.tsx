@@ -22,6 +22,7 @@ const BASELINE_GPU_ID = 'blackwell_b200'
 const AMD_TARGET_GPU_ID = 'amd_mi355x'
 const BASELINE_SOFTWARE_ID = 'nvaie'
 const AMD_TARGET_SOFTWARE_ID = 'amd_rocm'
+const CEREBRAS_ID = 'cerebras_wse3'
 
 export default function CompetitivePage() {
   const knowledge = loadKnowledge()
@@ -61,9 +62,10 @@ export default function CompetitivePage() {
   const amdTargetGpu = knowledge.components.get(AMD_TARGET_GPU_ID)
   const baselineSoftware = knowledge.components.get(BASELINE_SOFTWARE_ID)
   const amdTargetSoftware = knowledge.components.get(AMD_TARGET_SOFTWARE_ID)
-  if (!baselineGpu || !amdTargetGpu || !baselineSoftware || !amdTargetSoftware) {
+  const cerebras = knowledge.components.get(CEREBRAS_ID)
+  if (!baselineGpu || !amdTargetGpu || !baselineSoftware || !amdTargetSoftware || !cerebras) {
     throw new Error(
-      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}'`,
+      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}' / cerebras '${CEREBRAS_ID}'`,
     )
   }
   const amdGpuReport = applySwap(baseline, {
@@ -109,6 +111,7 @@ export default function CompetitivePage() {
         amdBaselineSoftware={baselineSoftware}
         amdTargetSoftware={amdTargetSoftware}
         amdReport={amdGpuReport}
+        cerebras={cerebras}
       />
     </div>
   )

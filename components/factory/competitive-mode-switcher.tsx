@@ -7,23 +7,25 @@ import {
   type SwapTarget,
 } from './fabric-swap-view'
 import { AmdReplacementView } from './amd-replacement-view'
+import { CerebrasParadigmView } from './cerebras-paradigm-view'
 
-type CompetitiveMode = 'slot' | 'replacement'
+type CompetitiveMode = 'slot' | 'replacement' | 'paradigm'
 
 interface Props {
   // Fabric slot-swap mode (existing — unchanged)
   fabricBaseline: Component
   fabricTargets: SwapTarget[]
   fabricDefaultTargetId: string
-  // AMD full-stack replacement mode. Step 1 shipped the L2 GPU scorecard
-  // (amdBaselineGpu + amdTargetGpu + amdReport, single-slot GPU swap). Step 2
-  // adds the LayerFightMap which renders per-layer verdicts including L5
-  // (NVAIE vs ROCm) — requires the software-component pair passed through.
+  // AMD full-stack replacement mode.
   amdBaselineGpu: Component
   amdTargetGpu: Component
   amdBaselineSoftware: Component
   amdTargetSoftware: Component
   amdReport: SwapReport
+  // Cerebras alternative-paradigm mode (new). PARADIGM doesn't decompose
+  // into NVIDIA's L1-L5 — no swap, no scorecard, no engine output. Just
+  // the all-PARADIGM cake + the cross-layer ParadigmContrast panel.
+  cerebras: Component
 }
 
 export function CompetitiveModeSwitcher({
@@ -35,19 +37,21 @@ export function CompetitiveModeSwitcher({
   amdBaselineSoftware,
   amdTargetSoftware,
   amdReport,
+  cerebras,
 }: Props) {
   const [mode, setMode] = useState<CompetitiveMode>('slot')
 
   return (
     <div className="space-y-6">
       <ModeTabs mode={mode} onSelect={setMode} />
-      {mode === 'slot' ? (
+      {mode === 'slot' && (
         <FabricSwapView
           baseline={fabricBaseline}
           targets={fabricTargets}
           defaultTargetId={fabricDefaultTargetId}
         />
-      ) : (
+      )}
+      {mode === 'replacement' && (
         <AmdReplacementView
           baselineGpu={amdBaselineGpu}
           targetGpu={amdTargetGpu}
@@ -56,13 +60,16 @@ export function CompetitiveModeSwitcher({
           report={amdReport}
         />
       )}
+      {mode === 'paradigm' && <CerebrasParadigmView cerebras={cerebras} />}
     </div>
   )
 }
 
-// Top-level mode tabs. Two modes encode the switching-cost spectrum:
-//   SLOT SWAPS         — one component swapped, narrow blast radius
-//   FULL-STACK         — whole platform swapped, broader blast radius
+// Top-level mode tabs. Three modes encode the switching-cost spectrum:
+//   SLOT SWAPS              — one component swapped, narrow blast radius
+//   FULL-STACK REPLACEMENT  — whole platform swapped, broader blast radius
+//   ALTERNATIVE PARADIGM    — different machine entirely (re-architecture,
+//                             not a swap; no swap-report applies)
 // The tab labels themselves teach the taxonomy.
 function ModeTabs({
   mode,
@@ -80,11 +87,12 @@ function ModeTabs({
         <div className="mt-1 text-xs text-gray-400">
           The switching-cost spectrum encoded as structure. Slot swaps =
           contained blast radius (one component). Full-stack replacement =
-          broader blast radius (platform). The further from NVIDIA, the more
-          layers change.
+          broader blast radius (platform). Alternative paradigm = a
+          different machine entirely — adopting it is a re-architecture,
+          not a swap.
         </div>
       </div>
-      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-2 md:divide-x md:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-3 md:divide-x md:divide-y-0">
         <ModeTab
           label="SLOT SWAPS"
           sublabel="Fabric — low switching cost"
@@ -96,6 +104,12 @@ function ModeTabs({
           sublabel="AMD — broader blast radius"
           selected={mode === 'replacement'}
           onClick={() => onSelect('replacement')}
+        />
+        <ModeTab
+          label="ALTERNATIVE PARADIGM"
+          sublabel="Cerebras — different machine"
+          selected={mode === 'paradigm'}
+          onClick={() => onSelect('paradigm')}
         />
       </div>
     </div>

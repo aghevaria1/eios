@@ -490,10 +490,22 @@ function bandStyles(
     }
   }
   if (state.kind === 'paradigm') {
+    // Distinct visual treatment from the other 5 states:
+    //   · Indigo background (signature PARADIGM color)
+    //   · Vertical-stripe pattern (PERPENDICULAR to N/A's diagonal hatch)
+    //     — signals "monolithic columnar architecture, not separate layers"
+    //   · Connecting left-border (border-l-2 indigo-400/60) — when every
+    //     band in a fight-map is PARADIGM, the left-edges align across the
+    //     stack and visually read as ONE continuous line running through
+    //     the whole cake, the doesn't-decompose insight.
     return {
-      bg: 'bg-indigo-500/10',
-      layerIdText: 'text-indigo-400',
-      shortLabelText: 'text-indigo-200',
+      bg: 'bg-indigo-500/10 border-l-2 border-l-indigo-400/60',
+      inlineStyle: {
+        backgroundImage:
+          'repeating-linear-gradient(90deg, rgba(99,102,241,0.02) 0 6px, rgba(99,102,241,0.10) 6px 8px)',
+      },
+      layerIdText: 'text-indigo-300',
+      shortLabelText: 'italic text-indigo-200',
       evidenceText: 'text-gray-300',
       pointersText: 'text-gray-400',
     }
