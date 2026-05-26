@@ -2,94 +2,117 @@
 // state for one competitor vs the NVIDIA baseline. Headline synthesis for
 // any competitive comparison view.
 //
-// FOUR STATES (taxonomy — different competitors use different subsets):
+// FIVE STATES (taxonomy — different competitors use different subsets):
 //
 //   CONTESTED  — competitor genuinely fights NVIDIA at this layer. Carries
-//                WINNER (nvidia | competitor | tie) + STRENGTH (decisive |
-//                moderate | close), and may carry a NUANCE label (e.g.
-//                'workload-dependent' for AMD's L4).
+//                WINNER (nvidia | competitor | tie | split) + STRENGTH
+//                (decisive | moderate | close), and may carry a NUANCE
+//                label. The 'split' winner means each side leads its own
+//                axis (e.g. Broadcom leads scale + economics; NVIDIA leads
+//                integration + SHARP) — NOT a single winner. Split verdicts
+//                carry structural nvidiaAxis[] + competitorAxis[] fields
+//                that force both sides to be named (parallel to how
+//                AGNOSTIC requires freedom[] + optimizationTradeoff[]).
 //
-//   N/A        — competitor doesn't play at this layer. Visually dimmed +
-//                diagonal-stripe hatched to read as "out of play." MUST be
-//                distinct from SHARED (a tie = even fight; N/A = no fight)
-//                and from TIE (an even fight). Example: Broadcom (fabric
-//                vendor) has nothing at L4/L5.
+//   AGNOSTIC   — competitor fields NO offering at this layer, but unlike
+//                NVIDIA does not LOCK this layer either — openness is
+//                itself a competitive property vs NVIDIA's lock-in/gravity.
+//                Structural honesty guard: every AGNOSTIC verdict MUST
+//                carry both freedom[] (what the openness frees) AND
+//                optimizationTradeoff[] (what NVIDIA's lock-in delivers
+//                that's lost). The type system makes "open = better"
+//                framing impossible. Rendered as a two-column body with a
+//                "Customer-dependent — open ≠ better" italic disclaimer.
+//                Distinct from N/A (competitor absent AND irrelevant) and
+//                SHARED (present-and-identical). Example: Cornelis at
+//                L2-gpu / L3 / L4 / L5 — they don't field offerings there
+//                but their open-fabric posture frees those layers from
+//                NVIDIA pull.
+//
+//   N/A        — competitor doesn't play at this layer AND it's irrelevant
+//                to the competitive story (no openness story either).
+//                Visually dimmed + diagonal-stripe hatched. Example: any
+//                fabric vendor at L1 — they have no datacenter offering
+//                and no opinion about facilities.
 //
 //   SHARED     — layer is present in both stacks identically — not a
-//                differentiator. Example: AMD vs NVIDIA, the datacenter
-//                (L1) and ISV/orchestration layer (L3) are the same
-//                regardless of GPU vendor. Both stacks include them, but
-//                the GPU choice doesn't change them.
+//                differentiator. Both vendors play, with identical outcomes.
+//                Example: AMD vs NVIDIA L1 / L3 — both stacks include the
+//                datacenter and ISV layer; the GPU choice doesn't change
+//                them.
 //
 //   PARADIGM   — competitor doesn't map to the layer model at all.
 //                Example: Cerebras (wafer-scale = different paradigm).
-//                Renders with explicit "doesn't map" treatment.
 //
 // HONESTY DISCIPLINE:
-//   SHARED ≠ N/A ≠ TIE. Conflating them would either fabricate a fight
-//   where none exists or hide one where it does. The taxonomy is the
-//   guardrail — render them visually distinct.
-//
-// EXTENSIONS WIRED BUT NOT EXERCISED YET:
-//   AMD (first instance) uses CONTESTED + SHARED only. The N/A hatch +
-//   PARADIGM treatment + competitor-color variants are built in this
-//   iteration because fabric (N/A) and Cerebras (PARADIGM) need them
-//   later — building once vs reaching back to add states keeps the
-//   component a stable surface across competitors.
+//   The 5 states encode genuinely different competitive realities. The
+//   discriminated union enforces what fields each state must carry
+//   (split → nvidiaAxis + competitorAxis; agnostic → freedom +
+//   optimizationTradeoff). The type system is the guardrail against
+//   collapsing distinct states into a misleading single label.
 
 import type { CSSProperties } from 'react'
 
-export type LayerId = 'L1' | 'L2' | 'L3' | 'L4' | 'L5'
+// L2 has optional sub-slot variants: full-stack competitors (AMD) use 'L2'
+// for the whole compute+fabric layer; point-solution competitors split it
+// to surface "absent at compute, present at networking" (fabric vendors).
+export type LayerId =
+  | 'L1'
+  | 'L2'
+  | 'L2-gpu'
+  | 'L2-fabric'
+  | 'L3'
+  | 'L4'
+  | 'L5'
 
-export type ContestedWinner = 'nvidia' | 'competitor' | 'tie'
+export type ContestedWinner = 'nvidia' | 'competitor' | 'tie' | 'split'
 export type ContestedStrength = 'decisive' | 'moderate' | 'close'
 
-// Discriminated union — each kind carries only the fields that make
-// sense for it. Type-safety enables reuse across competitors without
-// optional-field sprawl.
+// Discriminated union — each kind carries only the fields that make sense
+// for it. Type-safety enables reuse across competitors without optional-
+// field sprawl, and forces both sides to be named for split + agnostic
+// states (the honesty guardrails).
 export type LayerState =
   | {
       kind: 'contested'
       winner: ContestedWinner
       strength: ContestedStrength
-      // Optional nuance modifier (badge beside the state pill). Used for
-      // AMD's L4 to surface workload-dependence without losing the
-      // at-a-glance tie verdict.
       nuance?: string
+      // REQUIRED when winner === 'split': each side's axis list. Forces
+      // the verdict to name what BOTH sides lead, preventing "competitor
+      // leads" overreach. Strength on a split verdict means "how cleanly
+      // the split decomposes" (decisive = clean axis decomposition).
+      nvidiaAxis?: string[]
+      competitorAxis?: string[]
     }
   | { kind: 'n/a' }
   | { kind: 'shared' }
   | { kind: 'paradigm' }
+  | {
+      kind: 'agnostic'
+      // Structurally required — type-enforced "freedom vs optimization"
+      // tradeoff framing. Both arrays MUST be populated.
+      freedom: string[]
+      optimizationTradeoff: string[]
+    }
 
 export interface LayerVerdict {
   layerId: LayerId
   layerName: string
   state: LayerState
-  // Pre-composed concise label for the band body (e.g. 'NVIDIA — DECISIVE',
-  // 'TIE — CLOSE', 'Same regardless of GPU vendor', 'not contested').
-  // Caller composes this to keep wording control in one place.
   shortLabel: string
-  // 1-2 sentence why. For SHARED/N/A, brief reason for the state.
   evidence: string
-  // Optional bullet evidence (cited specifics — moat libraries, workload
-  // splits, etc.).
   pointers?: string[]
-  // Optional reference to the underlying data ('see scorecard below',
-  // 'amd_rocm.kpi_values', etc.) — lets the reader trace verdicts back
-  // to seeded data.
   sourceRef?: string
 }
 
-// Competitor colors — additive set. AMD = sky (matches existing sky pills
-// in the win/loss scorecard). Cerebras planned amber. Purple held in
-// reserve for a third competitor.
-export type CompetitorColor = 'sky' | 'amber' | 'purple'
+export type CompetitorColor = 'sky' | 'amber' | 'purple' | 'cyan'
 
 interface Props {
   competitorName: string
   competitorColor?: CompetitorColor // default sky
-  verdicts: LayerVerdict[] // caller orders (typically L5 top → L1 bottom)
-  narrative: string // pattern roll-up shown below the cake; no numeric score
+  verdicts: LayerVerdict[]
+  narrative: string
 }
 
 export function LayerFightMap({
@@ -105,15 +128,19 @@ export function LayerFightMap({
           LAYER FIGHT MAP  ·  {competitorName} vs NVIDIA
         </div>
         <div className="mt-1 text-xs leading-relaxed text-gray-400">
-          The cake as competitive surface. Each layer is one of four states:
-          <span className="text-amber-300"> CONTESTED</span> (real fight — read
-          the winner + strength),
+          The cake as competitive surface. Five states encode genuinely
+          different competitive realities:
+          <span className="text-amber-300"> CONTESTED</span> (real fight —
+          winner can be split-by-axis to avoid overclaiming),
+          <span className="text-teal-300"> AGNOSTIC</span> (competitor
+          fields nothing here but its openness frees the layer from NVIDIA
+          lock-in — tradeoff vs optimization),
           <span className="text-gray-300"> SHARED</span> (present in both
           stacks identically — not a differentiator),
           <span className="text-gray-500"> N/A</span> (competitor doesn&apos;t
-          play here — dimmed/hatched), or
-          <span className="text-indigo-300"> PARADIGM</span> (doesn&apos;t map
-          to the layer model). Order: L5 (top) → L1 (bottom).
+          play AND it&apos;s irrelevant — dimmed/hatched), or
+          <span className="text-indigo-300"> PARADIGM</span> (doesn&apos;t
+          map to the layer model). Order: L5 (top) → L1 (bottom).
         </div>
       </header>
       <div className="flex flex-col">
@@ -121,6 +148,7 @@ export function LayerFightMap({
           <LayerBand
             key={v.layerId}
             verdict={v}
+            competitorName={competitorName}
             competitorColor={competitorColor}
           />
         ))}
@@ -133,12 +161,15 @@ export function LayerFightMap({
 // ─── One layer band — the visual unit of the cake ─────────────────────
 function LayerBand({
   verdict,
+  competitorName,
   competitorColor,
 }: {
   verdict: LayerVerdict
+  competitorName: string
   competitorColor: CompetitorColor
 }) {
   const styles = bandStyles(verdict.state, competitorColor)
+  const renderTwoColumn = shouldRenderTwoColumn(verdict.state)
   return (
     <div
       className={`relative border-b border-gray-800/60 px-5 py-4 ${styles.bg}`}
@@ -160,6 +191,13 @@ function LayerBand({
       <div className={`mt-2 text-xs leading-relaxed ${styles.evidenceText}`}>
         {verdict.evidence}
       </div>
+      {renderTwoColumn && (
+        <TwoColumnBody
+          state={verdict.state}
+          competitorName={competitorName}
+          competitorColor={competitorColor}
+        />
+      )}
       {verdict.pointers && verdict.pointers.length > 0 && (
         <ul
           className={`mt-2 space-y-0.5 text-[11px] leading-relaxed ${styles.pointersText}`}
@@ -180,6 +218,124 @@ function LayerBand({
   )
 }
 
+function shouldRenderTwoColumn(state: LayerState): boolean {
+  if (state.kind === 'agnostic') return true
+  if (state.kind === 'contested' && state.winner === 'split') return true
+  return false
+}
+
+// ─── Two-column body — used by AGNOSTIC and CONTESTED-SPLIT ──────────
+// Both states share the same structural visual: two parallel columns
+// naming each side, italic disclaimer at the bottom. The discipline:
+// the type system requires both sides to be populated; the visual makes
+// the tradeoff land.
+function TwoColumnBody({
+  state,
+  competitorName,
+  competitorColor,
+}: {
+  state: LayerState
+  competitorName: string
+  competitorColor: CompetitorColor
+}) {
+  if (state.kind === 'agnostic') {
+    return (
+      <TwoColumnLayout
+        leftHeader="FREEDOM"
+        leftHeaderClass={openFreedomHeaderClasses(competitorColor)}
+        leftItems={state.freedom}
+        rightHeader="OPTIMIZATION TRADEOFF"
+        rightHeaderClass="text-[#9FD848]"
+        rightItems={state.optimizationTradeoff}
+        footer="Customer-dependent — open ≠ better; lock-in buys real optimization."
+      />
+    )
+  }
+  if (state.kind === 'contested' && state.winner === 'split') {
+    return (
+      <TwoColumnLayout
+        leftHeader={`${competitorName.toUpperCase()} LEADS`}
+        leftHeaderClass={competitorHeaderClasses(competitorColor)}
+        leftItems={state.competitorAxis ?? []}
+        rightHeader="NVIDIA LEADS"
+        rightHeaderClass="text-[#9FD848]"
+        rightItems={state.nvidiaAxis ?? []}
+        footer="Customer-dependent — depends on what you optimize for. Different axes, not a single winner."
+      />
+    )
+  }
+  return null
+}
+
+function TwoColumnLayout({
+  leftHeader,
+  leftHeaderClass,
+  leftItems,
+  rightHeader,
+  rightHeaderClass,
+  rightItems,
+  footer,
+}: {
+  leftHeader: string
+  leftHeaderClass: string
+  leftItems: string[]
+  rightHeader: string
+  rightHeaderClass: string
+  rightItems: string[]
+  footer: string
+}) {
+  return (
+    <div className="mt-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <ColumnBlock header={leftHeader} headerClass={leftHeaderClass} items={leftItems} />
+        <ColumnBlock header={rightHeader} headerClass={rightHeaderClass} items={rightItems} />
+      </div>
+      <div className="mt-2 text-[10px] italic leading-relaxed text-gray-500">
+        {footer}
+      </div>
+    </div>
+  )
+}
+
+function ColumnBlock({
+  header,
+  headerClass,
+  items,
+}: {
+  header: string
+  headerClass: string
+  items: string[]
+}) {
+  return (
+    <div className="rounded border border-gray-800/60 bg-gray-950/30 p-3">
+      <div className={`text-[10px] font-mono font-semibold tracking-widest ${headerClass}`}>
+        {header}
+      </div>
+      <ul className="mt-1.5 space-y-0.5 text-[11px] leading-relaxed text-gray-300">
+        {items.map((it, i) => (
+          <li key={i}>
+            <span className="text-gray-600">·</span> {it}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function competitorHeaderClasses(competitorColor: CompetitorColor): string {
+  if (competitorColor === 'sky') return 'text-sky-300'
+  if (competitorColor === 'amber') return 'text-amber-300'
+  if (competitorColor === 'cyan') return 'text-cyan-300'
+  return 'text-purple-300'
+}
+
+function openFreedomHeaderClasses(competitorColor: CompetitorColor): string {
+  // For AGNOSTIC, the "freedom" side reads as competitor-flavored openness.
+  // Reuse the competitor color so the cross-competitor identity stays
+  // consistent across AGNOSTIC and CONTESTED-SPLIT bands.
+  return competitorHeaderClasses(competitorColor)
+}
+
 // ─── State pill (right of band) + optional nuance badge ──────────────
 function StatePill({
   state,
@@ -197,7 +353,7 @@ function StatePill({
         {pill.label}
       </span>
       {state.kind === 'contested' && state.nuance && (
-        <span className="whitespace-nowrap rounded border border-dashed border-amber-400/50 bg-amber-500/5 px-1.5 py-0.5 text-[9px] font-mono uppercase tracking-widest text-amber-200">
+        <span className="max-w-[200px] whitespace-normal rounded border border-dashed border-amber-400/50 bg-amber-500/5 px-1.5 py-0.5 text-right text-[9px] font-mono uppercase leading-tight tracking-widest text-amber-200">
           {state.nuance}
         </span>
       )}
@@ -229,6 +385,21 @@ function pillFor(
         'border-dashed border-indigo-400/50 bg-indigo-500/10 text-indigo-200',
     }
   }
+  if (state.kind === 'agnostic') {
+    return {
+      label: 'AGNOSTIC / OPEN',
+      classes:
+        'border-dashed border-teal-400/60 bg-teal-500/10 text-teal-200',
+    }
+  }
+  // contested
+  if (state.winner === 'split') {
+    return {
+      label: 'SPLIT — BY AXIS',
+      classes:
+        'border-dashed border-amber-400/60 bg-amber-500/8 text-amber-100',
+    }
+  }
   return {
     label: contestedLabel(state.winner, state.strength),
     classes: contestedPillClasses(state.winner, state.strength, competitorColor),
@@ -236,7 +407,7 @@ function pillFor(
 }
 
 function contestedLabel(
-  winner: ContestedWinner,
+  winner: 'nvidia' | 'competitor' | 'tie',
   strength: ContestedStrength,
 ): string {
   const winnerWord =
@@ -249,12 +420,11 @@ function contestedLabel(
 }
 
 function contestedPillClasses(
-  winner: ContestedWinner,
+  winner: 'nvidia' | 'competitor' | 'tie',
   strength: ContestedStrength,
   competitorColor: CompetitorColor,
 ): string {
   if (winner === 'tie') {
-    // Tie = amber neutral, strength tunes opacity.
     return strength === 'decisive'
       ? 'border-amber-500/60 bg-amber-500/15 text-amber-200'
       : 'border-amber-500/50 bg-amber-500/10 text-amber-200'
@@ -264,7 +434,7 @@ function contestedPillClasses(
       ? 'border-[#76B900]/60 bg-[#76B900]/15 text-[#9FD848]'
       : 'border-[#76B900]/40 bg-[#76B900]/10 text-[#9FD848]'
   }
-  // competitor wins — branch per color so Tailwind JIT picks up the literals.
+  // competitor wins
   if (competitorColor === 'sky') {
     return strength === 'decisive'
       ? 'border-sky-500/60 bg-sky-500/15 text-sky-200'
@@ -274,6 +444,11 @@ function contestedPillClasses(
     return strength === 'decisive'
       ? 'border-amber-500/60 bg-amber-500/15 text-amber-200'
       : 'border-amber-500/40 bg-amber-500/10 text-amber-200'
+  }
+  if (competitorColor === 'cyan') {
+    return strength === 'decisive'
+      ? 'border-cyan-500/60 bg-cyan-500/15 text-cyan-200'
+      : 'border-cyan-500/40 bg-cyan-500/10 text-cyan-200'
   }
   return strength === 'decisive'
     ? 'border-purple-500/60 bg-purple-500/15 text-purple-200'
@@ -293,8 +468,6 @@ function bandStyles(
   pointersText: string
 } {
   if (state.kind === 'n/a') {
-    // Diagonal-stripe hatch + dimmed text = "out of play." Distinct from
-    // SHARED gray (which is solid and at full opacity).
     return {
       bg: 'opacity-60',
       inlineStyle: {
@@ -325,7 +498,59 @@ function bandStyles(
       pointersText: 'text-gray-400',
     }
   }
+  if (state.kind === 'agnostic') {
+    // Subtle teal tint + dashed border (open/unlocked motif). The body
+    // does the heavy lifting via the two-column FREEDOM/TRADEOFF layout.
+    return {
+      bg: 'bg-teal-500/5',
+      inlineStyle: { borderBottomStyle: 'dashed' },
+      layerIdText: 'text-teal-300',
+      shortLabelText: 'text-teal-100',
+      evidenceText: 'text-gray-300',
+      pointersText: 'text-gray-400',
+    }
+  }
   // contested
+  if (state.winner === 'split') {
+    // Two-color gradient: competitor color on left → NVIDIA-green on right.
+    // Visually signals "both sides win different axes" before the reader
+    // reaches the two-column body. Explicit per-color branches for
+    // Tailwind JIT (arbitrary-color gradient stops must be literal strings).
+    if (competitorColor === 'sky') {
+      return {
+        bg: 'bg-gradient-to-r from-sky-500/10 to-[#76B900]/10',
+        layerIdText: 'text-amber-300',
+        shortLabelText: 'text-amber-100',
+        evidenceText: 'text-gray-300',
+        pointersText: 'text-gray-400',
+      }
+    }
+    if (competitorColor === 'amber') {
+      return {
+        bg: 'bg-gradient-to-r from-amber-500/10 to-[#76B900]/10',
+        layerIdText: 'text-amber-300',
+        shortLabelText: 'text-amber-100',
+        evidenceText: 'text-gray-300',
+        pointersText: 'text-gray-400',
+      }
+    }
+    if (competitorColor === 'cyan') {
+      return {
+        bg: 'bg-gradient-to-r from-cyan-500/10 to-[#76B900]/10',
+        layerIdText: 'text-amber-300',
+        shortLabelText: 'text-amber-100',
+        evidenceText: 'text-gray-300',
+        pointersText: 'text-gray-400',
+      }
+    }
+    return {
+      bg: 'bg-gradient-to-r from-purple-500/10 to-[#76B900]/10',
+      layerIdText: 'text-amber-300',
+      shortLabelText: 'text-amber-100',
+      evidenceText: 'text-gray-300',
+      pointersText: 'text-gray-400',
+    }
+  }
   if (state.winner === 'tie') {
     return {
       bg: state.strength === 'decisive' ? 'bg-amber-500/12' : 'bg-amber-500/8',
@@ -347,7 +572,7 @@ function bandStyles(
       pointersText: 'text-gray-400',
     }
   }
-  // competitor wins — explicit per-color branches for Tailwind JIT
+  // competitor wins (clean — not split)
   if (competitorColor === 'sky') {
     return {
       bg: state.strength === 'decisive' ? 'bg-sky-500/15' : 'bg-sky-500/8',
@@ -366,6 +591,15 @@ function bandStyles(
       pointersText: 'text-gray-400',
     }
   }
+  if (competitorColor === 'cyan') {
+    return {
+      bg: state.strength === 'decisive' ? 'bg-cyan-500/15' : 'bg-cyan-500/8',
+      layerIdText: 'text-cyan-300',
+      shortLabelText: 'text-cyan-200',
+      evidenceText: 'text-gray-300',
+      pointersText: 'text-gray-400',
+    }
+  }
   return {
     bg:
       state.strength === 'decisive' ? 'bg-purple-500/15' : 'bg-purple-500/8',
@@ -377,10 +611,6 @@ function bandStyles(
 }
 
 // ─── Narrative rollup ─────────────────────────────────────────────────
-// Pattern paragraph that names the shape of the fight. No numeric score —
-// the colored cake IS the score (per-layer at a glance), and a roll-up
-// percentage would require defensible layer-weighting + miscount N/A
-// layers + flatten the pattern.
 function NarrativeRollup({ narrative }: { narrative: string }) {
   return (
     <div className="border-t border-gray-800 bg-gray-950/40 px-5 py-4">
