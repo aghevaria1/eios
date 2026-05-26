@@ -35,6 +35,24 @@ export const KPI_DEFINITIONS: KpiDefinition[] = [
     honesty_note: 'Dense vs sparse footnoted by vendor; treat sparse as ~2x dense.',
   },
   {
+    id: 'compute_tdp_per_gpu',
+    name: 'GPU TDP (per GPU)',
+    tier: 1,
+    dependencies: ['gpu'],
+    description:
+      'Thermal design power per GPU (watts). Feeds the calculated build-metrics layer: GPU power = count × TDP, facility power = GPU power × PUE band.',
+  },
+  {
+    id: 'compute_per_gpu_price_band',
+    name: 'Per-GPU price band (compute hardware only)',
+    tier: 1,
+    dependencies: ['gpu'],
+    description:
+      'Per-GPU acquisition price as a range — directional by nature because pricing varies by volume, config, region, and partner deal. Feeds the calculated compute-hardware CapEx range (count × band). MANDATORY framing: compute-hardware only — excludes network, storage, facility, install.',
+    honesty_note:
+      'Always a RANGE, never a point. Cited to analyst pricing sources (HSBC, gpu.fm, Tom\'s Hardware). Compute-hardware-only label is mandatory — the range is the per-GPU cost, NOT a total-build-cost estimate.',
+  },
+  {
     id: 'compute_flops_fp8_per_gpu_dense',
     name: 'GPU FP8 FLOPS (per GPU, dense)',
     tier: 1,

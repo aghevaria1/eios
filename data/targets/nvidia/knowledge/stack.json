@@ -76,6 +76,24 @@
             "last_verified": "2026-05-20",
             "notes": "Datasheet column read — confirm dense/sparse attribution before promoting to cited. NOTE: the prior value (4.5 PFLOPS) was the FP16/BF16 figure, mislabeled as FP8; corrected."
           }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 1000, "max": 1000, "unit": "W" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA Blackwell B200 SXM module — TDP 1000 W per GPU per HGX B200 product brief / Blackwell architecture overview.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 40000, "max": 55000, "unit": "USD per GPU (compute-hardware only — excludes network/storage/facility/install)" },
+          "provenance": {
+            "status": "directional",
+            "source": "HSBC analyst pricing (GB200 NVL72 system ~$3M / 72 GPUs ≈ $42K/GPU low end) + gpu.fm March 2026 standalone B200 pricing ($45-55K high end) + Tom's Hardware corroboration. Band varies by volume, config, region, and partner deal — directional by structure.",
+            "last_verified": "2026-05-26",
+            "notes": "MANDATORY framing: COMPUTE-HARDWARE ONLY — excludes network, storage, facility, install. The range is the per-GPU acquisition cost, NOT a total-build-cost estimate. Always render as a range, never a point."
+          }
         }
       }
     },
@@ -119,6 +137,37 @@
             "notes": "Per-GPU dense; sparse is 2x. Per-superchip total is ~18 PFLOPS dense across 2 Blackwell GPUs. Verify against the GB200 datasheet before promoting to cited.",
             "last_verified": "2026-05-21"
           }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense, approx, per Blackwell GPU)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 per-GPU FP8 dense throughput inherits from the B200 datasheet column read (~9 PFLOPS FP8 dense).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "last_verified": "2026-05-26",
+            "notes": "Per-Blackwell-GPU dense. Inherits the same verify-needed status as B200's FP8 column read (dense/sparse attribution unconfirmed)."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 1200, "max": 1200, "unit": "W per Blackwell GPU (superchip ~2700 W including Grace CPU)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "GB200 superchip TDP characterization from NVIDIA materials + semiconductor-analyst coverage. Per-Blackwell-GPU vs per-superchip attribution varies by source.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "last_verified": "2026-05-26",
+            "notes": "Per-GPU figure inherits from documented superchip thermal envelope. Verify attribution (per-Blackwell-GPU vs per-superchip including Grace CPU) before promoting to cited."
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 40000, "max": 55000, "unit": "USD per GPU (compute-hardware only — excludes network/storage/facility/install)" },
+          "provenance": {
+            "status": "directional",
+            "source": "HSBC analyst pricing (GB200 NVL72 system ~$3M / 72 GPUs ≈ $42K/GPU low end) + gpu.fm March 2026 pricing ($45-55K high end). Band by structure — varies by volume, config, region, partner deal.",
+            "last_verified": "2026-05-26",
+            "notes": "MANDATORY framing: COMPUTE-HARDWARE ONLY — excludes network, storage, facility, install. Range, never point."
+          }
         }
       }
     },
@@ -159,6 +208,35 @@
             "source": "User-specified per NVIDIA RTX PRO 6000 product announcement; not independently fetched in this build pass.",
             "last_verified": "2026-05-20",
             "notes": "Verify against NVIDIA RTX PRO product page before promoting to 'cited'."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 0.4, "max": 0.4, "unit": "PFLOPS (dense, approx — enterprise/edge class)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "RTX PRO 6000 (Blackwell workstation/edge class) FP4 throughput characterization. Per NVIDIA RTX PRO product materials, FP4 Tensor Core throughput is approximately an order of magnitude below HGX-class B200.",
+            "last_verified": "2026-05-26",
+            "notes": "Enterprise/edge class — designed for inference/visualization workloads, not large-scale training. Verify exact FP4 figure against RTX PRO 6000 datasheet."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 600, "max": 600, "unit": "W" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA RTX PRO 6000 product page (Blackwell workstation/edge class).",
+            "source_url": "https://www.nvidia.com/en-us/design-visualization/rtx-pro-6000/",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 8000, "max": 12000, "unit": "USD per GPU (workstation/edge class — compute-hardware only)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "RTX PRO 6000 enterprise / workstation pricing characterization — channel pricing varies by configuration and partner. Lower than HGX/NVL72-class by order of magnitude.",
+            "last_verified": "2026-05-26",
+            "notes": "Verify against current channel pricing. The price band is workstation/edge class, not datacenter-rack class — different deployment scale."
           }
         }
       }

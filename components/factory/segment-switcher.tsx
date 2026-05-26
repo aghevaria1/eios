@@ -1,13 +1,38 @@
 'use client'
 
 import { useState } from 'react'
-import type { Component, L1Profile, Layer, Segment } from '@/lib/factory/kpi'
+import type {
+  Component,
+  KpiDefinition,
+  KpiValue,
+  L1Profile,
+  Layer,
+  Segment,
+} from '@/lib/factory/kpi'
 import { AIFactoryCake, type L2Tile } from './ai-factory-cake'
 import {
   DeliveredKpisPanel,
   type KpiResult,
 } from './delivered-kpis-panel'
 import { TcoBars } from './tco-bars'
+import { CalculatedBuildMetrics } from './calculated-build-metrics'
+
+export interface CalcInputs {
+  // Lead-RA GPU per-unit specs (each KPI + its provenance)
+  fp4DensePerGpu: { kpi: KpiDefinition; value: KpiValue }
+  fp8DensePerGpu: { kpi: KpiDefinition; value: KpiValue }
+  hbmPerGpu: { kpi: KpiDefinition; value: KpiValue }
+  tdpPerGpu: { kpi: KpiDefinition; value: KpiValue }
+  pricePerGpu: { kpi: KpiDefinition; value: KpiValue }
+  leadGpuName: string
+  // Slider config (per-segment defaults set by the architect page)
+  sliderMin: number
+  sliderMax: number
+  sliderDefault: number
+  // Physical-unit metadata per lead RA
+  gpusPerUnit: number
+  unitLabel: string
+}
 
 export interface SegmentView {
   segment: Segment
@@ -27,6 +52,10 @@ export interface SegmentView {
   supporting: KpiResult[]
   tcoCapex: KpiResult
   tcoOpex: KpiResult
+  // CalculatedBuildMetrics inputs (Category-1 calculated KPIs). Category-2
+  // KPIs (northStar / supporting / tcoCapex / tcoOpex) intentionally do NOT
+  // receive the slider count — architectural immutability.
+  calc: CalcInputs
 }
 
 interface Props {
@@ -87,6 +116,27 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
       </p>
 
       <div className="mt-10 space-y-6">
+        {/* CalculatedBuildMetrics sits between the cake and the directional
+            DeliveredKpisPanel. The progression teaches the boundary:
+            architecture (cake) → what that scale builds to (live math) →
+            what the workload determines (directional KPIs + TCO bars).
+            The `key` prop forces a remount on segment change so slider state
+            resets to the per-segment default — simpler than preserving
+            counts across segment switches. */}
+        <CalculatedBuildMetrics
+          key={active.segment.id}
+          sliderMin={active.calc.sliderMin}
+          sliderMax={active.calc.sliderMax}
+          sliderDefault={active.calc.sliderDefault}
+          gpusPerUnit={active.calc.gpusPerUnit}
+          unitLabel={active.calc.unitLabel}
+          fp4DensePerGpu={active.calc.fp4DensePerGpu}
+          fp8DensePerGpu={active.calc.fp8DensePerGpu}
+          hbmPerGpu={active.calc.hbmPerGpu}
+          tdpPerGpu={active.calc.tdpPerGpu}
+          pricePerGpu={active.calc.pricePerGpu}
+          leadGpuName={active.calc.leadGpuName}
+        />
         <DeliveredKpisPanel
           northStar={active.northStar}
           supporting={active.supporting}

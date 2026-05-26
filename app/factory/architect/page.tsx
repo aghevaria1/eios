@@ -4,6 +4,7 @@ import {
   lookupKpiValue,
   KPI_DEFINITIONS,
   type KpiDefinition,
+  type KpiValue,
 } from '@/lib/factory/kpi'
 import type { L2Tile } from '@/components/factory/ai-factory-cake'
 import {
@@ -22,6 +23,31 @@ const DEFAULT_SEGMENT_ID = 'fortune-500'
 
 const TCO_CAPEX_ID = 'ops_tco_capex_directional'
 const TCO_OPEX_ID = 'ops_tco_opex_directional'
+
+// Per-segment slider configuration for CalculatedBuildMetrics. Ranges +
+// defaults bracket realistic deployment scale per segment; default seeds
+// a value that already shows interesting calculated numbers.
+const SLIDER_CONFIG: Record<
+  string,
+  { min: number; max: number; default: number }
+> = {
+  'frontier-ai-labs':   { min: 1000, max: 100000, default: 10000 },
+  hyperscalers:         { min: 1000, max: 250000, default: 50000 },
+  'fortune-500':        { min: 8,    max: 5000,   default: 256   },
+  'sovereign-ai':       { min: 100,  max: 50000,  default: 5000  },
+  'industry-verticals': { min: 8,    max: 2000,   default: 128   },
+}
+
+// Lead-RA → physical-unit metadata. NVL72 = 72 GPUs/rack (rack-scale system);
+// HGX = 8 GPUs/baseboard (node-level); RTX_PRO = 1 GPU/unit (workstation/edge).
+const RA_UNIT_META: Record<
+  string,
+  { gpusPerUnit: number; unitLabel: string }
+> = {
+  NVL72: { gpusPerUnit: 72, unitLabel: 'NVL72 racks' },
+  HGX: { gpusPerUnit: 8, unitLabel: 'HGX 8-GPU nodes' },
+  RTX_PRO: { gpusPerUnit: 1, unitLabel: 'RTX PRO units' },
+}
 
 export default function ArchitectPage() {
   const knowledge = loadKnowledge()
@@ -96,6 +122,50 @@ export default function ArchitectPage() {
 
     const raBlendDisplay = blend.ras.map((r) => r.id).join(' + ')
 
+    // ─── Calculated-Build-Metrics inputs ─────────────────────────────
+    // Lead-RA GPU's per-unit specs (FLOPS, HBM, TDP, price band) feed the
+    // calculated panel. count × per-unit-spec is the Category-1 math.
+    const leadRa = knowledge.architectures.find((a) => a.id === leadRaId)
+    if (!leadRa) {
+      throw new Error(`architect: lead RA '${leadRaId}' not in architectures`)
+    }
+    const leadGpu = knowledge.components.get(leadRa.default_components.gpu)
+    if (!leadGpu) {
+      throw new Error(
+        `architect: lead-RA GPU '${leadRa.default_components.gpu}' for segment '${segmentId}' not in components`,
+      )
+    }
+    const resolveLeadGpuKpi = (kpiId: string) => {
+      const kpi: KpiDefinition | undefined = KPI_DEFINITIONS.find(
+        (k) => k.id === kpiId,
+      )
+      if (!kpi)
+        throw new Error(`architect: lead-GPU KPI '${kpiId}' not in KPI_DEFINITIONS`)
+      const value: KpiValue | undefined = leadGpu.kpi_values?.[kpiId]
+      if (!value)
+        throw new Error(
+          `architect: lead-GPU '${leadGpu.id}' missing kpi_values['${kpiId}'] (required for CalculatedBuildMetrics)`,
+        )
+      return { kpi, value }
+    }
+    const calcInputs = {
+      fp4DensePerGpu: resolveLeadGpuKpi('compute_flops_fp4_per_gpu_dense'),
+      fp8DensePerGpu: resolveLeadGpuKpi('compute_flops_fp8_per_gpu_dense'),
+      hbmPerGpu: resolveLeadGpuKpi('compute_memory_capacity_per_gpu'),
+      tdpPerGpu: resolveLeadGpuKpi('compute_tdp_per_gpu'),
+      pricePerGpu: resolveLeadGpuKpi('compute_per_gpu_price_band'),
+      leadGpuName: leadGpu.name,
+    }
+    const slider = SLIDER_CONFIG[segmentId] ?? {
+      min: 8,
+      max: 5000,
+      default: 256,
+    }
+    const unitMeta = RA_UNIT_META[leadRaId] ?? {
+      gpusPerUnit: 1,
+      unitLabel: 'units',
+    }
+
     return {
       segment,
       raBlendDisplay,
@@ -105,13 +175,19 @@ export default function ArchitectPage() {
       chosenIsvs,
       softwareWrapper,
       oem,
-      // Per-segment L1 facility profile — optional; the cake falls back to the
-      // stack.json layer description when undefined.
       l1Profile: segment.l1_profile,
       northStar,
       supporting,
       tcoCapex,
       tcoOpex,
+      calc: {
+        ...calcInputs,
+        sliderMin: slider.min,
+        sliderMax: slider.max,
+        sliderDefault: slider.default,
+        gpusPerUnit: unitMeta.gpusPerUnit,
+        unitLabel: unitMeta.unitLabel,
+      },
     }
   })
 
