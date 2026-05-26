@@ -20,8 +20,8 @@ interface Props {
   // AMD full-stack replacement mode.
   amdBaselineGpu: Component
   amdTargetGpu: Component
-  amdBaselineSoftware: Component
-  amdTargetSoftware: Component
+  amdRoadmapRubin: Component
+  amdRoadmapMi455x: Component
   amdReport: SwapReport
   // Cerebras alternative-paradigm mode.
   cerebras: Component
@@ -41,8 +41,8 @@ export function CompetitiveModeSwitcher({
   fabricDefaultTargetId,
   amdBaselineGpu,
   amdTargetGpu,
-  amdBaselineSoftware,
-  amdTargetSoftware,
+  amdRoadmapRubin,
+  amdRoadmapMi455x,
   amdReport,
   cerebras,
   hyperscalerGoogle,
@@ -66,8 +66,8 @@ export function CompetitiveModeSwitcher({
         <AmdReplacementView
           baselineGpu={amdBaselineGpu}
           targetGpu={amdTargetGpu}
-          baselineSoftware={amdBaselineSoftware}
-          targetSoftware={amdTargetSoftware}
+          roadmapRubin={amdRoadmapRubin}
+          roadmapMi455x={amdRoadmapMi455x}
           report={amdReport}
         />
       )}

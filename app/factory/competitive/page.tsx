@@ -22,6 +22,8 @@ const BASELINE_GPU_ID = 'blackwell_b200'
 const AMD_TARGET_GPU_ID = 'amd_mi355x'
 const BASELINE_SOFTWARE_ID = 'nvaie'
 const AMD_TARGET_SOFTWARE_ID = 'amd_rocm'
+const ROADMAP_RUBIN_ID = 'vera_rubin_vr200'
+const ROADMAP_MI455X_ID = 'amd_helios_mi455x'
 const CEREBRAS_ID = 'cerebras_wse3'
 const HYPERSCALER_IDS = {
   google: 'google_tpu',
@@ -68,6 +70,8 @@ export default function CompetitivePage() {
   const amdTargetGpu = knowledge.components.get(AMD_TARGET_GPU_ID)
   const baselineSoftware = knowledge.components.get(BASELINE_SOFTWARE_ID)
   const amdTargetSoftware = knowledge.components.get(AMD_TARGET_SOFTWARE_ID)
+  const amdRoadmapRubin = knowledge.components.get(ROADMAP_RUBIN_ID)
+  const amdRoadmapMi455x = knowledge.components.get(ROADMAP_MI455X_ID)
   const cerebras = knowledge.components.get(CEREBRAS_ID)
   const hyperscalerGoogle = knowledge.components.get(HYPERSCALER_IDS.google)
   const hyperscalerAws = knowledge.components.get(HYPERSCALER_IDS.aws)
@@ -78,6 +82,8 @@ export default function CompetitivePage() {
     !amdTargetGpu ||
     !baselineSoftware ||
     !amdTargetSoftware ||
+    !amdRoadmapRubin ||
+    !amdRoadmapMi455x ||
     !cerebras ||
     !hyperscalerGoogle ||
     !hyperscalerAws ||
@@ -85,7 +91,7 @@ export default function CompetitivePage() {
     !hyperscalerMicrosoft
   ) {
     throw new Error(
-      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}' / cerebras '${CEREBRAS_ID}' / hyperscaler [${Object.values(HYPERSCALER_IDS).join(', ')}]`,
+      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}' / roadmap '${ROADMAP_RUBIN_ID}' + '${ROADMAP_MI455X_ID}' / cerebras '${CEREBRAS_ID}' / hyperscaler [${Object.values(HYPERSCALER_IDS).join(', ')}]`,
     )
   }
   const amdGpuReport = applySwap(baseline, {
@@ -128,8 +134,8 @@ export default function CompetitivePage() {
         fabricDefaultTargetId={DEFAULT_FABRIC_TARGET_ID}
         amdBaselineGpu={baselineGpu}
         amdTargetGpu={amdTargetGpu}
-        amdBaselineSoftware={baselineSoftware}
-        amdTargetSoftware={amdTargetSoftware}
+        amdRoadmapRubin={amdRoadmapRubin}
+        amdRoadmapMi455x={amdRoadmapMi455x}
         amdReport={amdGpuReport}
         cerebras={cerebras}
         hyperscalerGoogle={hyperscalerGoogle}

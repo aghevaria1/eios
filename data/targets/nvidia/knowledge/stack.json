@@ -193,6 +193,83 @@
       }
     },
     {
+      "id": "vera_rubin_vr200",
+      "name": "NVIDIA Vera Rubin VR200",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "generation": "roadmap",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 288, "max": 288, "unit": "GB HBM4" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "nvidia",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin roadmap disclosure (GTC 2025 + CES 2026 announcements). HBM4 vendor target; 2H 2026 shipping target.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "Roadmap claim — every figure on this component is a vendor target until silicon ships. AMD MI455X claims 432 GB HBM4 (50% more) — the memory-capacity-AMD-lead pattern from current gen REPEATS at the roadmap pair."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 22.2, "max": 22.2, "unit": "TB/s HBM4" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "nvidia",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin bandwidth target — bumped from ~13 TB/s at GTC 2025 to ~22 TB/s at CES 2026 in an explicit competitive response to AMD MI455X positioning. Cite the GTC 2025 → CES 2026 announcement sequence.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "COMPETITIVE-RESPONSE STORY: the ~22 TB/s figure is a chosen-late spec, NOT an organic generation step. NVIDIA raised the bandwidth target between GTC 2025 and CES 2026 to land above MI455X's claimed 19.6 TB/s. The bandwidth lead is real (per current claims) AND tactically positioned — surface both readings."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 35, "max": 50, "unit": "PFLOPS (dense, RANGE — spread across public disclosures)" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "nvidia",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin FP4 figures vary across public disclosures by dense/sparse and per-GPU framing. Range 35-50 PFLOPS captures the spread honestly rather than asserting a single point. AMD MI455X claims 40 PFLOPS FP4 — sits INSIDE the NVIDIA spread, so no defensible winner.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "Rendered as a RANGE on purpose — public disclosures conflict on dense/sparse attribution and per-GPU framing. The spread IS the honest signal. AMD's 40 PFLOPS claim lies inside the range — UNRESOLVED is the correct verdict, not a winner."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "text": "~3.5× Blackwell B200 (vendor multiplier, no point figure — Blackwell FP8 base is itself verify-needed)",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin FP8 is described as a multiplier (~3.5×) on Blackwell B200 FP8. Blackwell FP8 dense is itself a verify-needed datasheet read (~9 PFLOPS dense, approx). A multiplier on a verify-needed base = double-uncertainty; no defensible point value to compare against AMD MI455X's 20 PFLOPS claim.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "LAYERED UNCERTAINTY: vendor multiplier on a verify-needed base. UNRESOLVED is the honest verdict — neither PARITY (asserts confidence we don't have) nor a clean lead (no firm Rubin number to compare). Distinct from FP4's overlapping-range UNRESOLVED — FP8 has no firm Rubin figure at all."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 1800, "max": 1800, "unit": "W (Vera Rubin roadmap target; Rubin Ultra rumored ~2300 W with possible 2-die scale-back)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Vera Rubin TDP characterization from NVIDIA roadmap materials + semiconductor-analyst coverage. Roadmap target — not a measured spec.",
+            "last_verified": "2026-05-26",
+            "notes": "Roadmap target. Rubin Ultra (2H 2027) carries rumored thermal/design concerns at ~2300 W — see cadence timeline 2027 row."
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 50000, "max": 70000, "unit": "USD per GPU (compute-hardware only — roadmap estimate, no shipping pricing)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Roadmap pricing estimate — extrapolated from B200/GB200 channel pricing ($40-55K) with generational uplift. No shipping channel pricing exists for unreleased silicon.",
+            "last_verified": "2026-05-26",
+            "notes": "Roadmap price estimate, NOT a shipping figure. Generational uplift over B200/GB200 channel pricing — directional only."
+          }
+        }
+      }
+    },
+    {
       "id": "rtx_pro_6000",
       "name": "NVIDIA RTX PRO 6000",
       "layer": "L2",

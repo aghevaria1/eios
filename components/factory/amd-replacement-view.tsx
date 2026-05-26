@@ -15,184 +15,230 @@ import {
   NotesBlock,
   isCautionNote,
 } from './swap-report-card'
-import {
-  LayerFightMap,
-  type LayerVerdict,
-} from './layer-fight-map'
+import { RoadmapPairScorecard } from './roadmap-pair-scorecard'
+import { CadenceTimelineStrip } from './cadence-timeline-strip'
+import { Act1LayerTable } from './act1-layer-table'
+import { MoatTrajectoryTable } from './moat-trajectory-table'
+import { SwitchingCostTable } from './switching-cost-table'
 
 interface Props {
   baselineGpu: Component
   targetGpu: Component
-  // Software-layer components for the layer-fight-map. The engine's
-  // applySwap below is single-slot GPU; the LayerFightMap composes per-layer
-  // qualitative verdicts (L1-L5) from both component pairs — the bird's-eye
-  // synthesis that complements the L2-only quantitative scorecard below.
-  baselineSoftware: Component
-  targetSoftware: Component
+  // Roadmap-pair scorecard inputs (NVIDIA Rubin VR200 vs AMD MI455X). Both
+  // are generation: 'roadmap'. The scorecard reflects the heaviest-caveated
+  // comparison in the app — every figure a vendor claim, neither buyable.
+  roadmapRubin: Component
+  roadmapMi455x: Component
   report: SwapReport
 }
 
 export function AmdReplacementView({
   baselineGpu,
   targetGpu,
-  baselineSoftware,
-  targetSoftware,
+  roadmapRubin,
+  roadmapMi455x,
   report,
 }: Props) {
   const heldWithValues = report.held.filter((h) => h.before || h.after)
-  const layerVerdicts = buildLayerVerdicts(
-    baselineGpu,
-    targetGpu,
-    baselineSoftware,
-    targetSoftware,
-  )
   return (
-    <div className="space-y-6">
-      <DiagonalFramingLine />
-      <LayerFightMap
-        competitorName="AMD"
-        competitorColor="sky"
-        verdicts={layerVerdicts}
-        narrative={AMD_NARRATIVE}
-      />
-      <WinLossScorecard baselineGpu={baselineGpu} targetGpu={targetGpu} />
-      <BlastRadiusStrip
-        highlightedLayers={['L2']}
-        slotLabel="GPU (compute sub-slot)"
-        changedCount={report.changed.length}
-        heldCount={report.held.length}
-        framingText="GPU-slot swap. The dependency-graph engine counts here reflect the L2 (GPU) swap only — see Layer Fight Map above for the L4/L5 verdicts that do not run through this single-slot swap, and for the SHARED L1/L3 layers (same regardless of GPU vendor)."
-      />
-      <ChangedKpiSection
-        impacts={report.changed}
-        target={targetGpu}
-        slotLabel="gpu"
-      />
-      <HeldKpiSection
-        impacts={heldWithValues}
-        totalHeld={report.held.length}
-        slotLabel="gpu"
-      />
-      {report.unverified.length > 0 && (
-        <UnverifiedFlagsSection flags={report.unverified} />
-      )}
+    <div className="space-y-8">
+      {/* ─── ACT 1 ──────────────────────────────────────────────────
+          WHERE'S THE FIGHT — diagnosis. Brief THESIS paragraph + the new
+          5-row layer-verdict TABLE (replaces the LayerFightMap band-style
+          rendering in this view; LayerFightMap component itself untouched
+          for use by Cerebras + fabric tabs). All 5 verdicts are FROZEN
+          byte-for-byte from the AMD branch of LayerFightMap's verdicts.
+      */}
+      <ActSection>
+        <ActHeader
+          number="1"
+          title="WHERE'S THE FIGHT"
+          subtitle="diagnosis — where does AMD compete?"
+        />
+        <DiagonalFramingLine />
+        <Act1LayerTable />
+      </ActSection>
+
+      {/* ─── ACT 2 ──────────────────────────────────────────────────
+          THE SILICON RACE & THE MOAT — evidence. Internal structure:
+            Half 1: dated silicon (current-gen + roadmap-pair + cadence)
+            TURN:   "SILICON RESETS — THE MOAT COMPOUNDS"
+            Half 2: directional moat (L5/L4/L3 table — visually distinct
+                    via dashed border + "DIRECTION — NOT SCORED" header)
+          All silicon-half components FROZEN byte-for-byte; sub-labels
+          live OUTSIDE them (no scorecard component is edited). The moat
+          table replaces the band-style MoatTrajectoryPanel — trajectories
+          frozen, presentation now tabular.
+      */}
+      <ActSection>
+        <ActHeader
+          number="2"
+          title="THE SILICON RACE & THE MOAT"
+          subtitle="evidence — what's contested and where the moat actually lives"
+        />
+
+        {/* Half 1 — THE SILICON RACE (dated, frozen) */}
+        <HalfSubLabel
+          label="THE SILICON RACE"
+          caption="dated, resets every generation"
+        />
+        <ScorecardSubStrip label="CURRENT GEN" tone="neutral" />
+        <WinLossScorecard baselineGpu={baselineGpu} targetGpu={targetGpu} />
+        <ScorecardSubStrip label="NEXT GEN · ROADMAP" tone="amber" />
+        <RoadmapPairScorecard rubin={roadmapRubin} mi455x={roadmapMi455x} />
+        <CadenceTimelineStrip />
+
+        {/* THE TURN — pivot between dated silicon and directional moat */}
+        <TheTurn text="SILICON RESETS — THE MOAT COMPOUNDS" />
+
+        {/* Half 2 — THE MOAT (directional table, visually distinct) */}
+        <HalfSubLabel
+          label="THE MOAT"
+          caption="directional, compounding · not scored"
+        />
+        <MoatTrajectoryTable />
+      </ActSection>
+
+      {/* ─── ACT 3 ──────────────────────────────────────────────────
+          THE SWITCHING COST — consequence. Cost articulation LEADS
+          (the SwitchingCostTable answers "what does it actually cost?")
+          followed by the engine-output dependency cascade BELOW as the
+          technical proof (BlastRadius + Changed/Held/Unverified — the
+          dependency model in action). Cost first, then the engine
+          cascade — sequencing solves the wordiness, not deletion.
+      */}
+      <ActSection>
+        <ActHeader
+          number="3"
+          title="THE SWITCHING COST"
+          subtitle="consequence — cost articulation, then the engine cascade as proof"
+        />
+
+        {/* The cost answer first */}
+        <SwitchingCostTable />
+
+        {/* Dependency-detail sub-label, then the engine output below */}
+        <HalfSubLabel
+          label="DEPENDENCY DETAIL"
+          caption="the engine cascade — what changes vs holds when you swap the GPU slot"
+        />
+        <BlastRadiusStrip
+          highlightedLayers={['L2']}
+          slotLabel="GPU (compute sub-slot)"
+          changedCount={report.changed.length}
+          heldCount={report.held.length}
+          framingText="GPU-slot swap. The dependency-graph engine counts here reflect the L2 (GPU) swap only — see Act 1's Layer Verdicts table above for the L4/L5 verdicts that do not run through this single-slot swap, and for the SHARED L1/L3 layers."
+        />
+        <ChangedKpiSection
+          impacts={report.changed}
+          target={targetGpu}
+          slotLabel="gpu"
+        />
+        <HeldKpiSection
+          impacts={heldWithValues}
+          totalHeld={report.held.length}
+          slotLabel="gpu"
+        />
+        {report.unverified.length > 0 && (
+          <UnverifiedFlagsSection flags={report.unverified} />
+        )}
+      </ActSection>
     </div>
   )
 }
 
 // ────────────────────────────────────────────────────────────────────────
-// Layer Fight Map composition — per-layer verdicts for AMD vs NVIDIA.
-// Order: L5 (top) → L1 (bottom) to match cake order.
+// 3-Act scaffolding — the recomposition spine.
 //
-// AMD's per-layer mapping (the corrected taxonomy):
-//   L5 Ecosystem            CONTESTED · NVIDIA · DECISIVE
-//   L4 Software (frameworks) CONTESTED · TIE · CLOSE + nuance:'workload-dependent'
-//   L3 ISV / orchestration  SHARED   (same regardless of GPU vendor)
-//   L2 GPU (compute)         CONTESTED · TIE · CLOSE
-//   L1 Facility              SHARED   (same regardless of GPU vendor)
+// HIERARCHY (consistent across all 3 acts):
+//   · ACT HEADER     primary    NVIDIA-green left border + green caption
+//   · HALF SUB-LABEL secondary  amber left border + amber caption
+//   · SCORECARD SUB  tertiary   plain text strip (neutral gray or amber)
+//   · THE TURN       pivot      centered + italic + emphatic divider
 //
-// SHARED reasoning: L1 (datacenter) and L3 (Red Hat / VMware / Nutanix /
-// VAST orchestration) are present-and-identical in either stack. Switching
-// to AMD doesn't remove the datacenter or the ISV — those layers stay,
-// unchanged, regardless of GPU vendor. SHARED ≠ N/A: N/A would mean the
-// competitor doesn't play there at all (the Broadcom-fabric case at L4/L5,
-// later). Conflating SHARED with N/A would falsely imply AMD "doesn't
-// compete" at L1/L3 when in fact the layer is present and indifferent.
-//
-// L4 nuance: tie is correct (ROCm mainstream-inference ~90-95% viable),
-// but the tie is workload-dependent — memory-bound favors MI300X,
-// compute-bound favors H100. The 'workload-dependent' badge surfaces this
-// at-a-glance without fragmenting the state taxonomy.
-//
-// Pointers cite seeded KPI data (TensorRT-LLM gap, FA3 30-40% throughput
-// cost, etc.) — no values invented in this composition layer.
+// Three colors, three levels — green-primary / amber-secondary /
+// gray-tertiary. No competing colors.
 // ────────────────────────────────────────────────────────────────────────
-function buildLayerVerdicts(
-  baselineGpu: Component,
-  targetGpu: Component,
-  baselineSoftware: Component,
-  targetSoftware: Component,
-): LayerVerdict[] {
-  return [
-    {
-      layerId: 'L5',
-      layerName: 'Ecosystem (libs · platform depth · switching cost)',
-      state: { kind: 'contested', winner: 'nvidia', strength: 'decisive' },
-      shortLabel: 'NVIDIA — DECISIVE',
-      evidence:
-        'CUDA-exclusive libraries (TensorRT-LLM, FlashAttention 3, NCCL), ~20-year ecosystem depth, the CUDA-first default for new ML research. ROCm cannot close this without a multi-year compounding effort.',
-      pointers: [
-        'TensorRT-LLM — CUDA-only, no ROCm port planned',
-        'FlashAttention 3 — CUDA-only as of 2026; missing FA3 costs ~30-40% training throughput on 7B+ models per Spheron May 2026',
-        'NCCL collective communication — no ROCm equivalent',
-        '~20 years of compounding CUDA ecosystem (cuDNN, cuBLAS, TensorRT, Triton, NeMo, NIM); CUDA-first default for new ML tooling',
-        'Switching cost: high for CUDA-native codebases; lower for stacks already abstracted (PyTorch / vLLM / SGLang)',
-      ],
-      sourceRef: `See ${baselineSoftware.id}.kpi_values + ${targetSoftware.id}.kpi_values for per-KPI evidence + provenance pills.`,
-    },
-    {
-      layerId: 'L4',
-      layerName: 'Software (frameworks · mainstream inference)',
-      state: {
-        kind: 'contested',
-        winner: 'tie',
-        strength: 'close',
-        nuance: 'workload-dependent',
-      },
-      shortLabel: 'TIE — CLOSE',
-      evidence:
-        'ROCm reaches ~90-95% of CUDA on mainstream PyTorch / vLLM / SGLang inference — viable. The tie is workload-dependent: memory-bound workloads favor MI300X (~40% lower latency on Llama-2-70B per Clarifai / Tensorwave 2026), compute-bound workloads favor H100 (vLLM ROCm 37-75% higher latency on some configurations per aimultiple 2026).',
-      pointers: [
-        'Frameworks officially supported on ROCm: PyTorch, vLLM, SGLang, FlashInfer, llama.cpp',
-        'Memory-bound workloads (large-model inference, KV-cache-heavy) favor MI300X',
-        'Compute-bound workloads (training, prefill, dense matmul) favor H100',
-        '~90-95% mainstream-throughput claim is the optimistic end of a workload-dependent range — flagged VERIFY-NEEDED in seeded data',
-      ],
-      sourceRef: `See ${targetSoftware.id}.software_mainstream_inference + provenance notes (NVIDIA baseline: ${baselineSoftware.id}).`,
-    },
-    {
-      layerId: 'L3',
-      layerName: 'ISV / orchestration',
-      state: { kind: 'shared' },
-      shortLabel: 'Same regardless of GPU vendor',
-      evidence:
-        'Both stacks include the same ISV / orchestration layer — Red Hat OpenShift AI, VMware Private AI Foundation, Nutanix Enterprise AI, VAST Data — present in either deployment and identical to operate. Switching the GPU does not change L3.',
-      pointers: [
-        'Red Hat OpenShift AI: vendor-agnostic — runs on both NVIDIA and AMD',
-        'VMware Private AI Foundation: vendor-agnostic',
-        'Nutanix Enterprise AI: vendor-agnostic',
-        'VAST Data (storage): vendor-agnostic',
-      ],
-    },
-    {
-      layerId: 'L2',
-      layerName: 'GPU (compute silicon)',
-      state: { kind: 'contested', winner: 'tie', strength: 'close' },
-      shortLabel: 'TIE — CLOSE',
-      evidence: `${baselineGpu.name} vs ${targetGpu.name} near-parity at current generation. AMD wins memory capacity decisively (288 vs 192 GB, +50%); memory bandwidth + FP4 dense within ~5% (PARITY); FP8 dense UNRESOLVED (both sides carry verify-needed); shipping availability parity.`,
-      sourceRef: 'See Win/Loss Scorecard below for the full per-axis breakdown.',
-    },
-    {
-      layerId: 'L1',
-      layerName: 'Facility (land · power · shell)',
-      state: { kind: 'shared' },
-      shortLabel: 'Same regardless of GPU vendor',
-      evidence:
-        'Both stacks deploy in the same DC / colo / hyperscale facility patterns — same Dell PowerEdge XE9680 chassis (HGX-class, available in NVIDIA and AMD configurations), same air-cooled ceiling ~10-15 kW/rack for enterprise, same liquid-cooling envelopes for rack-scale. L1 is present-and-identical in either stack.',
-      pointers: [
-        'Dell PowerEdge XE9680: HGX-class chassis available for both vendors',
-        'Same DC / colo / hyperscale facility patterns',
-        'Same power + cooling envelopes',
-      ],
-    },
-  ]
+
+function ActSection({ children }: { children: React.ReactNode }) {
+  return <section className="space-y-4">{children}</section>
 }
 
-// Pattern roll-up — names the shape of the fight. No numeric score
-// (would require defensible layer-weighting + would miscount SHARED layers
-// + would flatten the at-a-glance pattern the colored cake already shows).
-const AMD_NARRATIVE =
-  'AMD contests 3 of 5 layers. L1 (facility) and L3 (ISV / orchestration) are SHARED — present in both stacks identically, so not differentiators regardless of GPU vendor. Of the 3 contested layers: silicon (L2) is a close tie (B200 vs MI355X near-parity); software (L4) is a workload-dependent tie (memory-bound favors AMD, compute-bound favors NVIDIA); and ecosystem (L5) is a decisive NVIDIA advantage — CUDA-exclusive libraries, 20-year depth, the CUDA-first default. Net: competitive on the commodity layers, structural moat at L5. The fight isn’t the chip — it’s the ecosystem above it.'
+function ActHeader({
+  number,
+  title,
+  subtitle,
+}: {
+  number: string
+  title: string
+  subtitle: string
+}) {
+  return (
+    <div className="border-l-2 border-l-[#76B900] bg-gray-900/60 px-4 py-3">
+      <div className="text-[10px] font-mono font-semibold tracking-widest text-[#76B900]">
+        ACT {number}  ·  {title}
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-gray-300">{subtitle}</p>
+    </div>
+  )
+}
+
+function HalfSubLabel({
+  label,
+  caption,
+}: {
+  label: string
+  caption: string
+}) {
+  return (
+    <div className="border-l border-l-amber-500/40 bg-amber-500/5 px-3 py-2">
+      <div className="text-[10px] font-mono font-semibold tracking-widest text-amber-300">
+        {label}
+      </div>
+      <p className="mt-0.5 text-[11px] italic leading-relaxed text-amber-100/80">
+        {caption}
+      </p>
+    </div>
+  )
+}
+
+function ScorecardSubStrip({
+  label,
+  tone,
+}: {
+  label: string
+  tone: 'neutral' | 'amber'
+}) {
+  const color = tone === 'amber' ? 'text-amber-400' : 'text-gray-500'
+  return (
+    <div
+      className={`text-[10px] font-mono font-semibold uppercase tracking-widest ${color}`}
+    >
+      {label}
+    </div>
+  )
+}
+
+function TheTurn({ text }: { text: string }) {
+  return (
+    <div className="my-2 flex items-center gap-3">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-600 to-gray-600/0" />
+      <span className="whitespace-nowrap px-3 text-sm font-mono font-semibold italic tracking-wider text-amber-200">
+        {text}
+      </span>
+      <div className="h-px flex-1 bg-gradient-to-l from-transparent via-gray-600 to-gray-600/0" />
+    </div>
+  )
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// (The previous buildLayerVerdicts function + AMD_NARRATIVE constant
+// were removed in the tables-everywhere recomposition. The AMD layer
+// verdicts now live in components/factory/act1-layer-table.tsx in their
+// canonical tabular form. The LayerFightMap component is no longer used
+// in this view; it remains in the codebase and is rendered by the
+// Cerebras + fabric tabs as before.)
+// ────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────
 // Diagonal framing — concede-then-locate. User-approved text verbatim.
