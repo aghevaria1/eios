@@ -1,5 +1,5 @@
 {
-  "version": "0.6.0",
+  "version": "0.7.0",
   "last_verified": "2026-05-26",
   "segments": [
     {
@@ -651,6 +651,108 @@
         "status": "directional",
         "notes": "Segment definition synthesized from vertical AI program disclosures (healthcare, manufacturing digital twins, robotics).",
         "last_verified": "2026-05-21"
+      }
+    },
+    {
+      "id": "neocloud",
+      "name": "Neocloud",
+      "subtitle": "Pure-play GPU-rental clouds (e.g., CoreWeave, Nebius, Lambda, Crusoe)",
+      "archetype": "GPU-specialized clouds — pure-play NVIDIA compute rental (e.g. CoreWeave, Nebius, Lambda, Crusoe)",
+      "buying_behavior": "optimizes for fleet UTILIZATION + TIME-TO-CAPACITY-online + rental MARGIN (the spread between NVIDIA cost and tenant rental) — early hardware access + fast deployment are the levers; rental-rate commoditization (H100 rates down 60-75% from peak) is the pressure",
+      "representative_deployment": "representative build: large multi-tenant GPU-rental fleet across many DCs, NVL72 / HGX-class · NVIDIA-integrated rack purchases (e.g. SuperPOD reference designs) · neocloud-native orchestration (e.g. CoreWeave SUNK / Mission Control) · Spectrum-X / Quantum-X800 fabric optimized for rental throughput (illustrative — e.g. CoreWeave-class ~250K-GPU fleet across many DCs)",
+      "customer_channel_note": "neoclouds are NVIDIA customers AND a go-to-market channel for NVIDIA — cited January 2026: NVIDIA integrated CoreWeave's SUNK + Mission Control software into NVIDIA's reference architectures for cloud partners, making a neocloud's tooling part of NVIDIA's recommended stack",
+      "north_star_kpis": ["ops_fleet_utilization", "ops_time_to_capacity_online"],
+      "supporting_kpis": ["compute_hardware_density", "ops_lead_time", "ops_service_footprint"],
+      "delivered_kpis": {
+        "ops_fleet_utilization": {
+          "text": "rental-business core metric — % of fleet rented to tenants at any time; varies by provider, region, contract mix (reserved vs on-demand vs spot); no defensible universal number across the segment",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Each neocloud reports differently and most utilization figures are commercially sensitive. Render directional only — directional band, not a measured number.",
+            "last_verified": "2026-05-26",
+            "notes": "Workload-and-deal-dependent. NEVER assert a specific provider's utilization rate."
+          }
+        },
+        "ops_time_to_capacity_online": {
+          "text": "wall-clock from rack-arrival to revenue-generating capacity online; varies by provider engineering depth, DC readiness, NVIDIA shipment cadence; early hardware access is the lever",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "No universal benchmark across providers; specific provider timelines are commercially sensitive. Render directional + verify-needed.",
+            "last_verified": "2026-05-26",
+            "notes": "Engineering-depth-and-DC-readiness-dependent. NEVER assert a specific provider's deployment timeline."
+          }
+        },
+        "compute_hardware_density": {
+          "text": "rack-density optimized for rental-throughput; neocloud rack density approaches hyperscaler 30-50 kW/rack typical for NVL72-class fleets, with regional variance",
+          "provenance": {
+            "status": "directional",
+            "source": "Neocloud rack density approaches hyperscaler norms for NVL72-class deployments; provider-specific.",
+            "last_verified": "2026-05-26",
+            "notes": "Directional — provider + DC + rack-class dependent."
+          }
+        },
+        "ops_lead_time": {
+          "text": "neoclouds compete for early NVIDIA allocation; effective lead-time is allocation-priority + DC-readiness, not standard order-to-rack procurement; rapid deployment IS the business model differentiator",
+          "provenance": {
+            "status": "directional",
+            "source": "Neoclouds engage NVIDIA at the allocation level; rapid deployment cycle is the business model.",
+            "last_verified": "2026-05-26",
+            "notes": "Directional — allocation-priority-and-DC-readiness driven; not a standard order-to-rack figure."
+          }
+        },
+        "ops_service_footprint": {
+          "text": "self-served operationally — neocloud engineering owns the stack end-to-end; NVIDIA engages at allocation + roadmap level + via reference-architecture integration (cf. CoreWeave SUNK Jan 2026)",
+          "provenance": {
+            "status": "directional",
+            "source": "Neoclouds operate as engineering-heavy partners, not standard support customers; NVIDIA integration patterns documented (CoreWeave SUNK / Mission Control reference-architecture integration).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "ops_tco_capex_directional": {
+          "band": "high",
+          "text": "factors: large GPU fleet at NVL72-class scale across many DCs; NVIDIA-integrated rack purchases (SuperPOD reference designs); facility power+cooling at multi-MW scale; rental-capex-financed",
+          "provenance": {
+            "status": "directional",
+            "source": "Neocloud CapEx scale: large fleets at NVL72-class density; capex-intensive business model with rental amortization.",
+            "last_verified": "2026-05-26",
+            "notes": "ALWAYS a directional band; never summed with OpEx. High band reflects multi-billion-dollar fleet buildouts (CoreWeave-class, Crusoe-class)."
+          }
+        },
+        "ops_tco_opex_directional": {
+          "band": "medium",
+          "text": "factors: continuous multi-MW power draw, rental-ops + provisioning headcount, fabric tuning overhead, downtime cost; offset by tenant-revenue (the rental-margin spread between NVIDIA cost and tenant rental price drives the business)",
+          "provenance": {
+            "status": "directional",
+            "source": "Neocloud OpEx structure: power + rental-ops + downtime, offset by tenant revenue. The rental-rate compression (H100 rates down 60-75% from peak) compresses the spread that drives the business.",
+            "last_verified": "2026-05-26",
+            "notes": "ALWAYS a directional band; never summed with CapEx. Medium band reflects power + rental-ops moderated by tenant-revenue offset."
+          }
+        }
+      },
+      "architecture_blend": {
+        "ras": [
+          {"id": "NVL72", "role": "rack-scale rental"},
+          {"id": "HGX", "role": "8-GPU-node rental"}
+        ],
+        "note": "NVL72 + HGX blend — NVL72 for rack-scale rental (higher per-tenant capacity), HGX for 8-GPU-node rental (smaller tenant slices). Most neoclouds offer both shapes."
+      },
+      "l1_profile": {
+        "text": "Multi-DC rental fleet — colocated power-dense facilities (CoreWeave + Crusoe + Lambda + Nebius operate across many regions); liquid-cooling envelopes for NVL72-class density; rapid DC bring-up is the differentiator.",
+        "provenance": {
+          "status": "directional",
+          "source": "Neocloud DC patterns: multi-region power-dense colo, often in tier-2 markets (Crusoe in Iceland, Nebius in Helsinki, CoreWeave across US/EU).",
+          "last_verified": "2026-05-26"
+        }
+      },
+      "partner_intensity": "high",
+      "partner_intensity_rationale": "Neocloud IS itself a partner / channel motion for NVIDIA — neocloud orchestration software (CoreWeave SUNK + Mission Control) integrated into NVIDIA reference architectures for cloud partners (Jan 2026 cited). The customer-AND-channel duality makes this segment partner-intense by construction.",
+      "provenance": {
+        "status": "cited",
+        "source": "Segment definition synthesized from neocloud public disclosures (CoreWeave S-1 + investor materials; Nebius / Lambda / Crusoe press releases) and NVIDIA's January 2026 CoreWeave SUNK + Mission Control reference-architecture integration announcement.",
+        "last_verified": "2026-05-26",
+        "notes": "Pure-play NVIDIA GPU-rental clouds — distinct from hyperscalers (multi-vendor + self-supply silicon) and from frontier labs (model-training-first); the rental-margin business model + customer-AND-channel duality define the segment."
       }
     }
   ]

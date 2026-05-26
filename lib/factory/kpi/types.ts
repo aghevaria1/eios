@@ -168,6 +168,13 @@ export interface Segment {
   // CUSTOMER SELF-SUPPLY competitive view. Generic field shape so other
   // segments could acquire similar duality framing later if appropriate.
   customer_competitor_note?: string
+  // Customer-AND-channel duality note — currently seeded only for the
+  // neocloud segment: pure-play GPU-rental clouds are simultaneously
+  // NVIDIA's massive customers AND a go-to-market channel for NVIDIA
+  // (cf. Jan 2026 CoreWeave SUNK + Mission Control integration into
+  // NVIDIA reference architectures). Distinct from customer_competitor_note
+  // — different dual-role flavor (channel/partner, not competitor).
+  customer_channel_note?: string
   provenance: Provenance
 }
 

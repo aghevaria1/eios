@@ -15,6 +15,7 @@ import {
 const SEGMENT_ORDER = [
   'frontier-ai-labs',
   'hyperscalers',
+  'neocloud',
   'fortune-500',
   'sovereign-ai',
   'industry-verticals',
@@ -33,6 +34,11 @@ const SLIDER_CONFIG: Record<
 > = {
   'frontier-ai-labs':   { min: 1000, max: 100000, default: 10000 },
   hyperscalers:         { min: 1000, max: 250000, default: 50000 },
+  // Neocloud: large multi-tenant rental fleets, comparable to hyperscaler
+  // scale upper bound (CoreWeave-class ~250K-GPU fleet across many DCs).
+  // Default in the mid-range — between frontier and hyperscaler scale —
+  // since per-DC slices are smaller than the multi-DC aggregate.
+  neocloud:             { min: 5000, max: 250000, default: 75000 },
   'fortune-500':        { min: 8,    max: 5000,   default: 256   },
   'sovereign-ai':       { min: 100,  max: 50000,  default: 5000  },
   'industry-verticals': { min: 8,    max: 2000,   default: 128   },

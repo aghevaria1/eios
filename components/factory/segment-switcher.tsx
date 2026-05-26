@@ -181,6 +181,13 @@ function GroundingBlock({ segment }: { segment: Segment }) {
           tone="dual-role"
         />
       )}
+      {segment.customer_channel_note && (
+        <GroundingRow
+          label="ALSO CHANNEL"
+          body={segment.customer_channel_note}
+          tone="dual-role"
+        />
+      )}
     </div>
   )
 }
@@ -227,7 +234,7 @@ function SegmentTabs({
           deterministic; no LLM call on switch.
         </div>
       </div>
-      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-5 md:divide-x md:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-3 md:divide-x lg:grid-cols-6 lg:divide-y-0">
         {views.map((v) => {
           const selected = v.segment.id === selectedId
           const northStarLabel = v.northStar

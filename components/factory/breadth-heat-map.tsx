@@ -124,6 +124,33 @@ const ROWS: SegmentRow[] = [
     },
   },
   {
+    segmentId: 'neocloud',
+    segmentName: 'Neocloud',
+    segmentSubtitle: 'e.g. CoreWeave, Nebius, Lambda, Crusoe',
+    cells: {
+      replace: {
+        state: 'niche',
+        why: 'NVIDIA-committed by business model; AMD marginal (some MI300X in catalogs, e.g. Crusoe)',
+        targetMode: 'replacement',
+      },
+      pointSolution: {
+        state: 'secondary',
+        why: 'frontier-scale fabrics (e.g. CoreWeave 250K-class fleets) make the choice live; moderated by NVIDIA-integrated buying (rack-scale reference designs)',
+        targetMode: 'slot',
+      },
+      paradigm: {
+        state: 'niche',
+        why: 'marginal alt-accelerator presence in catalogs',
+        targetMode: 'paradigm',
+      },
+      selfSupply: {
+        state: 'na',
+        why: 'neoclouds don\'t build silicon — antithetical to the GPU-rental business model',
+        targetMode: null,
+      },
+    },
+  },
+  {
     segmentId: 'fortune-500',
     segmentName: 'Fortune 500 Enterprise',
     segmentSubtitle: 'e.g. JPMorgan-class, Pfizer-class',
@@ -532,6 +559,11 @@ function PatternInsight() {
         <span className="font-mono text-amber-200">Frontier</span> faces a
         PRIMARY POINT-SOLUTION threat (large-scale training fabric-bound) plus
         three SECONDARY threats; broad pressure but not concentrated.{' '}
+        <span className="font-mono text-[#9FD848]">Neocloud is the least-contested segment</span>
+        {' '}— zero PRIMARY threats, NVIDIA-committed by business model — but
+        NOT zero pressure: SECONDARY on POINT-SOLUTION because their
+        frontier-scale fabrics (e.g. CoreWeave 250K-class) make the fabric
+        choice live; N/A on SELF-SUPPLY (antithetical to the rental model).{' '}
         <span className="font-mono text-gray-300">Fortune 500</span> and{' '}
         <span className="font-mono text-gray-300">Industry Verticals</span> are
         mostly NICHE / N/A — the ecosystem + integration moat protects them.

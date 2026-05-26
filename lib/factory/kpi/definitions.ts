@@ -274,6 +274,26 @@ export const KPI_DEFINITIONS: KpiDefinition[] = [
     description: 'North-star for Sovereign AI. % of data + computation that stays within sovereign boundary.',
   },
   {
+    id: 'ops_fleet_utilization',
+    name: 'Fleet utilization (% rented)',
+    tier: 2,
+    dependencies: ['oem', 'isv'],
+    description:
+      'North-star for Neocloud. % of the GPU fleet rented to tenants at any time — the rental-business core metric. DIRECTIONAL: varies by provider, region, deal structure (reserved vs on-demand vs spot); no defensible universal number across the segment.',
+    honesty_note:
+      'Workload-and-deal-dependent. Each neocloud reports differently and most figures are commercially sensitive. Render directional only.',
+  },
+  {
+    id: 'ops_time_to_capacity_online',
+    name: 'Time-to-capacity online',
+    tier: 2,
+    dependencies: ['oem', 'isv'],
+    description:
+      'North-star for Neocloud. Wall-clock from rack-arrival to revenue-generating capacity online. DIRECTIONAL: varies by provider engineering depth, DC readiness, and NVIDIA shipment cadence. Early hardware access is a lever; rack-deployment velocity is the differentiator.',
+    honesty_note:
+      'No universal benchmark across providers. Render directional + verify-needed; specific provider timelines are commercially sensitive.',
+  },
+  {
     id: 'ops_air_gap_capability',
     name: 'Air-gap capability',
     tier: 2,
