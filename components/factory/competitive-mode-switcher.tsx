@@ -9,8 +9,17 @@ import {
 import { AmdReplacementView } from './amd-replacement-view'
 import { CerebrasParadigmView } from './cerebras-paradigm-view'
 import { HyperscalerSelfSupplyView } from './hyperscaler-self-supply-view'
+import { BreadthHeatMap } from './breadth-heat-map'
 
-type CompetitiveMode = 'slot' | 'replacement' | 'paradigm' | 'self-supply'
+// CompetitiveMode is exported because the BreadthHeatMap component needs
+// to call back into the parent's mode setter when a cell is clicked
+// (cell click-through → depth-tab navigation).
+export type CompetitiveMode =
+  | 'slot'
+  | 'replacement'
+  | 'paradigm'
+  | 'self-supply'
+  | 'breadth'
 
 interface Props {
   // Fabric slot-swap mode (existing — unchanged)
@@ -50,7 +59,11 @@ export function CompetitiveModeSwitcher({
   hyperscalerMeta,
   hyperscalerMicrosoft,
 }: Props) {
-  const [mode, setMode] = useState<CompetitiveMode>('slot')
+  // Bird's Eye View is the default landing — entry-point synthesis showing
+  // all threats at-a-glance, then the user drills into depth tabs via the
+  // cell click-throughs. Tab order: Bird's Eye → Full-Stack Replacement →
+  // Slot Swaps → Alternative Paradigm → Customer Self-Supply.
+  const [mode, setMode] = useState<CompetitiveMode>('breadth')
 
   return (
     <div className="space-y-6">
@@ -80,18 +93,24 @@ export function CompetitiveModeSwitcher({
           microsoft={hyperscalerMicrosoft}
         />
       )}
+      {mode === 'breadth' && <BreadthHeatMap onCellClick={setMode} />}
     </div>
   )
 }
 
-// Top-level mode tabs. FOUR modes encode the complete switching-cost
-// spectrum + competitive-type framework:
-//   SLOT SWAPS              — one component swapped, narrow blast radius
-//   FULL-STACK REPLACEMENT  — whole platform swapped, broader blast radius
-//   ALTERNATIVE PARADIGM    — different machine entirely (re-architecture)
-//   CUSTOMER SELF-SUPPLY    — buyer becomes supplier (vertical integration)
-// That's the 4 fundamental ways an incumbent gets competed with — a
-// FRAMEWORK, not a competitor list. The tab labels teach the taxonomy.
+// Top-level mode tabs. Tab order = column order in the Bird's Eye matrix
+// (so cell click-throughs land in the expected place left-to-right):
+//
+//   BIRD'S EYE VIEW         breadth — segment × threat matrix (orthogonal entry)
+//   FULL-STACK REPLACEMENT  depth — whole platform swapped (AMD)
+//   SLOT SWAPS              depth — one component swapped (fabric)
+//   ALTERNATIVE PARADIGM    depth — different machine entirely (Cerebras)
+//   CUSTOMER SELF-SUPPLY    depth — buyer becomes supplier (hyperscaler)
+//
+// The 4 depth tabs answer "which competitor in which depth"; the breadth
+// tab answers "which segment faces which threat." Same truth, two angles.
+// Bird's Eye leads as the entry-point synthesis; drill into depth via
+// cell click-throughs.
 function ModeTabs({
   mode,
   onSelect,
@@ -106,24 +125,35 @@ function ModeTabs({
           COMPETITIVE MODE
         </div>
         <div className="mt-1 text-xs text-gray-400">
-          Four fundamental ways an incumbent gets competed with. Slot swaps =
-          contained blast radius. Full-stack replacement = broader. Alternative
-          paradigm = different machine entirely. Customer self-supply = the
-          buyer-exits-the-market end. The tab labels are the framework.
+          <span className="font-mono text-gray-300">4 depth tabs</span>{' '}
+          (per competitive type){' '}
+          <span className="font-mono text-gray-500">+</span>{' '}
+          <span className="font-mono text-gray-300">1 breadth view</span>{' '}
+          (segment × threat matrix). Depth tabs answer &quot;which competitor
+          in which depth&quot;; breadth view answers &quot;which segment faces
+          which threat.&quot; Same truth, two angles. The breadth tab is{' '}
+          <span className="italic">orthogonal</span> — not a 5th competitive
+          type.
         </div>
       </div>
-      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-2 md:divide-x lg:grid-cols-4 lg:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-2 md:divide-x lg:grid-cols-5 lg:divide-y-0">
         <ModeTab
-          label="SLOT SWAPS"
-          sublabel="Fabric — low switching cost"
-          selected={mode === 'slot'}
-          onClick={() => onSelect('slot')}
+          label="BIRD'S EYE VIEW"
+          sublabel="Segment × Threat Matrix · orthogonal"
+          selected={mode === 'breadth'}
+          onClick={() => onSelect('breadth')}
         />
         <ModeTab
           label="FULL-STACK REPLACEMENT"
           sublabel="AMD — broader blast radius"
           selected={mode === 'replacement'}
           onClick={() => onSelect('replacement')}
+        />
+        <ModeTab
+          label="SLOT SWAPS"
+          sublabel="Fabric — low switching cost"
+          selected={mode === 'slot'}
+          onClick={() => onSelect('slot')}
         />
         <ModeTab
           label="ALTERNATIVE PARADIGM"
