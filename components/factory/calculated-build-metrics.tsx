@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { KpiDefinition, KpiValue, Provenance } from '@/lib/factory/kpi'
 
 // Calculated Build Metrics — the honesty-architecture surface that makes
@@ -58,6 +58,12 @@ export interface CalculatedBuildMetricsProps {
   tdpPerGpu: KpiInput       // W
   pricePerGpu: KpiInput     // USD range
   leadGpuName: string       // e.g. "NVIDIA Blackwell B200"
+  // Optional callback — fires whenever the slider count changes, so the
+  // parent (SegmentSwitcher) can mirror the current count for downstream
+  // consumers like the Customer Brief overlay. Local state stays here
+  // (key-remount-on-segment-switch resets to sliderDefault as before);
+  // the callback is read-only observation, not state lift.
+  onCountChange?: (count: number) => void
 }
 
 const PUE_BAND_MIN = 1.10  // hyperscaler best (cited via hyperscaler segment delivered_kpis)
@@ -65,6 +71,12 @@ const PUE_BAND_MAX = 1.40  // enterprise typical (industry-published band)
 
 export function CalculatedBuildMetrics(props: CalculatedBuildMetricsProps) {
   const [count, setCount] = useState(props.sliderDefault)
+
+  // Mirror current count up to the parent (for brief snapshot capture).
+  // Fires on every count change; cheap (single number); read-only.
+  useEffect(() => {
+    props.onCountChange?.(count)
+  }, [count, props])
 
   // All Category-1 math derived from count + cited inputs. Memoized so
   // slider drag doesn't thrash GC.

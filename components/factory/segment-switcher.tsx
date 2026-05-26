@@ -16,6 +16,8 @@ import {
 } from './delivered-kpis-panel'
 import { TcoBars } from './tco-bars'
 import { CalculatedBuildMetrics } from './calculated-build-metrics'
+import { BriefOverlay } from './brief/brief-overlay'
+import { CustomerBrief } from './brief/customer-brief'
 
 export interface CalcInputs {
   // Lead-RA GPU per-unit specs (each KPI + its provenance)
@@ -68,8 +70,29 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
   const [selectedId, setSelectedId] = useState(defaultSegmentId)
   const active = views.find((v) => v.segment.id === selectedId) ?? views[0]
 
+  // GPU count mirrored up from CalculatedBuildMetrics (read-only) so the
+  // Customer Brief can capture the current slider state at brief-open time.
+  // The slider's local state still lives in CalculatedBuildMetrics; this is
+  // observation, not state lift.
+  const [currentGpuCount, setCurrentGpuCount] = useState(
+    active.calc.sliderDefault,
+  )
+  const [briefOpen, setBriefOpen] = useState(false)
+
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
+      {/* Top utility row — GENERATE BRIEF is the primary action, top-right
+          placement makes it discoverable as a print-snapshot affordance
+          before the user scrolls through the view content. */}
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setBriefOpen(true)}
+          className="rounded border border-[#76B900]/40 bg-[#76B900]/10 px-3 py-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#9FD848] transition-colors hover:bg-[#76B900]/20"
+        >
+          Generate Brief
+        </button>
+      </div>
       <SegmentTabs
         views={views}
         selectedId={active.segment.id}
@@ -137,6 +160,7 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
           tdpPerGpu={active.calc.tdpPerGpu}
           pricePerGpu={active.calc.pricePerGpu}
           leadGpuName={active.calc.leadGpuName}
+          onCountChange={setCurrentGpuCount}
         />
         <DeliveredKpisPanel
           northStar={active.northStar}
@@ -144,6 +168,16 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
         />
         <TcoBars capex={active.tcoCapex} opex={active.tcoOpex} />
       </div>
+
+      {briefOpen && (
+        <BriefOverlay
+          title={`Customer Brief · ${active.segment.name}`}
+          subtitle={`current scale: ${currentGpuCount.toLocaleString()} GPUs`}
+          onClose={() => setBriefOpen(false)}
+        >
+          <CustomerBrief view={active} currentGpuCount={currentGpuCount} />
+        </BriefOverlay>
+      )}
     </div>
   )
 }

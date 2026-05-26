@@ -25,3 +25,88 @@ body {
     text-wrap: balance;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   PRINT RULES — for the artifact-layer briefs (window.print() export).
+   Strategy: BriefOverlay React-Portals to document.body, so the overlay
+   is a direct child of <body> with class .brief-overlay-container. In
+   print, we hide every other body child and turn the overlay into the
+   page content (static positioning, body height collapses to brief
+   height, one page).
+   ───────────────────────────────────────────────────────────────── */
+@page {
+  size: letter;
+  /* Tight margins so the brief uses the full printable area + helps
+     compress the browser's default header/footer area. Note: fully
+     suppressing the browser-default URL/title header requires the user
+     to uncheck "Headers and footers" in print preview — no CSS-only fix
+     exists across all browsers. */
+  margin: 0.5cm;
+}
+
+@media print {
+  /* Reset html/body for clean print canvas */
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    color: black !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide every direct child of body EXCEPT the brief overlay container.
+     React Portal makes .brief-overlay-container a direct body child, so
+     this selector cleanly excludes the app chrome (layout / banner /
+     nav / page / footer) without touching the brief subtree. */
+  body > *:not(.brief-overlay-container) {
+    display: none !important;
+  }
+
+  /* Brief overlay becomes the print page content — collapse fixed
+     positioning to static so body height = brief height (one page). */
+  .brief-overlay-container {
+    position: static !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+  }
+
+  /* Hide explicit no-print markers (toolbar, Print/Close buttons, etc.) */
+  .print-hidden,
+  .print-hidden * {
+    display: none !important;
+  }
+
+  /* Brief print area: full width, no padding (page margin via @page) */
+  .brief-print-area {
+    position: static !important;
+    background: white !important;
+    color: black !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Avoid awkward page breaks mid-card */
+  .brief-section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Preserve provenance pill colors etc. in print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

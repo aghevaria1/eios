@@ -11,6 +11,8 @@ import { PartnerTypeToggle, type PartnerType } from './partner-type-toggle'
 import { PartnerSlotDiagram } from './partner-slot-diagram'
 import { PartnerKpiScorecard } from './partner-kpi-scorecard'
 import { CoSellMotionPanel } from './co-sell-motion-panel'
+import { BriefOverlay } from './brief/brief-overlay'
+import { PartnerBrief } from './brief/partner-brief'
 
 // Partner Lens — the OEM / ISV / Neocloud-as-channel responsibility view.
 //
@@ -61,6 +63,7 @@ export function PartnerLensView({ view, defaultSegmentId }: Props) {
   const [partnerType, setPartnerType] = useState<PartnerType>('oem')
   const [selectedSegmentId, setSelectedSegmentId] = useState(defaultSegmentId)
   const [selectedIsvId, setSelectedIsvId] = useState(view.isvs[0].id)
+  const [briefOpen, setBriefOpen] = useState(false)
 
   // Neocloud-as-channel is segment-locked to the neocloud segment.
   // Switching to neocloud mode auto-selects the neocloud segment; the
@@ -76,6 +79,16 @@ export function PartnerLensView({ view, defaultSegmentId }: Props) {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
+      {/* Top utility row — GENERATE BRIEF primary action, top-right. */}
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={() => setBriefOpen(true)}
+          className="rounded border border-[#76B900]/40 bg-[#76B900]/10 px-3 py-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#9FD848] transition-colors hover:bg-[#76B900]/20"
+        >
+          Generate Brief
+        </button>
+      </div>
       <Header />
       <PartnerTypeToggle
         partnerType={partnerType}
@@ -151,6 +164,29 @@ export function PartnerLensView({ view, defaultSegmentId }: Props) {
       </div>
 
       <OutOfScopeFooter />
+
+      {briefOpen && (
+        <BriefOverlay
+          title={`Partner Brief · ${partnerTypeLabel(partnerType)} · ${activeSegment.name}`}
+          subtitle={
+            partnerType === 'isv'
+              ? `ISV sub-target: ${activeIsv.name}`
+              : partnerType === 'neocloud'
+                ? 'segment-locked to Neocloud · channel motion exists in this segment by definition'
+                : 'OEM scoped to Dell XE9680 — Lenovo / Supermicro / HPE equivalent in text'
+          }
+          onClose={() => setBriefOpen(false)}
+        >
+          <PartnerBrief
+            partnerType={partnerType}
+            activeSegment={activeSegment}
+            oem={view.oem}
+            activeIsv={activeIsv}
+            kpiByIdSegmentSeeded={view.kpiByIdSegmentSeeded}
+            kpiDefById={view.kpiDefById}
+          />
+        </BriefOverlay>
+      )}
     </div>
   )
 }

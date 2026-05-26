@@ -10,6 +10,8 @@ import { AmdReplacementView } from './amd-replacement-view'
 import { CerebrasParadigmView } from './cerebras-paradigm-view'
 import { HyperscalerSelfSupplyView } from './hyperscaler-self-supply-view'
 import { BreadthHeatMap } from './breadth-heat-map'
+import { BriefOverlay } from './brief/brief-overlay'
+import { SalesBrief } from './brief/sales-brief'
 
 // CompetitiveMode is exported because the BreadthHeatMap component needs
 // to call back into the parent's mode setter when a cell is clicked
@@ -64,9 +66,20 @@ export function CompetitiveModeSwitcher({
   // cell click-throughs. Tab order: Bird's Eye → Full-Stack Replacement →
   // Slot Swaps → Alternative Paradigm → Customer Self-Supply.
   const [mode, setMode] = useState<CompetitiveMode>('breadth')
+  const [briefOpen, setBriefOpen] = useState(false)
 
   return (
     <div className="space-y-6">
+      {/* Top utility row — GENERATE BRIEF primary action, top-right. */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setBriefOpen(true)}
+          className="rounded border border-[#76B900]/40 bg-[#76B900]/10 px-3 py-2 text-xs font-mono font-semibold uppercase tracking-widest text-[#9FD848] transition-colors hover:bg-[#76B900]/20"
+        >
+          Generate Brief
+        </button>
+      </div>
       <ModeTabs mode={mode} onSelect={setMode} />
       {mode === 'slot' && (
         <FabricSwapView
@@ -94,8 +107,60 @@ export function CompetitiveModeSwitcher({
         />
       )}
       {mode === 'breadth' && <BreadthHeatMap onCellClick={setMode} />}
+
+      {briefOpen && (
+        <BriefOverlay
+          title={`Sales Brief · ${briefModeLabel(mode)}`}
+          subtitle={briefModeSubtitle(mode)}
+          onClose={() => setBriefOpen(false)}
+        >
+          <SalesBrief
+            mode={mode}
+            baselineGpu={amdBaselineGpu}
+            targetGpu={amdTargetGpu}
+            roadmapRubin={amdRoadmapRubin}
+            roadmapMi455x={amdRoadmapMi455x}
+            report={amdReport}
+            cerebras={cerebras}
+            hyperscalerGoogle={hyperscalerGoogle}
+            hyperscalerAws={hyperscalerAws}
+            hyperscalerMeta={hyperscalerMeta}
+            hyperscalerMicrosoft={hyperscalerMicrosoft}
+          />
+        </BriefOverlay>
+      )}
     </div>
   )
+}
+
+function briefModeSubtitle(m: CompetitiveMode): string {
+  switch (m) {
+    case 'replacement':
+      return 'AMD MI355X · current-gen scorecard + roadmap pair + moat thesis + switching cost + talk track'
+    case 'slot':
+      return 'Fabric · Cornelis / Broadcom / Arista — split-by-axis verdicts (no NVIDIA-sweep), AGNOSTIC-as-tradeoff'
+    case 'paradigm':
+      return 'Cerebras WSE-3 · paradigm-different · 3-facet verdict (SERIOUS-BUT-NARROW + NICHE-SHARP + MARKET-ARC)'
+    case 'self-supply':
+      return 'Hyperscaler silicon · customer-AND-competitor duality · 4 maturity-differentiated programs'
+    case 'breadth':
+      return 'Segment × Threat Matrix · 5×4 cell map · cross-pressure insight'
+  }
+}
+
+function briefModeLabel(m: CompetitiveMode): string {
+  switch (m) {
+    case 'replacement':
+      return 'Full-Stack Replacement (AMD)'
+    case 'slot':
+      return 'Slot Swaps (Fabric)'
+    case 'paradigm':
+      return 'Alternative Paradigm (Cerebras)'
+    case 'self-supply':
+      return 'Customer Self-Supply (Hyperscaler silicon)'
+    case 'breadth':
+      return "Bird's Eye View (Segment × Threat Matrix)"
+  }
 }
 
 // Top-level mode tabs. Tab order = column order in the Bird's Eye matrix
