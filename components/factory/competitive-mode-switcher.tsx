@@ -8,8 +8,9 @@ import {
 } from './fabric-swap-view'
 import { AmdReplacementView } from './amd-replacement-view'
 import { CerebrasParadigmView } from './cerebras-paradigm-view'
+import { HyperscalerSelfSupplyView } from './hyperscaler-self-supply-view'
 
-type CompetitiveMode = 'slot' | 'replacement' | 'paradigm'
+type CompetitiveMode = 'slot' | 'replacement' | 'paradigm' | 'self-supply'
 
 interface Props {
   // Fabric slot-swap mode (existing — unchanged)
@@ -22,10 +23,16 @@ interface Props {
   amdBaselineSoftware: Component
   amdTargetSoftware: Component
   amdReport: SwapReport
-  // Cerebras alternative-paradigm mode (new). PARADIGM doesn't decompose
-  // into NVIDIA's L1-L5 — no swap, no scorecard, no engine output. Just
-  // the all-PARADIGM cake + the cross-layer ParadigmContrast panel.
+  // Cerebras alternative-paradigm mode.
   cerebras: Component
+  // Hyperscaler customer-self-supply mode (new — 4th tab).
+  // Strategic panel, NOT a fight-map: hyperscaler captive chips are mostly
+  // internal/unbenchmarked; the threat axis is market-structure /
+  // vertical-integration, not spec. The 4 are differentiated by maturity.
+  hyperscalerGoogle: Component
+  hyperscalerAws: Component
+  hyperscalerMeta: Component
+  hyperscalerMicrosoft: Component
 }
 
 export function CompetitiveModeSwitcher({
@@ -38,6 +45,10 @@ export function CompetitiveModeSwitcher({
   amdTargetSoftware,
   amdReport,
   cerebras,
+  hyperscalerGoogle,
+  hyperscalerAws,
+  hyperscalerMeta,
+  hyperscalerMicrosoft,
 }: Props) {
   const [mode, setMode] = useState<CompetitiveMode>('slot')
 
@@ -61,16 +72,26 @@ export function CompetitiveModeSwitcher({
         />
       )}
       {mode === 'paradigm' && <CerebrasParadigmView cerebras={cerebras} />}
+      {mode === 'self-supply' && (
+        <HyperscalerSelfSupplyView
+          google={hyperscalerGoogle}
+          aws={hyperscalerAws}
+          meta={hyperscalerMeta}
+          microsoft={hyperscalerMicrosoft}
+        />
+      )}
     </div>
   )
 }
 
-// Top-level mode tabs. Three modes encode the switching-cost spectrum:
+// Top-level mode tabs. FOUR modes encode the complete switching-cost
+// spectrum + competitive-type framework:
 //   SLOT SWAPS              — one component swapped, narrow blast radius
 //   FULL-STACK REPLACEMENT  — whole platform swapped, broader blast radius
-//   ALTERNATIVE PARADIGM    — different machine entirely (re-architecture,
-//                             not a swap; no swap-report applies)
-// The tab labels themselves teach the taxonomy.
+//   ALTERNATIVE PARADIGM    — different machine entirely (re-architecture)
+//   CUSTOMER SELF-SUPPLY    — buyer becomes supplier (vertical integration)
+// That's the 4 fundamental ways an incumbent gets competed with — a
+// FRAMEWORK, not a competitor list. The tab labels teach the taxonomy.
 function ModeTabs({
   mode,
   onSelect,
@@ -85,14 +106,13 @@ function ModeTabs({
           COMPETITIVE MODE
         </div>
         <div className="mt-1 text-xs text-gray-400">
-          The switching-cost spectrum encoded as structure. Slot swaps =
-          contained blast radius (one component). Full-stack replacement =
-          broader blast radius (platform). Alternative paradigm = a
-          different machine entirely — adopting it is a re-architecture,
-          not a swap.
+          Four fundamental ways an incumbent gets competed with. Slot swaps =
+          contained blast radius. Full-stack replacement = broader. Alternative
+          paradigm = different machine entirely. Customer self-supply = the
+          buyer-exits-the-market end. The tab labels are the framework.
         </div>
       </div>
-      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-3 md:divide-x md:divide-y-0">
+      <div className="grid grid-cols-1 divide-y divide-gray-800 md:grid-cols-2 md:divide-x lg:grid-cols-4 lg:divide-y-0">
         <ModeTab
           label="SLOT SWAPS"
           sublabel="Fabric — low switching cost"
@@ -110,6 +130,12 @@ function ModeTabs({
           sublabel="Cerebras — different machine"
           selected={mode === 'paradigm'}
           onClick={() => onSelect('paradigm')}
+        />
+        <ModeTab
+          label="CUSTOMER SELF-SUPPLY"
+          sublabel="Hyperscaler silicon — buyer exits"
+          selected={mode === 'self-supply'}
+          onClick={() => onSelect('self-supply')}
         />
       </div>
     </div>

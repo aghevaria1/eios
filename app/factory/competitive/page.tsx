@@ -23,6 +23,12 @@ const AMD_TARGET_GPU_ID = 'amd_mi355x'
 const BASELINE_SOFTWARE_ID = 'nvaie'
 const AMD_TARGET_SOFTWARE_ID = 'amd_rocm'
 const CEREBRAS_ID = 'cerebras_wse3'
+const HYPERSCALER_IDS = {
+  google: 'google_tpu',
+  aws: 'aws_trainium3',
+  meta: 'meta_mtia',
+  microsoft: 'microsoft_maia200',
+} as const
 
 export default function CompetitivePage() {
   const knowledge = loadKnowledge()
@@ -63,9 +69,23 @@ export default function CompetitivePage() {
   const baselineSoftware = knowledge.components.get(BASELINE_SOFTWARE_ID)
   const amdTargetSoftware = knowledge.components.get(AMD_TARGET_SOFTWARE_ID)
   const cerebras = knowledge.components.get(CEREBRAS_ID)
-  if (!baselineGpu || !amdTargetGpu || !baselineSoftware || !amdTargetSoftware || !cerebras) {
+  const hyperscalerGoogle = knowledge.components.get(HYPERSCALER_IDS.google)
+  const hyperscalerAws = knowledge.components.get(HYPERSCALER_IDS.aws)
+  const hyperscalerMeta = knowledge.components.get(HYPERSCALER_IDS.meta)
+  const hyperscalerMicrosoft = knowledge.components.get(HYPERSCALER_IDS.microsoft)
+  if (
+    !baselineGpu ||
+    !amdTargetGpu ||
+    !baselineSoftware ||
+    !amdTargetSoftware ||
+    !cerebras ||
+    !hyperscalerGoogle ||
+    !hyperscalerAws ||
+    !hyperscalerMeta ||
+    !hyperscalerMicrosoft
+  ) {
     throw new Error(
-      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}' / cerebras '${CEREBRAS_ID}'`,
+      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}' / cerebras '${CEREBRAS_ID}' / hyperscaler [${Object.values(HYPERSCALER_IDS).join(', ')}]`,
     )
   }
   const amdGpuReport = applySwap(baseline, {
@@ -112,6 +132,10 @@ export default function CompetitivePage() {
         amdTargetSoftware={amdTargetSoftware}
         amdReport={amdGpuReport}
         cerebras={cerebras}
+        hyperscalerGoogle={hyperscalerGoogle}
+        hyperscalerAws={hyperscalerAws}
+        hyperscalerMeta={hyperscalerMeta}
+        hyperscalerMicrosoft={hyperscalerMicrosoft}
       />
     </div>
   )

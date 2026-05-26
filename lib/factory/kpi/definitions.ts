@@ -379,6 +379,54 @@ export const KPI_DEFINITIONS: KpiDefinition[] = [
     honesty_note:
       'IPO valuation + raise figures vary across sources — note the spread, do not assert one number. Scale-check (NVIDIA share + revenue ratio) is mandatory framing to size validation correctly (fast-growing sliver vs imminent displacement).',
   },
+  // ─────────────────────────────────────────────────────────
+  // Tier 1 — CUSTOMER SELF-SUPPLY KPIs (no dependencies — these
+  // describe hyperscaler captive silicon: TPU, Trainium, MTIA,
+  // Maia. Strategic-context entries, NOT layer-fight-map
+  // competitors: most chips are internal/captive and not
+  // publicly benchmarked vs NVIDIA spec-for-spec. The threat
+  // axis is market-structure / vertical-integration, not spec.
+  // Differentiated by maturity (the differentiation IS the
+  // insight — they're a spectrum, not a monolith).
+  // ─────────────────────────────────────────────────────────
+  {
+    id: 'self_supply_maturity_tier',
+    name: 'Maturity tier (descriptor)',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Descriptor of where this self-supply program sits on the maturity spectrum (most mature + merchant / commercial volume + coexistence / narrow + internal / least mature). Descriptor only — NOT a numbered ranking; "tier" implies a leaderboard NVIDIA has graded, which would be dishonest. The descriptor names what kind of self-supply program it is, not where it ranks.',
+    honesty_note:
+      'Characterization, not a grade. The maturity SPREAD across the 4 programs is the insight — the differentiation prevents the "hyperscalers are coming for NVIDIA" monolithic framing.',
+  },
+  {
+    id: 'self_supply_chip_specs',
+    name: 'Chip specifications (where public)',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Process node, peak performance, memory, co-design partners — where the hyperscaler has published or where credible coverage exists. Most chips are internal / captive; specs are CITED where public, flagged where vendor-claimed-only.',
+    honesty_note:
+      'MANDATORY framing: most hyperscaler chips are not publicly benchmarked vs NVIDIA. Specs are vendor-published or analyst-corroborated; NOT head-to-head verdicts. This is market-structure analysis, not a spec comparison.',
+  },
+  {
+    id: 'self_supply_deployment_state',
+    name: 'Deployment state',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Where + how the chip is deployed: merchant (sold externally) vs captive (used internally only); GA vs ramping; anchor customers driving volume; cloud-portability.',
+  },
+  {
+    id: 'self_supply_coexistence_signal',
+    name: 'Coexistence signal vs NVIDIA',
+    tier: 1,
+    dependencies: [],
+    description:
+      'Evidence of coexistence with NVIDIA (NVLink Fusion partnerships, training-on-NVIDIA workloads, multi-vendor patterns at the customer) vs evidence of replacement framing. Coexistence is REAL across all 4 to varying degrees — this KPI prevents the "self-supply means less NVIDIA" zero-sum framing.',
+    honesty_note:
+      'Coexistence is the not-zero-sum anchor. Frame as "self-supply specific workloads + NVIDIA holds the rest," not "hyperscalers replace NVIDIA."',
+  },
 ]
 
 export function getKpiById(id: string): KpiDefinition | undefined {

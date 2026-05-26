@@ -1,6 +1,6 @@
 {
-  "version": "0.6.0",
-  "last_verified": "2026-05-25",
+  "version": "0.7.0",
+  "last_verified": "2026-05-26",
   "categories": {
     "full_cake_replacement": {
       "description": "Replaces the NVIDIA stack end-to-end. Examples: AMD Helios, hyperscaler custom silicon (where applicable).",
@@ -27,6 +27,10 @@
     "paradigm_alternative": {
       "description": "Architecturally different machines that do NOT decompose into NVIDIA's L1-L5 layer model. Adopting them is a re-architecture, not a stack swap. Currently: Cerebras WSE-3 (wafer-scale inference appliance). Rendered via the layer-fight-map PARADIGM state across all bands + a cross-layer ParadigmContrast explainer panel.",
       "members": ["cerebras_wse3"]
+    },
+    "customer_self_supply": {
+      "description": "NVIDIA's biggest customers becoming their own suppliers via vertical integration. Strategic-context entries — NOT layer-fight-map competitors (most chips are internal / captive and not publicly benchmarked vs NVIDIA spec-for-spec; forcing them onto the cake would mis-frame a market-structure threat as a spec fight). Differentiated by MATURITY; the spread across the 4 is the insight (NOT a monolith). Currently: Google TPU v7 Ironwood (most mature + only merchant) / AWS Trainium3 (commercial volume + NVLink Fusion coexistence) / Meta MTIA (narrow + internal) / Microsoft Maia 200 (least mature + OpenAI-volume-justified). Rendered via the HyperscalerSelfSupplyView strategic panel (header framing + 4 maturity-differentiated cards + 5-facet calibrated verdict). On the switching-cost spectrum: this is the buyer-exits-the-market end.",
+      "members": ["google_tpu", "aws_trainium3", "meta_mtia", "microsoft_maia200"]
     }
   },
   "components": [
@@ -525,6 +529,186 @@
             "source": "Public S-1 / IPO filings + Cerebras press releases + OpenAI partnership announcement + AWS Bedrock availability announcement + analyst coverage (The Information, Reuters, CNBC, semiconductor-analyst reports for the share + revenue ratio).",
             "last_verified": "2026-05-25",
             "notes": "MANDATORY framing: the NVIDIA ~90% share + ~423× revenue scale-check is what keeps 'serious + validated' from inflating to 'imminent displacement.' Cerebras is a fast-growing sliver of a fast-growing market, NOT a stack-replacement threat. IPO valuation + raise figures are noted as a source-spread rather than asserted — sources do not agree on a single number. The OpenAI-restricts-to-Anthropic clause is sourced market-dynamics; surfaced as fact, not editorialized as competitive-warfare-strategy."
+          }
+        }
+      }
+    },
+    {
+      "id": "google_tpu",
+      "name": "Google TPU v7 Ironwood",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "google",
+      "generation": "current",
+      "positioning": "The MOST MATURE + ONLY MERCHANT-AMBITION self-supply program. Google TPU is the longest-running customer-built AI silicon program (since 2015) and the only one moving beyond its origin cloud — external + on-prem deployments are underway, and Meta is reportedly in talks for billions in TPU purchases. Co-designed with Broadcom + MediaTek. Gemini 3 trained on TPU. This is the self-supply chip with merchant-vendor characteristics, which makes it the most direct customer-becoming-supplier-becoming-competitor path of the 4.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "MOST MATURE + MERCHANT — the only self-supply program with merchant-vendor characteristics (external / on-prem deployment beyond Google Cloud; Meta in talks)",
+          "provenance": {
+            "status": "cited",
+            "source": "Google Cloud TPU v7 Ironwood announcement + Meta-in-talks-for-TPUs coverage (Reuters, The Information, CNBC 2026). Google TPU has been in production since 2015 — the longest-running custom AI silicon program among hyperscalers.",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "v7 Ironwood · ~10× prior generation · ~42.5 exaflops per pod · 192 GB HBM3e per chip · Broadcom + MediaTek co-design",
+          "provenance": {
+            "status": "cited",
+            "source": "Google Cloud TPU v7 Ironwood specifications + Google Cloud Next 2026 announcements; Broadcom + MediaTek co-design partnership disclosed in Google blog + semiconductor analyst coverage (SemiAnalysis, Tom's Hardware).",
+            "last_verified": "2026-05-26",
+            "notes": "Public specs are CITED via Google announcements. NOT independently benchmarked vs NVIDIA B200 spec-for-spec — market-structure analysis, not spec comparison."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "Generally Available on Google Cloud. Moving beyond GCP via external + on-prem partnerships. Meta in talks for billions in TPU purchases (reported, Reuters / The Information). Gemini 3 trained on TPU.",
+          "provenance": {
+            "status": "cited",
+            "source": "Google Cloud TPU availability + Meta-in-talks coverage (Reuters, The Information, CNBC 2026) + Gemini 3 training disclosure (Google announcements).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Most direct self-supply-becomes-competitor path of the 4. Customers picking TPU outside GCP move workloads off NVIDIA more decisively than other hyperscaler chips. BUT: frontier model partnerships across the industry still flow through NVIDIA for cross-vendor compatibility; Google itself still buys NVIDIA for many GCP workloads.",
+          "provenance": {
+            "status": "cited",
+            "source": "Industry analyst coverage of TPU merchant deployments + Google Cloud's continued NVIDIA H100 / B200 availability for customers who require it.",
+            "last_verified": "2026-05-26",
+            "notes": "Coexistence is real even for the merchant-threat case — Google sells both TPU and NVIDIA capacity on GCP; the threat is in customer-share trajectory, not zero-sum replacement."
+          }
+        }
+      }
+    },
+    {
+      "id": "aws_trainium3",
+      "name": "AWS Trainium3",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "aws",
+      "generation": "current",
+      "positioning": "COMMERCIAL VOLUME + the MOST EXPLICIT COEXISTENCE signal. Trainium3 went GA December 2025 (3nm, 2.52 PFLOPS FP8) and is anchored by Anthropic + OpenAI workloads driving AWS volume. The defining coexistence signal: Trainium4 integrates NVLink Fusion (AWS-NVIDIA collaboration) — AWS is NOT trying to replace NVIDIA wholesale; the partnership says 'self-supply specific workloads + NVIDIA stays for the rest.' This is the not-zero-sum case in its purest form across the 4.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "COMMERCIAL VOLUME + COEXISTENCE — anchored by Anthropic + OpenAI for volume; coexists explicitly with NVIDIA via NVLink Fusion in Trainium4",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS re:Invent 2025 Trainium3 GA announcement + Anthropic / OpenAI Trainium adoption coverage + AWS-NVIDIA NVLink Fusion partnership announcement (re:Invent 2025).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "GA December 2025 · 3nm process · 2.52 PFLOPS FP8 · anchored by Anthropic + OpenAI workloads on AWS",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS Trainium3 specifications (AWS re:Invent 2025) + Anthropic + OpenAI Trainium adoption (AWS press releases, customer case studies).",
+            "last_verified": "2026-05-26",
+            "notes": "Public AWS-published specs. NOT independently benchmarked vs NVIDIA B200 spec-for-spec — workload-specific deployment, not spec comparison."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "GA on AWS only (captive cloud — NOT merchant; you can rent Trainium3 capacity on AWS, but Trainium3 chips do not ship outside AWS). Anthropic + OpenAI workloads driving production volume.",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS Trainium3 availability is AWS-cloud-only by design (AWS Trainium product positioning).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Trainium4 integrates NVLink Fusion (AWS-NVIDIA collaboration announced re:Invent 2025) — the most explicit coexistence signal across the 4 hyperscaler programs. AWS is NOT trying to replace NVIDIA wholesale; the partnership says 'self-supply specific workloads + NVIDIA stays for the rest.' AWS continues to sell NVIDIA H100 / B200 / GB200 capacity at scale.",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS-NVIDIA NVLink Fusion partnership announcement (AWS re:Invent 2025 + NVIDIA GTC announcements) + AWS continued NVIDIA capacity (P5 / P5e instance families).",
+            "last_verified": "2026-05-26"
+          }
+        }
+      }
+    },
+    {
+      "id": "meta_mtia",
+      "name": "Meta MTIA (gens 300 / 400 / 500)",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "meta",
+      "generation": "current",
+      "positioning": "NARROW + INTERNAL — 100,000s of units deployed inside Meta (Facebook + Instagram inference workloads); NOT sold externally. RISC-V architecture, gens 300 / 400 / 500 in production. The defining limit-of-own-program signal: Meta is in talks to license or buy Google TPUs (billions, reported) — Meta hedges across NVIDIA + MTIA + (potentially) TPU. NOT 'Meta replaces NVIDIA with MTIA'; it's 'multi-vendor diversification.' Meta still buys NVIDIA for frontier training at scale.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "NARROW + INTERNAL — 100,000s deployed but production-only-inside-Meta, no external availability; Meta in talks for Google TPUs (limits-of-own-program signal)",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta MTIA deployment scale (Meta engineering blog + analyst coverage); Meta-in-talks-for-Google-TPUs coverage (Reuters, The Information 2026).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "MTIA generations 300 / 400 / 500 · RISC-V architecture · 100,000s of units deployed in Meta production (FB + IG inference)",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta engineering blog + RISC-V Foundation announcements + semiconductor-analyst coverage of MTIA generations.",
+            "last_verified": "2026-05-26",
+            "notes": "MTIA is internal-only by design — no public spec-vs-NVIDIA benchmarks exist. Architecture facts are CITED via Meta disclosures."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "Internal-only. 100,000s of MTIA units in Meta production for FB + IG inference workloads. NOT for sale externally. Meta uses NVIDIA for frontier training + MTIA for specific inference workloads — coexistence within Meta is multi-vendor by design.",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta engineering blog disclosures + analyst coverage of Meta's multi-vendor AI infrastructure strategy.",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Multi-vendor pattern within Meta. NVIDIA for training + MTIA for inference; reportedly exploring TPU adoption (billions, in talks) — Meta hedges across multiple silicon vendors, not replacing NVIDIA with MTIA. The Meta-in-talks-for-TPU signal explicitly bounds MTIA's own-program reach.",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta multi-vendor infrastructure strategy coverage + Meta-in-talks-for-Google-TPUs reporting (Reuters, The Information 2026).",
+            "last_verified": "2026-05-26",
+            "notes": "Coexistence is real AND the in-talks-for-TPU signal shows the limits of any single self-supply program — even Meta hedges."
+          }
+        }
+      }
+    },
+    {
+      "id": "microsoft_maia200",
+      "name": "Microsoft Maia 200",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "microsoft",
+      "generation": "current",
+      "positioning": "LEAST MATURE — earliest of the 4 self-supply programs. Maia 200 (3nm, 216 GB HBM3e, vendor-claimed ~3× Trainium3 FP4 — claimed, not independently benchmarked) is ramping; OpenAI's Azure compute volume justifies the program economically. OpenAI continues to use NVIDIA + AWS Trainium in parallel — Microsoft hasn't replaced NVIDIA volume; Maia adds capacity for OpenAI-specific workloads. Earliest of the 4, not the most concerning to NVIDIA today.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "LEAST MATURE — earliest of the 4 programs; OpenAI's Azure compute volume is what justifies Maia economically (anchor-customer-driven, not broad-platform)",
+          "provenance": {
+            "status": "cited",
+            "source": "Microsoft Ignite 2025 Maia 200 announcement + OpenAI Azure compute volume coverage + semiconductor-analyst comparisons across the 4 hyperscaler programs.",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "Maia 200 · 3nm process · 216 GB HBM3e · vendor-claimed ~3× Trainium3 FP4 (CLAIMED only — not independently benchmarked)",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "microsoft",
+            "source": "Microsoft Maia 200 specifications (Microsoft Ignite 2025); the 3× Trainium3 FP4 figure is a Microsoft vendor claim.",
+            "last_verified": "2026-05-26",
+            "flag": "verify-needed",
+            "notes": "The 3× Trainium3 FP4 claim is vendor-stated and not independently benchmarked. Maia 200 is internal-Azure-only; no public head-to-head benchmarks vs NVIDIA exist."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "Ramping on Azure. OpenAI's Azure compute volume justifies the program economically. OpenAI continues using NVIDIA + AWS Trainium in parallel — Maia adds capacity, NOT a replacement.",
+          "provenance": {
+            "status": "cited",
+            "source": "Microsoft Ignite 2025 + OpenAI multi-vendor compute coverage (The Information, Reuters 2026).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Multi-vendor pattern. OpenAI uses NVIDIA + AWS Trainium + Microsoft Maia simultaneously across its compute footprint. Microsoft has NOT replaced NVIDIA on Azure; Maia adds capacity for OpenAI-specific workloads. Earliest of the 4 programs — least mature, least concerning to NVIDIA today.",
+          "provenance": {
+            "status": "cited",
+            "source": "OpenAI multi-vendor compute strategy (The Information, Reuters, CNBC 2026); Microsoft Azure continued NVIDIA H100 / B200 capacity at scale.",
+            "last_verified": "2026-05-26"
           }
         }
       }
