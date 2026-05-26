@@ -1,11 +1,14 @@
 {
-  "version": "0.5.0",
-  "last_verified": "2026-05-21",
+  "version": "0.6.0",
+  "last_verified": "2026-05-26",
   "segments": [
     {
       "id": "frontier-ai-labs",
       "name": "Frontier AI Labs",
       "subtitle": "Anthropic, xAI, other model-training labs at the frontier",
+      "archetype": "frontier model developers (e.g. Anthropic, xAI)",
+      "buying_behavior": "optimizes for time-to-train at scale — MFU and interconnect throughput over cost",
+      "representative_deployment": "representative build: ~thousands of GPUs, tightly-coupled single-region cluster, NVL72-class · Dell XE9680 chassis (or Supermicro equivalent) · Red Hat OpenShift AI · Spectrum-X / Quantum-X800 fabric",
       "north_star_kpis": ["compute_mfu", "compute_time_to_train"],
       "supporting_kpis": ["compute_checkpoint_resume_latency", "fabric_interconnect_throughput"],
       "delivered_kpis": {
@@ -137,6 +140,10 @@
       "id": "hyperscalers",
       "name": "Hyperscalers",
       "subtitle": "Azure, GCP, AWS hyperscale cloud operators",
+      "archetype": "cloud platforms at fleet scale (e.g. Google Cloud, Azure)",
+      "buying_behavior": "optimizes for TCO-per-token at fleet scale — efficiency and density across millions of queries",
+      "representative_deployment": "representative build: fleet-scale, multi-region, HGX/NVL72-class density · ODM-dominant chassis (Dell-class OEM for reference designs) · hyperscaler-native orchestration (or Red Hat OpenShift AI in partner-co-sell builds) · Spectrum-X Ethernet",
+      "customer_competitor_note": "the same hyperscalers also build custom silicon (TPU, Maia) — see the CUSTOMER SELF-SUPPLY competitive view",
       "north_star_kpis": ["compute_tco_per_token"],
       "supporting_kpis": ["ops_pue", "ops_fleet_availability", "compute_hardware_density"],
       "delivered_kpis": {
@@ -272,6 +279,9 @@
       "id": "fortune-500",
       "name": "Fortune 500 Enterprise",
       "subtitle": "Production AI workloads in regulated enterprises (e.g., JPMorgan-class)",
+      "archetype": "large regulated enterprises (e.g. JPMorgan-class financials, Pfizer-class life-sciences)",
+      "buying_behavior": "optimizes for production ROI with compliance — proven outcomes and audit trail over bleeding-edge",
+      "representative_deployment": "representative build: ~hundreds of GPUs, HGX-class · Dell XE9680 chassis (Lenovo equivalent common) · Red Hat OpenShift AI (or Nutanix Enterprise AI) · NVAIE-wrapped, compliance-oriented topology",
       "north_star_kpis": ["compute_production_roi"],
       "supporting_kpis": ["compute_inference_p99", "ops_deployment_cycle_time", "ops_compliance_audit_time"],
       "delivered_kpis": {
@@ -367,6 +377,9 @@
       "id": "sovereign-ai",
       "name": "Sovereign AI",
       "subtitle": "Nation-state and regional AI programs (G42 UAE, EU sovereign, etc.)",
+      "archetype": "national / government AI programs (e.g. G42-class sovereign builds)",
+      "buying_behavior": "optimizes for data residency and control — sovereignty and air-gap posture even at a cost premium",
+      "representative_deployment": "representative build: in-country datacenter, air-gap-capable topology · local-OEM partnerships (or Dell XE9680 where global vendor permitted) · Red Hat OpenShift AI (or sovereign-cloud ISV equivalent) · data-residency-oriented architecture",
       "north_star_kpis": ["ops_data_residency_pct"],
       "supporting_kpis": ["ops_air_gap_capability", "ops_portability_index", "ops_compliance_audit_time", "ops_security_perimeter"],
       "delivered_kpis": {
@@ -505,6 +518,9 @@
       "id": "industry-verticals",
       "name": "Industry Verticals",
       "subtitle": "Domain-specific deployments (e.g., Mayo Clinic healthcare AI)",
+      "archetype": "domain-specialized deployments (e.g. Mayo-class healthcare imaging, Siemens-class industrial automation)",
+      "buying_behavior": "optimizes for domain accuracy and safety-certification — vertical-specific reliability over general performance",
+      "representative_deployment": "representative build: edge + core mix, HGX-class core + RTX PRO 6000-class edge · vertical OEM-validated chassis (Dell XE9680 reference, vertical-certified) · NVIDIA Clara (healthcare) / Omniverse (industrial digital-twin) / DRIVE (automotive) / BioNeMo (drug discovery) on Red Hat OpenShift AI · domain-certified stack with safety-certification cadence",
       "north_star_kpis": ["compute_domain_accuracy", "compute_safety_latency"],
       "supporting_kpis": ["compute_edge_efficiency", "compute_digital_twin_sync", "ops_safety_certification"],
       "delivered_kpis": {

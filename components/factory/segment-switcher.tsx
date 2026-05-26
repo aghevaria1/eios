@@ -95,6 +95,7 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
             {active.segment.subtitle}
           </p>
         )}
+        <GroundingBlock segment={active.segment} />
       </header>
 
       <AIFactoryCake
@@ -143,6 +144,64 @@ export function SegmentSwitcher({ views, layers, defaultSegmentId }: Props) {
         />
         <TcoBars capex={active.tcoCapex} opex={active.tcoOpex} />
       </div>
+    </div>
+  )
+}
+
+// ─── Grounding block — archetype / buying_behavior / representative
+// build / customer-competitor note. Optional fields; render only the
+// ones present. Label-prefixed lines reinforce the illustrative framing
+// ("REPRESENTATIVE BUILD" announces the discipline at the visual level).
+// ────────────────────────────────────────────────────────────────────
+function GroundingBlock({ segment }: { segment: Segment }) {
+  const hasAny =
+    segment.archetype ||
+    segment.buying_behavior ||
+    segment.representative_deployment ||
+    segment.customer_competitor_note
+  if (!hasAny) return null
+  return (
+    <div className="mt-4 rounded-md border border-gray-800 bg-gray-900/40 px-4 py-3 text-xs leading-relaxed">
+      {segment.archetype && (
+        <GroundingRow label="ARCHETYPE" body={segment.archetype} />
+      )}
+      {segment.buying_behavior && (
+        <GroundingRow label="OPTIMIZES FOR" body={segment.buying_behavior} />
+      )}
+      {segment.representative_deployment && (
+        <GroundingRow
+          label="REPRESENTATIVE BUILD"
+          body={segment.representative_deployment}
+        />
+      )}
+      {segment.customer_competitor_note && (
+        <GroundingRow
+          label="ALSO COMPETITOR"
+          body={segment.customer_competitor_note}
+          tone="dual-role"
+        />
+      )}
+    </div>
+  )
+}
+
+function GroundingRow({
+  label,
+  body,
+  tone = 'default',
+}: {
+  label: string
+  body: string
+  tone?: 'default' | 'dual-role'
+}) {
+  const bodyClass =
+    tone === 'dual-role' ? 'text-amber-200/90' : 'text-gray-300'
+  return (
+    <div className="grid grid-cols-[auto_1fr] gap-x-3 py-0.5">
+      <div className="whitespace-nowrap pt-[2px] text-[9px] font-mono uppercase tracking-widest text-gray-500">
+        {label}
+      </div>
+      <div className={bodyClass}>{body}</div>
     </div>
   )
 }

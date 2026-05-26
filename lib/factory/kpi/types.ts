@@ -152,6 +152,22 @@ export interface Segment {
   // they are (hyperscaler direct ↔ channel-saturated enterprise).
   partner_intensity?: PartnerIntensity
   partner_intensity_rationale?: string
+  // Grounding fields — make each segment concrete and vivid without making
+  // any claim about a specific customer's actual infrastructure. All three
+  // are framed illustratively (the framing words "e.g.", "-class", and
+  // "representative build:" / "~" do the honesty work). They add SEGMENT
+  // CONTEXT, not KPI provenance — no KPI is touched by these fields, no
+  // provenance is changed, and no deployment is tied to a named exemplar.
+  archetype?: string
+  buying_behavior?: string
+  representative_deployment?: string
+  // Customer-AND-competitor duality note — currently seeded only for the
+  // hyperscaler segment, which is structurally distinct: the same companies
+  // are NVIDIA's largest customers AND its self-supply competitors via
+  // their custom silicon programs (TPU, Maia, etc.). Cross-references the
+  // CUSTOMER SELF-SUPPLY competitive view. Generic field shape so other
+  // segments could acquire similar duality framing later if appropriate.
+  customer_competitor_note?: string
   provenance: Provenance
 }
 
