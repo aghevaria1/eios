@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "last_verified": "2026-05-25",
   "categories": {
     "full_cake_replacement": {
@@ -9,6 +9,10 @@
     "fabric_alternatives": {
       "description": "Replaces ONLY the fabric layer within the cake. The rest of the NVIDIA stack remains.",
       "members": ["nvidia_spectrum_x", "nvidia_quantum_x800", "broadcom_jericho_tomahawk", "arista_ethernet", "cornelis_cn6000", "cornelis_cn5000"]
+    },
+    "software_alternatives": {
+      "description": "Replaces ONLY the software wrapper / programming-stack layer. The rest of the NVIDIA stack (GPU + fabric + OEM + ISV) remains. Currently: NVIDIA NVAIE (CUDA-rooted) vs AMD ROCm. Phase 3c-2 step 2 will render this as a software-layer scorecard extending the AMD full-stack-replacement view.",
+      "members": ["nvaie", "amd_rocm"]
     },
     "uec_coalition": {
       "description": "Ultra Ethernet Consortium members — open-standard fabric coalition. Includes AMD, Cornelis, Broadcom, hyperscalers. Broadcom designs hyperscaler chips, making them a double enabler.",
@@ -22,6 +26,67 @@
     }
   },
   "components": [
+    {
+      "id": "amd_rocm",
+      "name": "AMD ROCm (CUDA-equivalent software stack)",
+      "category": "software_alternatives",
+      "layer": "L5",
+      "slot": "software",
+      "vendor": "amd",
+      "generation": "current",
+      "positioning": "AMD's CUDA-equivalent open-source software stack. Runs on AMD Instinct (MI300X / MI355X / MI455X). ROCm 7.x is the current generation (recent releases through ROCm 7.2.x per AMD ROCm release docs). Mainstream PyTorch / vLLM / SGLang inference path is viable today; the moat that remains is CUDA's library exclusivity (TensorRT-LLM, FlashAttention 3) and ~20-year ecosystem depth. Paired with amd_mi355x (current GPU) for the full-stack-replacement competitive view.",
+      "moat_framing": "ROCm has made real progress on mainstream inference — PyTorch + vLLM + SGLang all have official ROCm support, and MI300X/MI355X are competitive with H100/B200 on memory-bound workloads. The remaining gap is precise: (1) CUDA-exclusive libraries (TensorRT-LLM, FlashAttention 3) with no full ROCm equivalent — missing FA3 reportedly costs 30-40% training throughput on 7B+ models per Spheron May 2026; (2) CUDA's ~20-year ecosystem depth (cuDNN, cuBLAS, TensorRT, NCCL); (3) CUDA-first default for new research and tooling. The switching cost is high but workload-dependent — viable for mainstream PyTorch/vLLM workflows, costly for CUDA-native codebases with exclusive-lib dependencies. NEVER claim ROCm parity with CUDA; NEVER claim ROCm broken — the honest read is 'depends what you're building.'",
+      "kpi_values": {
+        "software_framework_support": {
+          "text": "PyTorch, vLLM, SGLang official ROCm support (ROCm 7.x current generation; PyTorch ships ROCm-native paths; vLLM has official ROCm support with AMD Zen CPU backend + RDNA 3.5/4 device IDs; SGLang inference performance testing documented on ROCm). Additional: FlashInfer, llama.cpp. Training frameworks: Megatron-LM, verl.",
+          "provenance": {
+            "status": "cited",
+            "source": "AMD ROCm Compatibility Matrix + ROCm 7.x release notes + vLLM official ROCm path + SGLang inference docs on ROCm. Cross-confirmed across AMD docs + framework release notes.",
+            "source_url": "https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html",
+            "last_verified": "2026-05-25",
+            "notes": "Official support across major ML frameworks is verified across multiple sources. Specific 'ROCm 7.2 / Jan 2026' release timing not independently confirmed in web search; ROCm 7.x is the current generation per AMD docs (releases through 7.2.x referenced)."
+          }
+        },
+        "software_mainstream_inference": {
+          "text": "Workload-dependent. Memory-bound inference: MI300X often beats H100 (~40% lower latency on Llama-2-70B per Clarifai / Tensorwave 2026 benchmarks). Compute-bound: H100 leads (vLLM ROCm latency 37-75% higher than H200 in some configurations per aimultiple 2026). The optimistic '~90-95% of H100 throughput' framing applies to specific PyTorch/vLLM workloads but does not cleanly verify as a single number.",
+          "provenance": {
+            "status": "claimed",
+            "flag": "verify-needed",
+            "claimed_by": "amd (positioning) + mixed independent benchmark coverage",
+            "source": "Independent benchmarks split by workload type. Clarifai + Tensorwave + SemiAnalysis 2026 coverage shows MI300X memory-bound wins (Llama-2-70B ~40% lower latency, Llama3 405B + DeepSeekv3 670B absolute + per-dollar wins). aimultiple 2026 + ROCm vLLM docs show vLLM ROCm-vs-CUDA latency gap on compute-bound (MI300X 37-75% higher latency than H200 in tested configurations).",
+            "source_url": "https://www.clarifai.com/blog/mi300x-vs-h100",
+            "last_verified": "2026-05-25",
+            "notes": "WORKLOAD-DEPENDENT — not directly comparable as a single number. Memory-bound MI300X often wins; compute-bound H100 leads. Software stack maturity gap between vLLM ROCm vs CUDA is the structural variable. The '~90-95%' figure originates in optimistic vendor + early-benchmark framing; conservative independent reads show wider variance. Pill flagged VERIFY-NEEDED to reflect this. Honest read: 'competitive on mainstream PyTorch / vLLM inference, workload-dependent — neither vendor cleanly wins across the board.'"
+          }
+        },
+        "software_cuda_exclusive_libs": {
+          "text": "Gap, not strength: TensorRT-LLM (NVIDIA-only, no ROCm equivalent — confirmed AMD ROCm docs + Spheron 2026 + Thundercompute 2026); FlashAttention 3 (CUDA-only as of 2026 — AMD has FlashAttention 2 via Triton for RDNA3 since ROCm 6.4 March 2025, but FA3 port incomplete; missing FA3 costs 30-40% training throughput on 7B+ models per Spheron May 2026); NCCL collective comm (no ROCm equivalent). This is the precise library moat ROCm has NOT closed.",
+          "provenance": {
+            "status": "cited",
+            "source": "Multiple 2026 analyses confirm: TensorRT-LLM is CUDA-only by design with no ROCm port (Spheron, SemiAnalysis, Thundercompute 2026 comparisons). FlashAttention 3 ROCm port incomplete — AMD PyTorch compatibility docs acknowledge FA3 integration but practitioners report FA3 gap costs 30-40% training throughput on 7B+ models (Spheron May 2026 quantification).",
+            "source_url": "https://www.spheron.network/blog/rocm-vs-cuda-gpu-cloud-2026/",
+            "last_verified": "2026-05-25",
+            "notes": "The library moat is real, specific, and NAMED. Not 'ROCm is broken' — it's 'ROCm doesn't have THESE specific libraries.' Workloads using TensorRT-LLM or FA3 should stay on CUDA; workloads on stock PyTorch / vLLM can move with variable performance cost."
+          }
+        },
+        "software_ecosystem_maturity": {
+          "text": "ROCm is closing the depth gap (ROCm 7.x release cadence + framework integration progress) but is not at CUDA parity. CUDA has ~20 years of compounding ecosystem (released 2007); ROCm has been on the modern AI-targeted cadence for roughly half that. Library breadth (cuDNN / cuBLAS / TensorRT / NCCL) and CUDA-first tooling default remain the structural moat.",
+          "provenance": {
+            "status": "directional",
+            "source": "Comparative ecosystem-maturity characterization synthesized from CUDA release timeline + practitioner survey coverage + analyst reports (Spheron 2026, Thundercompute 2026). Directional — no single measured KPI captures 'ecosystem maturity.'",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_switching_cost": {
+          "text": "High but workload-dependent. CUDA-native codebases (especially those depending on TensorRT-LLM, FlashAttention 3, or NCCL) require significant port effort + performance acceptance penalty. Codebases already abstracted (PyTorch + vLLM + SGLang) port with less friction — these frameworks have official ROCm paths. CUDA-first tooling default for new research/work perpetuates the asymmetry.",
+          "provenance": {
+            "status": "directional",
+            "source": "Switching cost characterization synthesized from practitioner reports of CUDA -> ROCm porting efforts + analyst coverage (Spheron 2026, Thundercompute 2026). The high/workload-dependent split is the structurally honest read.",
+            "last_verified": "2026-05-25"
+          }
+        }
+      }
+    },
     {
       "id": "amd_mi355x",
       "name": "AMD Instinct MI355X (CDNA 4, current shipping)",

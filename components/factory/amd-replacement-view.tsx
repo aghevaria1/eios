@@ -15,29 +15,50 @@ import {
   NotesBlock,
   isCautionNote,
 } from './swap-report-card'
+import {
+  LayerFightMap,
+  type LayerVerdict,
+} from './layer-fight-map'
 
 interface Props {
   baselineGpu: Component
   targetGpu: Component
+  // Software-layer components for the layer-fight-map (added in phase 3c-2
+  // step 2 part 2). The engine's applySwap below is still single-slot GPU,
+  // so the BlastRadiusStrip counts reflect GPU-dependencies only. The
+  // LayerFightMap composes per-layer verdicts qualitatively from baseline +
+  // target component data (across L1-L5) — that's the bird's-eye summary
+  // that complements the L2-only quantitative scorecard.
+  baselineSoftware: Component
+  targetSoftware: Component
   report: SwapReport
 }
 
 export function AmdReplacementView({
   baselineGpu,
   targetGpu,
+  baselineSoftware,
+  targetSoftware,
   report,
 }: Props) {
   const heldWithValues = report.held.filter((h) => h.before || h.after)
+  const layerVerdicts = buildLayerVerdicts(
+    baselineGpu,
+    targetGpu,
+    baselineSoftware,
+    targetSoftware,
+  )
   return (
     <div className="space-y-6">
       <DiagonalFramingLine />
+      <LayerFightMap verdicts={layerVerdicts} />
       <WinLossScorecard baselineGpu={baselineGpu} targetGpu={targetGpu} />
       <BlastRadiusStrip
         highlightedLayers={['L2']}
         slotLabel="GPU (compute sub-slot)"
         changedCount={report.changed.length}
         heldCount={report.held.length}
-        framingText="GPU-slot swap. Blast radius is broader than the fabric swap (GPU dependencies span compute / TCO / operational KPIs). Step 2 will extend the swap to the software layer (ROCm vs CUDA / NVAIE), lighting up L4/L5 too. Roadmap pair (Vera Rubin vs MI455X) is the next fast-follow — same shape, future generation."
+        framingText="GPU-slot swap. The dependency-graph engine counts here reflect the L2 (GPU) swap only — see Layer Fight Map above for the L4/L5 verdicts that do not run through this single-slot swap. Roadmap pair (Vera Rubin vs MI455X) is the next fast-follow — same shape, future generation."
       />
       <ChangedKpiSection
         impacts={report.changed}
@@ -54,6 +75,106 @@ export function AmdReplacementView({
       )}
     </div>
   )
+}
+
+// ────────────────────────────────────────────────────────────────────────
+// Layer Fight Map composition — builds per-layer verdicts from baseline +
+// target component data. Order: L5 (top) → L1 (bottom) to match cake order.
+//
+// Verdicts are composed in-component (not data-driven) because they're
+// narrative summaries pulling from multiple seeded KPI values across two
+// components. Each verdict's `pointers` cite specific seeded data so the
+// reader can trace back. Per the honesty discipline: pointers reference
+// seeded values; nothing is invented here that isn't in the data.
+//
+// L4 carries the workload-dependence nuance per user direction: NIM/Nemotron/
+// Dynamo are NVIDIA-proprietary (no AMD equivalent — NVIDIA wins), AND
+// software_mainstream_inference is workload-split (memory-bound MI300X wins,
+// compute-bound H100 leads). So L4 reads "NVIDIA WINS — workload-dependent"
+// rather than a clean NVIDIA WINS or a clean tie.
+// ────────────────────────────────────────────────────────────────────────
+function buildLayerVerdicts(
+  baselineGpu: Component,
+  targetGpu: Component,
+  baselineSoftware: Component,
+  targetSoftware: Component,
+): LayerVerdict[] {
+  return [
+    {
+      layerId: 'L5',
+      layerName: 'Applications · NVAIE wrapper',
+      verdict: 'nvidia-wins',
+      verdictLabel: 'NVIDIA WINS — software ecosystem moat',
+      evidence:
+        "NVAIE wraps the CUDA-rooted software stack with a library moat ROCm has not closed. The gap is precise and named, not handwaved.",
+      pointers: [
+        `TensorRT-LLM (CUDA-only, no ROCm port planned) — confirmed across multiple 2026 analyses`,
+        `FlashAttention 3 (CUDA-only as of 2026; ROCm has FA2 via Triton, not FA3) — missing FA3 costs ~30-40% training throughput on 7B+ models per Spheron May 2026`,
+        `NCCL collective communication — no ROCm equivalent`,
+        `~20 years of compounding CUDA ecosystem (cuDNN, cuBLAS, TensorRT, Triton inference server, NeMo, NIM); CUDA-first default for new research and ML tooling`,
+        `Switching cost: high for CUDA-native codebases with exclusive-lib dependencies; lower for stacks already abstracted (PyTorch / vLLM / SGLang)`,
+      ],
+      sourceRef: `See ${baselineSoftware.id}.kpi_values + ${targetSoftware.id}.kpi_values for full per-KPI evidence + provenance pills.`,
+    },
+    {
+      layerId: 'L4',
+      layerName: 'Models / Microservices',
+      verdict: 'workload-dependent',
+      verdictLabel:
+        'NVIDIA WINS — workload-dependent (no clean tie; depends what you’re running)',
+      evidence:
+        'NIM / Nemotron / Dynamo / NeMo Guardrails are NVIDIA-proprietary microservices with no AMD equivalent — that’s a clean NVIDIA win for the L4 platform layer. But underneath, mainstream PyTorch / vLLM / SGLang inference performance is workload-dependent: memory-bound workloads favor MI300X, compute-bound workloads favor H100. The L4 verdict reads as NVIDIA WINS for the proprietary microservices, with the explicit workload-split caveat for the runtime layer beneath.',
+      pointers: [
+        'NVIDIA-proprietary L4 layer: NIM (microservices), Nemotron (foundation models), Dynamo (orchestration), NeMo Guardrails — no AMD equivalent shipping today',
+        'Mainstream inference performance: memory-bound MI300X often beats H100 (~40% lower latency on Llama-2-70B per Clarifai / Tensorwave 2026), compute-bound H100 leads (vLLM ROCm 37-75% higher latency than H200 in some configurations per aimultiple 2026)',
+        'The "~90-95% of H100 throughput" framing is the optimistic end of a workload-dependent range, not cleanly citable as a single number — flagged VERIFY-NEEDED in seeded data',
+      ],
+      sourceRef: `See ${targetSoftware.id}.software_mainstream_inference + sources cited in its provenance notes (paired with ${baselineSoftware.id} as the NVIDIA baseline).`,
+    },
+    {
+      layerId: 'L3',
+      layerName: 'ISV Platform',
+      verdict: 'shared',
+      verdictLabel: 'SHARED — both vendors compose with same ISVs',
+      evidence:
+        'The L3 ISV platform layer (Red Hat OpenShift AI, VMware Private AI Foundation, Nutanix Enterprise AI, VAST Data) is composable across both vendor ecosystems. Neither vendor has an ISV lock-in moat at this layer — it’s structurally non-differentiating for the AMD vs NVIDIA comparison.',
+      pointers: [
+        'Red Hat OpenShift AI: runs on both NVIDIA and AMD platforms',
+        'VMware Private AI Foundation: vendor-agnostic',
+        'Nutanix Enterprise AI: vendor-agnostic',
+        'VAST Data: storage layer, vendor-agnostic',
+      ],
+    },
+    {
+      layerId: 'L2',
+      layerName: 'Chips · GPU + Fabric',
+      verdict: 'parity-dominant',
+      verdictLabel: 'PARITY-DOMINANT — with AMD memory win + FP8 unresolved',
+      evidence:
+        'Hardware close at current generation. AMD wins memory capacity decisively (288 vs 192 GB, +50%); memory bandwidth + FP4 dense are within ~5% (PARITY); FP8 dense is UNRESOLVED (both sides carry verify-needed). Shipping availability is parity (both ship today).',
+      pointers: [
+        `${targetGpu.name} memory capacity: 288 GB HBM3e (CLAIMED) vs ${baselineGpu.name} 192 GB HBM3e (CITED) — AMD wins (+50%)`,
+        'Memory bandwidth: 8 vs 8 TB/s — PARITY',
+        'FP4 dense: ~9.2 vs 9 PFLOPS — PARITY (within ~5%, AMD dense/sparse caveat applies)',
+        'FP8 dense: B200 verify-needed, MI355X CLAIMED + verify-needed — UNRESOLVED (figure-spread across sources)',
+        'Shipping availability: both current — PARITY',
+      ],
+      sourceRef: 'See Win/Loss Scorecard below for the full per-axis breakdown.',
+    },
+    {
+      layerId: 'L1',
+      layerName: 'Land · Power · Shell',
+      verdict: 'shared',
+      verdictLabel: 'SHARED — same facility infrastructure',
+      evidence:
+        'Both vendors deploy in the same enterprise DC / colo / hyperscale facility patterns. Dell PowerEdge XE9680 (HGX-class chassis) is common to both; same liquid-cooling envelopes for rack-scale, same air-cooled ceilings for enterprise (~10-15 kW/rack). L1 is structurally non-differentiating for the vendor comparison.',
+      pointers: [
+        'Dell PowerEdge XE9680 chassis: HGX-class server, both NVIDIA and AMD configurations available',
+        'Enterprise DC / colo / hyperscale facility patterns: vendor-agnostic',
+        'Air-cooling ceiling ~10-15 kW/rack + liquid-cooling envelope for rack-scale: same physics either vendor',
+      ],
+    },
+  ]
 }
 
 // ────────────────────────────────────────────────────────────────────────

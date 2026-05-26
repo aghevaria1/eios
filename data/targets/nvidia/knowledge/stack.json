@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "last_verified": "2026-05-25",
   "layers": [
     {
@@ -331,6 +331,49 @@
             "source": "TensorRT-LLM is a CUDA-only library by design; ROCm has no compatible re-implementation as of writing.",
             "source_url": "https://developer.nvidia.com/tensorrt",
             "last_verified": "2026-05-20"
+          }
+        },
+        "software_framework_support": {
+          "text": "PyTorch (CUDA-native), TensorFlow, JAX, vLLM, SGLang, MLX — full first-class support across all major ML frameworks. CUDA-native at the kernel level. Most new frameworks ship CUDA-first in their primary release path.",
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA CUDA + NVAIE product materials confirm first-class CUDA support across major ML frameworks; CUDA-first default in framework release paths is widely documented in PyTorch / TF / vLLM release notes.",
+            "source_url": "https://developer.nvidia.com/deep-learning-frameworks",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_mainstream_inference": {
+          "text": "Baseline (100%) — H100 + Blackwell are NVIDIA's own silicon. Mainstream PyTorch / vLLM throughput on NVIDIA is the reference point against which all competitors are measured.",
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA is the baseline by construction — competitor benchmarks express their throughput as a fraction of (or beat of) H100 / Blackwell. Not a vendor claim; an artifact of how the industry measures inference performance.",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_cuda_exclusive_libs": {
+          "text": "TensorRT-LLM (CUDA-only, no ROCm port planned), FlashAttention 3 (CUDA-only as of 2026; ROCm has FlashAttention 2 via Triton for RDNA3 but not FA3 — missing FA3 reportedly costs 30-40% training throughput on 7B+ models per Spheron May 2026), NCCL collective communication (no ROCm equivalent), cuDNN, cuBLAS, Triton inference server — the library moat.",
+          "provenance": {
+            "status": "cited",
+            "source": "TensorRT-LLM CUDA-only confirmed by NVIDIA TensorRT documentation + multiple 2026 analyses (Spheron, Thundercompute). FlashAttention 3 ROCm gap quantified in Spheron May 2026 (30-40% training throughput cost at 7B+ models). NCCL has no ROCm equivalent per AMD ROCm compatibility docs.",
+            "source_url": "https://developer.nvidia.com/tensorrt",
+            "last_verified": "2026-05-25",
+            "notes": "Library moat is real, specific, and named. Workloads using TensorRT-LLM or FA3 stay on CUDA today; workloads on stock PyTorch / vLLM can move to ROCm but at variable performance cost."
+          }
+        },
+        "software_ecosystem_maturity": {
+          "text": "~20 years of CUDA ecosystem (released 2007). cuDNN, cuBLAS, TensorRT, NCCL, Triton inference server, NeMo, NIM. Compounding ecosystem moat: more libraries, more courses, more papers, more practitioner-hours, more tooling defaults. CUDA-first default for new research and ML infrastructure.",
+          "provenance": {
+            "status": "directional",
+            "source": "CUDA's ecosystem age (release year 2007) + library breadth + community size are documented across analyst reports + practitioner surveys. 'CUDA-first default' characterization is directional — no single measured KPI captures 'ecosystem maturity.'",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_switching_cost": {
+          "text": "High — CUDA-native codebases require port effort to alternatives; CUDA-exclusive libs (TensorRT-LLM, FA3, NCCL) have no full equivalent — porting requires re-implementation or accepting performance penalties; CUDA-first tooling default means new work tends to come up on CUDA first, perpetuating the gap.",
+          "provenance": {
+            "status": "directional",
+            "source": "Switching cost synthesized from practitioner reports of CUDA -> ROCm porting + analyst coverage (Spheron 2026, SemiAnalysis, Thundercompute 2026). Not a measured single number.",
+            "last_verified": "2026-05-25"
           }
         }
       }

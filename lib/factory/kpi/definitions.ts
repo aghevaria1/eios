@@ -290,6 +290,59 @@ export const KPI_DEFINITIONS: KpiDefinition[] = [
     dependencies: ['oem', 'isv'],
     description: 'OpEx component of TCO. ALWAYS directional band, NEVER point value, NEVER summed with CapEx by this module.',
   },
+
+  // ─────────────────────────────────────────────────────────
+  // Software-layer KPIs — added for phase 3c-2 step 2 (software-layer
+  // competitive scorecard: NVIDIA NVAIE/CUDA vs AMD ROCm). Text-valued
+  // KPIs (use the `text` field of KpiValue) — software comparisons are
+  // multi-attribute and qualitative, not single-number metrics.
+  // Honesty discipline still applies: each value carries provenance.
+  // ─────────────────────────────────────────────────────────
+  {
+    id: 'software_framework_support',
+    name: 'Framework support',
+    tier: 1,
+    dependencies: ['software'],
+    description:
+      'Which ML frameworks ship with first-class support for this software stack (PyTorch, vLLM, SGLang, MLX, etc.). Text-valued KPI; lists the supported frameworks.',
+  },
+  {
+    id: 'software_mainstream_inference',
+    name: 'Mainstream inference performance',
+    tier: 1,
+    dependencies: ['software'],
+    description:
+      'Relative performance on standard PyTorch / vLLM inference workloads vs the NVIDIA baseline. Workload-dependent (memory-bound and compute-bound benchmarks tell different stories).',
+    honesty_note:
+      'Performance is workload-dependent — memory-bound MI300X often beats H100; compute-bound H100 leads. Treat single-number "X% of H100" claims with care.',
+  },
+  {
+    id: 'software_cuda_exclusive_libs',
+    name: 'CUDA-exclusive libraries',
+    tier: 1,
+    dependencies: ['software'],
+    description:
+      'Which NVIDIA-only libraries (TensorRT-LLM, FlashAttention 3, NCCL) lack a full ROCm/competitor equivalent. The library moat — from NVIDIA POV: strength; from ROCm POV: the precise gap.',
+  },
+  {
+    id: 'software_ecosystem_maturity',
+    name: 'Ecosystem maturity',
+    tier: 1,
+    dependencies: ['software'],
+    description:
+      'Depth and breadth of the software ecosystem (libraries, docs, courses, papers, tooling defaults). Directional characterization, not a single number.',
+    honesty_note: 'Subjective characterization — directional by nature.',
+  },
+  {
+    id: 'software_switching_cost',
+    name: 'Switching cost',
+    tier: 1,
+    dependencies: ['software'],
+    description:
+      'Effort to port a codebase + tooling from this software stack to a competitor. High for CUDA-native codebases relying on CUDA-exclusive libs; lower for stacks already abstracted (PyTorch, vLLM, SGLang).',
+    honesty_note:
+      'Synthesized characterization based on practitioner reports + analyst coverage; not a measured single value.',
+  },
 ]
 
 export function getKpiById(id: string): KpiDefinition | undefined {

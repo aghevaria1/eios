@@ -20,6 +20,8 @@ const FABRIC_TARGET_IDS = [
 
 const BASELINE_GPU_ID = 'blackwell_b200'
 const AMD_TARGET_GPU_ID = 'amd_mi355x'
+const BASELINE_SOFTWARE_ID = 'nvaie'
+const AMD_TARGET_SOFTWARE_ID = 'amd_rocm'
 
 export default function CompetitivePage() {
   const knowledge = loadKnowledge()
@@ -52,12 +54,16 @@ export default function CompetitivePage() {
     return { component: targetFabric, report }
   })
 
-  // ── AMD full-stack replacement mode (GPU swap only this step) ──
+  // ── AMD full-stack replacement mode (L2 GPU swap quantified via applySwap;
+  // L4 + L5 verdicts surfaced qualitatively via LayerFightMap from the
+  // software components below — see amd-replacement-view.tsx) ──
   const baselineGpu = knowledge.components.get(BASELINE_GPU_ID)
   const amdTargetGpu = knowledge.components.get(AMD_TARGET_GPU_ID)
-  if (!baselineGpu || !amdTargetGpu) {
+  const baselineSoftware = knowledge.components.get(BASELINE_SOFTWARE_ID)
+  const amdTargetSoftware = knowledge.components.get(AMD_TARGET_SOFTWARE_ID)
+  if (!baselineGpu || !amdTargetGpu || !baselineSoftware || !amdTargetSoftware) {
     throw new Error(
-      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' or AMD target '${AMD_TARGET_GPU_ID}'`,
+      `competitive: missing baseline GPU '${BASELINE_GPU_ID}' / AMD target '${AMD_TARGET_GPU_ID}' / baseline software '${BASELINE_SOFTWARE_ID}' / AMD target software '${AMD_TARGET_SOFTWARE_ID}'`,
     )
   }
   const amdGpuReport = applySwap(baseline, {
@@ -100,6 +106,8 @@ export default function CompetitivePage() {
         fabricDefaultTargetId={DEFAULT_FABRIC_TARGET_ID}
         amdBaselineGpu={baselineGpu}
         amdTargetGpu={amdTargetGpu}
+        amdBaselineSoftware={baselineSoftware}
+        amdTargetSoftware={amdTargetSoftware}
         amdReport={amdGpuReport}
       />
     </div>

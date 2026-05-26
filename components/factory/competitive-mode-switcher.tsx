@@ -15,10 +15,14 @@ interface Props {
   fabricBaseline: Component
   fabricTargets: SwapTarget[]
   fabricDefaultTargetId: string
-  // AMD full-stack replacement mode (new — GPU swap only this phase; step 2
-  // adds the software layer)
+  // AMD full-stack replacement mode. Step 1 shipped the L2 GPU scorecard
+  // (amdBaselineGpu + amdTargetGpu + amdReport, single-slot GPU swap). Step 2
+  // adds the LayerFightMap which renders per-layer verdicts including L5
+  // (NVAIE vs ROCm) — requires the software-component pair passed through.
   amdBaselineGpu: Component
   amdTargetGpu: Component
+  amdBaselineSoftware: Component
+  amdTargetSoftware: Component
   amdReport: SwapReport
 }
 
@@ -28,6 +32,8 @@ export function CompetitiveModeSwitcher({
   fabricDefaultTargetId,
   amdBaselineGpu,
   amdTargetGpu,
+  amdBaselineSoftware,
+  amdTargetSoftware,
   amdReport,
 }: Props) {
   const [mode, setMode] = useState<CompetitiveMode>('slot')
@@ -45,6 +51,8 @@ export function CompetitiveModeSwitcher({
         <AmdReplacementView
           baselineGpu={amdBaselineGpu}
           targetGpu={amdTargetGpu}
+          baselineSoftware={amdBaselineSoftware}
+          targetSoftware={amdTargetSoftware}
           report={amdReport}
         />
       )}
