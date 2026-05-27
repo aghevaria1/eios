@@ -263,7 +263,7 @@ function SegmentTabs({
           SEGMENT
         </div>
         <div className="mt-1 text-xs text-gray-400">
-          Five customer segments seeded with delivered KPIs and RA blends.
+          Six customer segments seeded with delivered KPIs and RA blends.
           Switch to recompose the architect view — engine output is
           deterministic; no LLM call on switch.
         </div>
