@@ -126,6 +126,27 @@ npm run build    # production build
 
 ---
 
+## Roadmap — where this goes next
+
+The architecture was chosen for evolution. Two improvements, one story: make the retrieval and tool layers explicit, and the whole app becomes live. *(Framed as the designed-for trajectory — not capability the app claims today.)*
+
+**1. Make RAG + MCP explicit (the mechanism).** Today the knowledge is seeded JSON resolved by a deterministic engine — the retrieval and tool layers are implicit. The next layer makes them first-class: a retrievable vector corpus (RAG) over the knowledge base, and live source/tool ingestion via MCP. (This is a pattern proven elsewhere in production — it's an architectural maturation, not a rewrite.)
+
+**2. Real-time industry updates (the capability it unlocks).** When a competitor ships a capability or a vendor signs a new ISV, the app ingests it and every view + brief re-projects — because all views are projections of one provenance-tagged knowledge base. One change, propagated everywhere, with the honesty model intact.
+
+The two connect as a single pipeline extension:
+
+```
+new competitor / partner move
+        │
+        ▼
+   MCP ingests  →  RAG corpus updates  →  provenance-tagged KB updates  →  every view + brief re-projects
+```
+
+The single-source-of-truth knowledge base (one KB feeding all views) was a deliberate choice precisely to make this propagation possible — the roadmap is what the architecture was designed to enable, not a bolt-on.
+
+---
+
 ## The six customer segments
 
 | Segment | Optimizes for |
