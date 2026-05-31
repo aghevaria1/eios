@@ -11,3 +11,5 @@ data/eios.db
 .DS_Store
 .claude/
 tsconfig.tsbuildinfo
+
+.vercel
