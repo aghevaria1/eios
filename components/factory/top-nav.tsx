@@ -21,13 +21,15 @@ const V3_NAV = [
   { label: 'Architect', href: '/factory/architect' },
   { label: 'Competitive', href: '/factory/competitive' },
   { label: 'Partner', href: '/factory/partner' },
+  { label: 'Prioritization', href: '/factory/prioritization' },
 ]
 
 function isV3Route(pathname: string): boolean {
   return (
     pathname.startsWith('/factory/architect') ||
     pathname.startsWith('/factory/competitive') ||
-    pathname.startsWith('/factory/partner')
+    pathname.startsWith('/factory/partner') ||
+    pathname.startsWith('/factory/prioritization')
   )
 }
 
