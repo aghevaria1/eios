@@ -1,7 +1,0 @@
-INCIDENT-004 | pod-beta | 2025-12-10 | CRITICAL
-Node: pod-beta (NVIDIA B200) | Customer: Cisco
-Anomaly: Sudden drop in tokens/sec from 880 to 120. Utilization paradoxically low at 34%.
-Root Cause: NVLink fabric degradation caused inter-GPU communication bottleneck. Compute available but throughput collapsed.
-Action Taken: Emergency failover to pod-alpha. Cisco notified. NVLink reset performed.
-SLA Impact: Cisco SLA breached for 6 minutes. Penalty: $6,000. Recovery faster than manual baseline by 14 minutes.
-Resolution: NVLink fabric reset restored full throughput. Root cause logged for hardware team.

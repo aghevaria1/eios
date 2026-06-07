@@ -1,8 +1,0 @@
-INCIDENT-011 | pod-alpha | 2026-02-02 | HIGH
-Node: pod-alpha (NVIDIA B200) | Customer: Cisco
-Anomaly: Sustained utilization at 96% for 45 minutes during 3am scheduled batch window.
-Token throughput declining 2% per minute. Memory pressure at 185GB of 192GB.
-Root Cause: Batch job scheduled without accounting for concurrent real-time inference load.
-Action Taken: Batch job paused. Real-time traffic prioritized. Batch rescheduled to 5am.
-SLA Impact: Cisco latency SLA at risk but not breached. Proactive action successful.
-Resolution: Scheduling system updated to reserve 20% headroom for real-time burst capacity.

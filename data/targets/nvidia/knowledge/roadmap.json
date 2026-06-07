@@ -1,0 +1,93 @@
+{
+  "version": "0.1.0",
+  "last_verified": "2026-05-20",
+  "time_axis": [
+    {
+      "phase": "in-flight",
+      "timeframe": "now (2024-2026)",
+      "components": ["blackwell_b200", "blackwell_b300", "rtx_pro_6000", "connectx_8", "nvidia_spectrum_x", "nvidia_quantum_x800"],
+      "headline": "Blackwell generation deployed",
+      "provenance": {
+        "status": "cited",
+        "source": "NVIDIA Blackwell product line is shipping (B200, B300, GB200 NVL72 deployed at hyperscalers).",
+        "last_verified": "2026-05-20"
+      }
+    },
+    {
+      "phase": "coming-next",
+      "timeframe": "H2 2026",
+      "headline": "Vera Rubin generation — NVL144 + NVL144 CPX",
+      "vera_rubin": {
+        "memory_per_gpu": {
+          "range": { "min": 288, "max": 288, "unit": "GB HBM4" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "User-specified per NVIDIA GTC 2025 announcement.",
+            "last_verified": "2026-05-20",
+            "notes": "Pending verification against NVIDIA newsroom URL."
+          }
+        },
+        "memory_bandwidth_per_gpu": {
+          "range": { "min": 13, "max": 13, "unit": "TB/s (approx)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "User-specified per GTC 2025 (~13 TB/s).",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "nvl144_performance": {
+          "inference_fp4_ef": {
+            "range": { "min": 3.6, "max": 3.6, "unit": "NVFP4 EF (inference)" },
+            "provenance": {
+              "status": "directional",
+              "flag": "verify-needed",
+              "source": "User-specified per GTC 2025 — NVL144 = 3.6 NVFP4 EF inference.",
+              "last_verified": "2026-05-20"
+            }
+          },
+          "training_fp8_ef": {
+            "range": { "min": 1.2, "max": 1.2, "unit": "FP8 EF (training)" },
+            "provenance": {
+              "status": "directional",
+              "flag": "verify-needed",
+              "source": "User-specified per GTC 2025 — NVL144 = 1.2 FP8 EF training.",
+              "last_verified": "2026-05-20"
+            }
+          }
+        },
+        "nvl144_cpx_separate_sku": {
+          "performance_ef": {
+            "range": { "min": 8, "max": 8, "unit": "EF" },
+            "provenance": {
+              "status": "directional",
+              "flag": "verify-needed",
+              "source": "User-specified per GTC 2025 — NVL144 CPX is a SEPARATE SKU at 8 EF; keep distinct from NVL144.",
+              "last_verified": "2026-05-20",
+              "notes": "Critical to NOT conflate NVL144 (3.6/1.2 EF) and NVL144 CPX (8 EF) — they are distinct products."
+            }
+          }
+        },
+        "networking": {
+          "nvlink_generation": "NVLink 6",
+          "dpu": "BlueField-4",
+          "supernic": "ConnectX-9"
+        }
+      }
+    },
+    {
+      "phase": "future",
+      "timeframe": "2027+",
+      "headline": "Optical / Co-Packaged Optics (CPO)",
+      "components": ["corning_cpo"],
+      "narrative": "Transition from copper to fiber at scale; Corning CPO and similar optical interconnect technologies become the rack-scale interconnect.",
+      "provenance": {
+        "status": "directional",
+        "source": "Industry direction — Corning + NVIDIA + others working on CPO. Public statements indicate H2 2027+ deployment.",
+        "last_verified": "2026-05-20",
+        "notes": "Pre-product direction; verify against specific NVIDIA / Corning announcements."
+      }
+    }
+  ]
+}

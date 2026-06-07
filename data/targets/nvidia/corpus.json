@@ -1,0 +1,138 @@
+[
+  {
+    "id": "b200-memory-capacity",
+    "source": "knowledge/stack.json",
+    "title": "NVIDIA Blackwell B200 — Memory Capacity (verified)",
+    "section": "Compute Specs",
+    "page": null,
+    "text": "NVIDIA Blackwell B200 ships with 192 GB HBM3e per GPU as the nominal datasheet figure. Detailed datasheet entries report 186 GB on some lines; cloud consoles often display approximately 180 GB usable per instance due to vendor overhead. The 192 GB nominal value is the canonical figure; the 186 and 180 deltas are documentation and usable-overhead nuances, not separate SKUs. Memory type is HBM3e. Source: NVIDIA HGX B200 datasheet. Provenance tag: cited."
+  },
+  {
+    "id": "b200-memory-bandwidth",
+    "source": "knowledge/stack.json",
+    "title": "NVIDIA Blackwell B200 — Memory Bandwidth (verified)",
+    "section": "Compute Specs",
+    "page": null,
+    "text": "NVIDIA Blackwell B200 delivers 8 TB/s of HBM3e memory bandwidth per GPU. This figure is confirmed directly from the NVIDIA HGX B200 datasheet — not derived from system-level totals. Per-GPU memory bandwidth at this magnitude is one of the architectural levers for Frontier AI Labs training workloads (Time-to-Train, MFU) where HBM bandwidth is the critical-path bottleneck for tightly-coupled tensor operations. Provenance tag: cited."
+  },
+  {
+    "id": "b200-flops-fp4-dense",
+    "source": "knowledge/stack.json",
+    "title": "NVIDIA Blackwell B200 — FP4 Tensor Core (verified)",
+    "section": "Compute Specs",
+    "page": null,
+    "text": "NVIDIA Blackwell B200 delivers 9 PFLOPS FP4 dense per GPU; the sparse 2:1 ratio yields 18 PFLOPS FP4 sparse per GPU. The widely-quoted marketing figure of 20 PFLOPS FP4 is the sparse 2:1 number. When comparing across vendors the dense versus sparse distinction matters because vendor marketing materials do not always make the attribution explicit. Source: NVIDIA HGX B200 datasheet. Provenance tag: cited."
+  },
+  {
+    "id": "b200-flops-fp8-pending",
+    "source": "knowledge/stack.json",
+    "title": "NVIDIA Blackwell B200 — FP8 Tensor Core (pending verification)",
+    "section": "Compute Specs",
+    "page": null,
+    "text": "NVIDIA Blackwell B200 FP8 dense per-GPU performance reads approximately 9 PFLOPS from the HGX B200 datasheet individual-GPU column. Dense versus sparse attribution is not yet confirmed for FP8; this value is tagged directional with a verify-needed flag. Note: an earlier internal record listed 4.5 PFLOPS for FP8 — that was the FP16/BF16 figure mislabeled and has been corrected. Provenance tag: directional, pending dense/sparse confirmation."
+  },
+  {
+    "id": "arch-hgx-positioning",
+    "source": "knowledge/architectures.json",
+    "title": "HGX — workhorse architecture for train + inference",
+    "section": "Architecture Positioning",
+    "page": null,
+    "text": "HGX is the 8-GPU baseboard format used in OEM servers across AI infrastructure. It carries Blackwell B200 or B300 GPUs, x86 or NVIDIA Vera CPU options, fifth-generation NVLink for GPU-GPU interconnect. Default fabric is NVIDIA Spectrum-X Ethernet. HGX is the workhorse choice for both training and large-batch inference. The OEM ecosystem includes Dell PowerEdge XE9680 plus equivalent Lenovo, Supermicro, HPE, and Cisco offerings. Source: NVIDIA HGX product page. Provenance tag: cited."
+  },
+  {
+    "id": "arch-nvl72-positioning",
+    "source": "knowledge/architectures.json",
+    "title": "NVL72 — frontier rack-scale architecture",
+    "section": "Architecture Positioning",
+    "page": null,
+    "text": "GB200 NVL72 is the rack-scale frontier configuration: 72 Blackwell GPUs and 36 Grace CPUs in a single liquid-cooled rack, connected via fifth-generation NVLink. The system targets the largest training and inference workloads where Frontier AI Labs anchor on MFU and Time-to-Train. Liquid cooling is non-optional at this density. Default fabric is NVIDIA Spectrum-X or Quantum-X800. Source: NVIDIA GB200 NVL72 product page. Provenance tag: cited."
+  },
+  {
+    "id": "amd-helios-moat-framing",
+    "source": "knowledge/competitors.json",
+    "title": "AMD Helios MI455X — competitive moat framing (verbatim)",
+    "section": "Full-cake replacement",
+    "page": null,
+    "text": "AMD has hardware parity and a memory-bandwidth edge with the MI455X, but ROCm has NOT reached CUDA's ecosystem maturity, and TensorRT-LLM is NVIDIA-only and won't run on ROCm. AMD's Helios rack of 72 MI455X targets Q3 2026 and represents the most credible full-cake replacement to date. The decisive moat is software: CUDA ecosystem depth and TensorRT-LLM availability, not raw silicon performance. Provenance tag: cited."
+  },
+  {
+    "id": "hyperscaler-custom-silicon-additive",
+    "source": "knowledge/competitors.json",
+    "title": "Hyperscaler custom silicon — additive, not replacement",
+    "section": "Full-cake replacement (Hyperscaler segment only)",
+    "page": null,
+    "text": "Hyperscaler custom silicon — Google TPU v7 Ironwood, AWS Trainium 3, Microsoft Maia 200, Meta MTIA 400 — is additive to NVIDIA, not a replacement. Pattern: hyperscalers use custom silicon for INTERNAL workloads (claimed 30-60% per-query inference savings on internal workloads), and NVIDIA for MERCHANT cloud where external customers want CUDA. Internal-workload adoption tracks around 15-20% per analyst coverage. Hyperscaler segment only — does not generalize. Provenance tag: claimed (vendor) for the savings figure, cited for the additive pattern."
+  },
+  {
+    "id": "cornelis-cn5000-claimed-perf",
+    "source": "knowledge/competitors.json",
+    "title": "Cornelis CN5000 — claimed fabric performance",
+    "section": "Fabric alternative",
+    "page": null,
+    "text": "Cornelis CN5000, the current 400G Omni-Path generation, carries vendor-claimed performance: 45% lower latency vs 400G InfiniBand NDR; 800M to 1.6B messages per second; 2x application speedup on 8-node HPC workloads. These are CLAIMED (vendor benchmarks), not neutral measurements. The compare-against in the latency claim is NVIDIA Quantum-2 NDR 400G. Roadmap: CN5000 today → CN6000 800G RoCEv2 in 2026 → CN7000 1.6T UEC in 2027. Source: Cornelis CN5000 positioning materials. Provenance tag: claimed (Cornelis)."
+  },
+  {
+    "id": "fabric-collective-op-scale-conditional",
+    "source": "knowledge/competitors.json",
+    "title": "Fabric collective-op — scale-conditional outcome",
+    "section": "Fabric — collective-op",
+    "page": null,
+    "text": "Fabric collective-op performance (AllReduce, AllGather, reduce-scatter) is scale-conditional. Cornelis wins at small-node HPC (vendor cites 2x application speedup on 8-node HPC; small-cluster MPI workloads). NVIDIA wins at large scale via SHARP and NCCL — in-network compute collapses collective overhead as cluster size grows. Breakpoint estimate: Cornelis advantage erodes beyond approximately 16-32 nodes; the SHARP/NCCL gap widens with node count. There is no single winner. Provenance tags: cited (NVIDIA SHARP/NCCL docs), claimed (Cornelis small-scale)."
+  },
+  {
+    "id": "segment-frontier-ai-labs",
+    "source": "knowledge/segments.json",
+    "title": "Frontier AI Labs — segment profile",
+    "section": "Customer Segments",
+    "page": null,
+    "text": "Frontier AI Labs (Anthropic, xAI, OpenAI, Mistral) are the model-training labs at the frontier. North-star KPIs: MFU (Model FLOPS Utilization) and Time-to-Train. Supporting KPIs: checkpoint/resume latency, interconnect throughput. These customers buy NVL72 rack-scale configurations at the largest cluster sizes, typically ten thousand-plus GPUs. Time-to-Train compresses competitive cycles for model releases; HBM bandwidth and collective throughput are the architectural levers."
+  },
+  {
+    "id": "segment-hyperscalers",
+    "source": "knowledge/segments.json",
+    "title": "Hyperscalers — segment profile",
+    "section": "Customer Segments",
+    "page": null,
+    "text": "Hyperscalers (Azure, GCP, AWS) operate at fleet scale across many tenants and workloads. North-star KPI: TCO per token. Supporting KPIs: PUE, fleet availability, hardware density. Internal workloads sometimes use custom silicon for cost optimization; merchant cloud workloads stay on NVIDIA because external customers want CUDA. The TCO equation is dominated by power efficiency, hardware density per rack, and software-ecosystem fit. Custom silicon adoption is additive to the NVIDIA fleet, not replacement."
+  },
+  {
+    "id": "segment-fortune-500",
+    "source": "knowledge/segments.json",
+    "title": "Fortune 500 Enterprise — segment profile",
+    "section": "Customer Segments",
+    "page": null,
+    "text": "Fortune 500 Enterprise (JPMorgan-class regulated enterprises) deploy production AI workloads under audit and compliance regimes. North-star KPI: Production ROI. Supporting KPIs: inference p99 latency, deployment cycle time, compliance audit time. These customers value the OEM partnership ecosystem (Dell, HPE, Lenovo) for service footprint and Red Hat OpenShift AI or VMware Private AI Foundation for governed-platform deployment. KPI emphasis is on deployment velocity and audit readiness, not raw compute throughput."
+  },
+  {
+    "id": "segment-sovereign-ai",
+    "source": "knowledge/segments.json",
+    "title": "Sovereign AI — segment profile",
+    "section": "Customer Segments",
+    "page": null,
+    "text": "Sovereign AI (G42 UAE, EU AI Factory programs, EuroHPC, allied-nation initiatives) anchor on data residency and vendor-independence requirements. North-star KPI: Data residency (percent of compute and data staying within sovereign boundary). Supporting KPIs: air-gap capability, portability index, security perimeter. Compliance with BIS export-control framework and NDAA-clean supply-chain provenance are non-optional purchase criteria. Custom silicon adoption is low; CUDA ecosystem familiarity carries weight in long-term strategic planning."
+  },
+  {
+    "id": "segment-industry-verticals",
+    "source": "knowledge/segments.json",
+    "title": "Industry Verticals — segment profile",
+    "section": "Customer Segments",
+    "page": null,
+    "text": "Industry Verticals (Mayo Clinic healthcare AI, Tier-1 manufacturing digital twins, autonomous driving safety stacks) deploy domain-specific AI under strict safety regimes. North-star KPIs: Domain accuracy and Safety latency. Supporting KPIs: edge compute efficiency, digital-twin sync latency, safety certification (FDA, IEC 61508, ISO 26262). Edge deployments use RTX PRO-class hardware. Software stack emphasizes certification readiness and domain-specific accuracy over raw throughput."
+  },
+  {
+    "id": "nvaie-software-ecosystem",
+    "source": "knowledge/stack.json",
+    "title": "NVIDIA AI Enterprise (NVAIE) — software ecosystem",
+    "section": "L5 — Software",
+    "page": null,
+    "text": "NVIDIA AI Enterprise (NVAIE) wraps the NVIDIA AI software ecosystem: CUDA, cuDNN, TensorRT-LLM, NeMo, NIM (NVIDIA Inference Microservices), Dynamo orchestration, NeMo Guardrails. TensorRT-LLM is CUDA-only by design and does NOT run on AMD ROCm. The L3 ISV layer (Red Hat OpenShift AI, VMware Private AI Foundation, Nutanix Enterprise AI, VAST Data) provides enterprise-platform integration. The combination is the broadest commercially-supported enterprise AI software portfolio on the market. Provenance tag: cited."
+  },
+  {
+    "id": "roadmap-vera-rubin-nvl144",
+    "source": "knowledge/roadmap.json",
+    "title": "Roadmap — Vera Rubin (H2 2026)",
+    "section": "Coming-next generation",
+    "page": null,
+    "text": "Vera Rubin (H2 2026) is the next generation after Blackwell: 288 GB HBM4 per GPU, approximately 13 TB/s bandwidth, NVLink 6, BlueField-4 DPU, ConnectX-9 SuperNIC. Two distinct SKUs to keep separate: NVL144 (3.6 NVFP4 EF inference, 1.2 FP8 EF training) and NVL144 CPX (8 EF — a SEPARATE SKU at higher peak throughput). Conflating NVL144 and NVL144 CPX is a common error. Provenance tag: directional (user-specified per GTC 2025; pending NVIDIA newsroom URL verification)."
+  }
+]

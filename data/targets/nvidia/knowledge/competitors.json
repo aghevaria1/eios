@@ -1,0 +1,717 @@
+{
+  "version": "0.7.0",
+  "last_verified": "2026-05-26",
+  "categories": {
+    "full_cake_replacement": {
+      "description": "Replaces the NVIDIA stack end-to-end. Examples: AMD Helios, hyperscaler custom silicon (where applicable).",
+      "members": ["amd_mi355x", "amd_helios_mi455x", "hyperscaler_custom_silicon"]
+    },
+    "fabric_alternatives": {
+      "description": "Replaces ONLY the fabric layer within the cake. The rest of the NVIDIA stack remains.",
+      "members": ["nvidia_spectrum_x", "nvidia_quantum_x800", "broadcom_jericho_tomahawk", "arista_ethernet", "cornelis_cn6000", "cornelis_cn5000"]
+    },
+    "software_alternatives": {
+      "description": "Replaces ONLY the software wrapper / programming-stack layer. The rest of the NVIDIA stack (GPU + fabric + OEM + ISV) remains. Currently: NVIDIA NVAIE (CUDA-rooted) vs AMD ROCm. Phase 3c-2 step 2 will render this as a software-layer scorecard extending the AMD full-stack-replacement view.",
+      "members": ["nvaie", "amd_rocm"]
+    },
+    "uec_coalition": {
+      "description": "Ultra Ethernet Consortium members — open-standard fabric coalition. Includes AMD, Cornelis, Broadcom, hyperscalers. Broadcom designs hyperscaler chips, making them a double enabler.",
+      "members_summary": "AMD + Cornelis + Broadcom + major hyperscalers",
+      "provenance": {
+        "status": "cited",
+        "source": "Ultra Ethernet Consortium public member roster.",
+        "source_url": "https://ultraethernet.org",
+        "last_verified": "2026-05-20"
+      }
+    },
+    "paradigm_alternative": {
+      "description": "Architecturally different machines that do NOT decompose into NVIDIA's L1-L5 layer model. Adopting them is a re-architecture, not a stack swap. Currently: Cerebras WSE-3 (wafer-scale inference appliance). Rendered via the layer-fight-map PARADIGM state across all bands + a cross-layer ParadigmContrast explainer panel.",
+      "members": ["cerebras_wse3"]
+    },
+    "customer_self_supply": {
+      "description": "NVIDIA's biggest customers becoming their own suppliers via vertical integration. Strategic-context entries — NOT layer-fight-map competitors (most chips are internal / captive and not publicly benchmarked vs NVIDIA spec-for-spec; forcing them onto the cake would mis-frame a market-structure threat as a spec fight). Differentiated by MATURITY; the spread across the 4 is the insight (NOT a monolith). Currently: Google TPU v7 Ironwood (most mature + only merchant) / AWS Trainium3 (commercial volume + NVLink Fusion coexistence) / Meta MTIA (narrow + internal) / Microsoft Maia 200 (least mature + OpenAI-volume-justified). Rendered via the HyperscalerSelfSupplyView strategic panel (header framing + 4 maturity-differentiated cards + 5-facet calibrated verdict). On the switching-cost spectrum: this is the buyer-exits-the-market end.",
+      "members": ["google_tpu", "aws_trainium3", "meta_mtia", "microsoft_maia200"]
+    }
+  },
+  "components": [
+    {
+      "id": "amd_rocm",
+      "name": "AMD ROCm (CUDA-equivalent software stack)",
+      "category": "software_alternatives",
+      "layer": "L5",
+      "slot": "software",
+      "vendor": "amd",
+      "generation": "current",
+      "positioning": "AMD's CUDA-equivalent open-source software stack. Runs on AMD Instinct (MI300X / MI355X / MI455X). ROCm 7.x is the current generation (recent releases through ROCm 7.2.x per AMD ROCm release docs). Mainstream PyTorch / vLLM / SGLang inference path is viable today; the moat that remains is CUDA's library exclusivity (TensorRT-LLM, FlashAttention 3) and ~20-year ecosystem depth. Paired with amd_mi355x (current GPU) for the full-stack-replacement competitive view.",
+      "moat_framing": "ROCm has made real progress on mainstream inference — PyTorch + vLLM + SGLang all have official ROCm support, and MI300X/MI355X are competitive with H100/B200 on memory-bound workloads. The remaining gap is precise: (1) CUDA-exclusive libraries (TensorRT-LLM, FlashAttention 3) with no full ROCm equivalent — missing FA3 reportedly costs 30-40% training throughput on 7B+ models per Spheron May 2026; (2) CUDA's ~20-year ecosystem depth (cuDNN, cuBLAS, TensorRT, NCCL); (3) CUDA-first default for new research and tooling. The switching cost is high but workload-dependent — viable for mainstream PyTorch/vLLM workflows, costly for CUDA-native codebases with exclusive-lib dependencies. NEVER claim ROCm parity with CUDA; NEVER claim ROCm broken — the honest read is 'depends what you're building.'",
+      "kpi_values": {
+        "software_framework_support": {
+          "text": "PyTorch, vLLM, SGLang official ROCm support (ROCm 7.x current generation; PyTorch ships ROCm-native paths; vLLM has official ROCm support with AMD Zen CPU backend + RDNA 3.5/4 device IDs; SGLang inference performance testing documented on ROCm). Additional: FlashInfer, llama.cpp. Training frameworks: Megatron-LM, verl.",
+          "provenance": {
+            "status": "cited",
+            "source": "AMD ROCm Compatibility Matrix + ROCm 7.x release notes + vLLM official ROCm path + SGLang inference docs on ROCm. Cross-confirmed across AMD docs + framework release notes.",
+            "source_url": "https://rocm.docs.amd.com/en/latest/compatibility/compatibility-matrix.html",
+            "last_verified": "2026-05-25",
+            "notes": "Official support across major ML frameworks is verified across multiple sources. Specific 'ROCm 7.2 / Jan 2026' release timing not independently confirmed in web search; ROCm 7.x is the current generation per AMD docs (releases through 7.2.x referenced)."
+          }
+        },
+        "software_mainstream_inference": {
+          "text": "Workload-dependent. Memory-bound inference: MI300X often beats H100 (~40% lower latency on Llama-2-70B per Clarifai / Tensorwave 2026 benchmarks). Compute-bound: H100 leads (vLLM ROCm latency 37-75% higher than H200 in some configurations per aimultiple 2026). The optimistic '~90-95% of H100 throughput' framing applies to specific PyTorch/vLLM workloads but does not cleanly verify as a single number.",
+          "provenance": {
+            "status": "claimed",
+            "flag": "verify-needed",
+            "claimed_by": "amd (positioning) + mixed independent benchmark coverage",
+            "source": "Independent benchmarks split by workload type. Clarifai + Tensorwave + SemiAnalysis 2026 coverage shows MI300X memory-bound wins (Llama-2-70B ~40% lower latency, Llama3 405B + DeepSeekv3 670B absolute + per-dollar wins). aimultiple 2026 + ROCm vLLM docs show vLLM ROCm-vs-CUDA latency gap on compute-bound (MI300X 37-75% higher latency than H200 in tested configurations).",
+            "source_url": "https://www.clarifai.com/blog/mi300x-vs-h100",
+            "last_verified": "2026-05-25",
+            "notes": "WORKLOAD-DEPENDENT — not directly comparable as a single number. Memory-bound MI300X often wins; compute-bound H100 leads. Software stack maturity gap between vLLM ROCm vs CUDA is the structural variable. The '~90-95%' figure originates in optimistic vendor + early-benchmark framing; conservative independent reads show wider variance. Pill flagged VERIFY-NEEDED to reflect this. Honest read: 'competitive on mainstream PyTorch / vLLM inference, workload-dependent — neither vendor cleanly wins across the board.'"
+          }
+        },
+        "software_cuda_exclusive_libs": {
+          "text": "Gap, not strength: TensorRT-LLM (NVIDIA-only, no ROCm equivalent — confirmed AMD ROCm docs + Spheron 2026 + Thundercompute 2026); FlashAttention 3 (CUDA-only as of 2026 — AMD has FlashAttention 2 via Triton for RDNA3 since ROCm 6.4 March 2025, but FA3 port incomplete; missing FA3 costs 30-40% training throughput on 7B+ models per Spheron May 2026); NCCL collective comm (no ROCm equivalent). This is the precise library moat ROCm has NOT closed.",
+          "provenance": {
+            "status": "cited",
+            "source": "Multiple 2026 analyses confirm: TensorRT-LLM is CUDA-only by design with no ROCm port (Spheron, SemiAnalysis, Thundercompute 2026 comparisons). FlashAttention 3 ROCm port incomplete — AMD PyTorch compatibility docs acknowledge FA3 integration but practitioners report FA3 gap costs 30-40% training throughput on 7B+ models (Spheron May 2026 quantification).",
+            "source_url": "https://www.spheron.network/blog/rocm-vs-cuda-gpu-cloud-2026/",
+            "last_verified": "2026-05-25",
+            "notes": "The library moat is real, specific, and NAMED. Not 'ROCm is broken' — it's 'ROCm doesn't have THESE specific libraries.' Workloads using TensorRT-LLM or FA3 should stay on CUDA; workloads on stock PyTorch / vLLM can move with variable performance cost."
+          }
+        },
+        "software_ecosystem_maturity": {
+          "text": "ROCm is closing the depth gap (ROCm 7.x release cadence + framework integration progress) but is not at CUDA parity. CUDA has ~20 years of compounding ecosystem (released 2007); ROCm has been on the modern AI-targeted cadence for roughly half that. Library breadth (cuDNN / cuBLAS / TensorRT / NCCL) and CUDA-first tooling default remain the structural moat.",
+          "provenance": {
+            "status": "directional",
+            "source": "Comparative ecosystem-maturity characterization synthesized from CUDA release timeline + practitioner survey coverage + analyst reports (Spheron 2026, Thundercompute 2026). Directional — no single measured KPI captures 'ecosystem maturity.'",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_switching_cost": {
+          "text": "High but workload-dependent. CUDA-native codebases (especially those depending on TensorRT-LLM, FlashAttention 3, or NCCL) require significant port effort + performance acceptance penalty. Codebases already abstracted (PyTorch + vLLM + SGLang) port with less friction — these frameworks have official ROCm paths. CUDA-first tooling default for new research/work perpetuates the asymmetry.",
+          "provenance": {
+            "status": "directional",
+            "source": "Switching cost characterization synthesized from practitioner reports of CUDA -> ROCm porting efforts + analyst coverage (Spheron 2026, Thundercompute 2026). The high/workload-dependent split is the structurally honest read.",
+            "last_verified": "2026-05-25"
+          }
+        }
+      }
+    },
+    {
+      "id": "amd_mi355x",
+      "name": "AMD Instinct MI355X (CDNA 4, current shipping)",
+      "category": "full_cake_replacement",
+      "slot": "gpu",
+      "vendor": "amd",
+      "generation": "current",
+      "positioning": "Current-shipping AMD AI accelerator (launched 12 June 2025, CDNA 4 / 3nm / 185B transistors, 1400W TBP liquid-cooled). The honest current-generation contemporary of NVIDIA Blackwell B200 — both shipping today, hardware close to parity. AMD's 2026 roadmap successor is Helios MI455X (separate component, generation: roadmap).",
+      "moat_framing": "Hardware is near-parity with B200 (memory capacity leads, bandwidth ties, FP4 essentially even, FP8 close). AMD's gap is ROCm vs CUDA — ROCm has been closing the gap but is not at parity, and TensorRT-LLM remains NVIDIA-only and won't run on ROCm. The moat conversation has moved from silicon to software; the 2026 generation (MI455X) extends the spec lead but does not bridge the ROCm-vs-CUDA gap.",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 288, "max": 288, "unit": "GB HBM3e" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "amd",
+            "source": "AMD Instinct MI355X product page + datasheet brief — 288 GB HBM3e per GPU, 4th Gen CDNA architecture. Confirmed across multiple sources (AMD product page, Wikipedia AMD Instinct table, Oracle OCI deployment blog, Flopper.io spec sheet).",
+            "source_url": "https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html",
+            "last_verified": "2026-05-25",
+            "notes": "Per-GPU figure — 50% larger than Blackwell B200 (192 GB). Vendor-claimed (AMD source materials); pill renders CLAIMED. Both products are shipping today (MI355X launched 12 June 2025) — the CITED-vs-CLAIMED distinction reflects evidence basis (NVIDIA datasheet-confirmed vs AMD vendor-stated), NOT announced-vs-shipping."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 8, "max": 8, "unit": "TB/s" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "amd",
+            "source": "AMD Instinct MI355X product brief — 8 TB/s memory bandwidth (HBM3e). Multiple sources confirm (AMD product page, Wikipedia, Flopper.io).",
+            "source_url": "https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html",
+            "last_verified": "2026-05-25",
+            "notes": "At parity with B200's 8 TB/s. Vendor-claimed (AMD source materials); both shipping today. The CITED-vs-CLAIMED pill split reflects evidence basis only."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 9.2, "max": 9.2, "unit": "PFLOPS FP4 (dense, vendor 'up to' figure)" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "amd",
+            "source": "AMD MI355X product materials cite 'up to 9.2 PetaFLOPS FP4' (per AMD product page summary). Consistent with Wikipedia's reported 20.1 PFLOPS FP4 (with sparsity) / 2x dense:sparse ratio = ~10 PFLOPS dense. Vendor figure-spread is within ~10% noise — 9.2 is the AMD-cited dense number.",
+            "source_url": "https://www.amd.com/en/products/accelerators/instinct/mi350/mi355x.html",
+            "last_verified": "2026-05-25",
+            "notes": "DENSE / SPARSE caveat applies — AMD has not always explicitly stated dense vs sparse split in announcement materials; figure may not be apples-to-apples with NVIDIA B200's explicit dense/sparse split (9 PFLOPS dense / 18 PFLOPS sparse). Comparison vs B200's 9 PFLOPS FP4 dense is near-parity (~9.2 vs ~9, within ~2% — clean PARITY for the scorecard's ~5% tolerance). The parity finding holds regardless of small vendor-claim variance."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 5, "max": 5, "unit": "PFLOPS FP8 (dense, approx)" },
+          "provenance": {
+            "status": "claimed",
+            "flag": "verify-needed",
+            "claimed_by": "amd",
+            "source": "Tom's Hardware ISSCC 2026 article reports MI355X at 'five petaflops of FP8 compute, a 1.9x improvement over MI300X' (per-CU FP8 throughput doubled from 4,096 to 8,192 FLOPS/clock — implied dense matrix figure). Other published figures vary widely: Flopper.io lists 10.1 PFLOPS FP8; AMD platform materials cite 40.3 PFLOPS FP8 matrix dense and 80.5 PFLOPS with sparsity — these likely measure different scopes (per-GPU matrix vs scalar, OCP-FP8 vs general FP8).",
+            "source_url": "https://www.tomshardware.com/tech-industry/semiconductors/inside-the-instinct-mi355x",
+            "last_verified": "2026-05-25",
+            "notes": "DENSE/SPARSE caveat applies (AMD has not explicitly stated; figures depend on measurement methodology). Figure-spread across sources (5, 10.1, 40.3, 80.5 PFLOPS) reflects different measurement scopes — flagged VERIFY-NEEDED in addition to CLAIMED until reconciled against AMD's authoritative datasheet. Comparison vs B200's 9 PFLOPS FP8 dense (itself verify-needed) — BOTH sides low-confidence on this axis, scorecard renders UNRESOLVED rather than a winner."
+          }
+        }
+      }
+    },
+    {
+      "id": "amd_helios_mi455x",
+      "name": "AMD Helios (MI455X / MI450)",
+      "category": "full_cake_replacement",
+      "slot": "gpu",
+      "vendor": "amd",
+      "generation": "roadmap",
+      "positioning": "Full-stack replacement. Helios rack = 72x MI455X (analogous to NVL72), targeting H2 2026 per AMD CES 2026 positioning.",
+      "moat_framing": "AMD has hardware parity / a memory-bandwidth edge, but ROCm has NOT reached CUDA's ecosystem maturity, and TensorRT-LLM is NVIDIA-only and won't run on ROCm.",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 432, "max": 432, "unit": "GB HBM4" },
+          "provenance": {
+            "status": "claimed",
+            "source": "AMD MI455X / Helios announcement materials (per user-supplied competitor brief).",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-21",
+            "notes": "AMD's own announcement figures for a pre-launch product (Helios targeting Q3 2026). Vendor-claim, not a shipping datasheet measurement — pill renders CLAIMED so the evidentiary weight reads honestly alongside cited NVIDIA datasheet specs in head-to-head views."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 19.6, "max": 19.6, "unit": "TB/s" },
+          "provenance": {
+            "status": "claimed",
+            "source": "AMD MI455X announcement materials.",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-21",
+            "notes": "Pre-launch announcement figure; pill renders CLAIMED to distinguish from independent / datasheet citations."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 40, "max": 40, "unit": "PFLOPS FP4" },
+          "provenance": {
+            "status": "claimed",
+            "source": "AMD MI455X announcement materials.",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-21",
+            "notes": "Pre-launch announcement figure; pill renders CLAIMED to distinguish from independent / datasheet citations. AMD has not specified dense vs sparse in announcement materials — figure may not be apples-to-apples with NVIDIA B200's explicit dense/sparse split (9 PFLOPS dense / 18 PFLOPS sparse)."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 20, "max": 20, "unit": "PFLOPS FP8" },
+          "provenance": {
+            "status": "claimed",
+            "source": "AMD MI455X / CES 2026 announcement materials — 'up to 20 PFLOPS at FP8 precision' per GPU.",
+            "claimed_by": "amd",
+            "last_verified": "2026-05-21",
+            "notes": "Pre-launch announcement figure (Helios H2 2026). Vendor-claim, pill CLAIMED. Note: AMD has not explicitly stated dense vs sparse; treat the comparison vs NVIDIA B200's 9 PFLOPS FP8 dense (verify-needed itself) with care."
+          }
+        }
+      }
+    },
+    {
+      "id": "hyperscaler_custom_silicon",
+      "name": "Hyperscaler Custom Silicon (TPU v7 / Trainium 3 / Maia 200 / MTIA 400)",
+      "category": "full_cake_replacement",
+      "slot": "gpu",
+      "vendor": "various",
+      "positioning_scope": "Hyperscaler segment ONLY — internal workloads. ADDITIVE to NVIDIA, not replacement: hyperscalers use custom silicon for internal training/inference and NVIDIA for MERCHANT cloud (external customers want CUDA).",
+      "kpi_values": {
+        "compute_tco_per_token_internal": {
+          "band": "wins",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "hyperscalers (Google, AWS, Microsoft, Meta)",
+            "source": "Per-query inference savings cited at ~30-60% for internal workloads on custom silicon vs NVIDIA.",
+            "last_verified": "2026-05-20",
+            "notes": "Vendor-claimed figure on internal workloads only. Does not transfer to merchant cloud."
+          }
+        },
+        "compute_tco_per_token_merchant": {
+          "band": "loses",
+          "provenance": {
+            "status": "directional",
+            "source": "Merchant cloud customers want CUDA — NVIDIA wins this slice. Hyperscaler custom silicon does not address external customers.",
+            "last_verified": "2026-05-21",
+            "notes": "Re-tagged from cited to directional in phase 3c-0 — this is an analytical assertion about merchant-cloud preferences, not a specific independent citation or vendor benchmark. Directional band better matches the evidentiary shape."
+          }
+        },
+        "deployment_adoption_internal": {
+          "range": { "min": 15, "max": 20, "unit": "% of hyperscaler internal-workload share" },
+          "provenance": {
+            "status": "cited",
+            "source": "Analyst coverage of hyperscaler internal-workload adoption of custom silicon (additive to NVIDIA).",
+            "last_verified": "2026-05-20",
+            "notes": "Range estimate from public analyst coverage; verify against specific reports."
+          }
+        }
+      }
+    },
+    {
+      "id": "broadcom_jericho_tomahawk",
+      "name": "Broadcom Tomahawk Ultra (Ethernet for AI scale-up)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "broadcom",
+      "generation": "current",
+      "positioning": "Within-cake fabric swap. Tomahawk Ultra is Broadcom's AI-optimized merchant Ethernet switch chip (announced + shipping mid-2025) — 51.2 Tbps total switch capacity, 64x 800GbE ports, 250 ns port-to-port latency, 77 billion PPS. Pin-compatible with Tomahawk 5 for fast OEM time-to-market. Broadcom also designs hyperscaler custom AI chips and supplies the Jericho3-AI silicon inside Arista 7800R4/7700R4 — making Broadcom a double enabler (fabric chip + ODM silicon).",
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port (51.2 Tb/s total switch capacity)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Broadcom Tomahawk Ultra announcement materials + Broadcom investor release (2025): 51.2 Tbps switch, 64 ports of 800/400/200/100 GbE.",
+            "source_url": "https://www.broadcom.com/company/news/product-releases/63341",
+            "last_verified": "2026-05-21",
+            "notes": "Structured switch-chip nameplate spec, parallel to NVIDIA SN5600 datasheet."
+          }
+        },
+        "fabric_latency": {
+          "range": { "min": 250, "max": 250, "unit": "ns port-to-port" },
+          "provenance": {
+            "status": "cited",
+            "source": "Broadcom Tomahawk Ultra announcement + HPCwire coverage (2025) — explicit 250 ns port-to-port delay figure published as a structured product spec.",
+            "source_url": "https://www.hpcwire.com/off-the-wire/broadcom-ships-tomahawk-ultra-ethernet-switch-with-250ns-latency-for-ai-and-hpc/",
+            "last_verified": "2026-05-21",
+            "notes": "Rare among fabric vendors — Broadcom publishes a specific cited per-hop latency. NVIDIA Spectrum-X and Cornelis CN6000 do not publish single per-hop figures. Demo-narration framing: TRANSPARENCY, NOT NECESSARILY SUPERIORITY — head-to-head latency comparison favors Broadcom's evidence base over vendors whose per-hop latency is unpublished, but a missing number from NVIDIA/Cornelis is NOT evidence of worse performance. The honest read is 'Broadcom is the only one publishing the number,' not 'Broadcom is the fastest.'"
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 77000, "max": 77000, "unit": "million packets/sec (= 77 billion PPS)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Broadcom Tomahawk Ultra announcement materials — 77 billion packets per second wire-speed at 64-byte packets.",
+            "source_url": "https://www.broadcom.com/company/news/product-releases/63341",
+            "last_verified": "2026-05-21",
+            "notes": "Packet rate, not MPI-style message rate — NOT directly comparable to Cornelis's million-msg/sec figures (different methodology). Both are fabric-throughput-related but vendors measure different things; flagging the asymmetry in this note for honest heat-map rendering."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "disaggregation / flexibility — merchant silicon Ethernet, customer chooses switch vendor and software independently",
+          "provenance": {
+            "status": "directional",
+            "source": "Broadcom positioning emphasizes merchant-silicon Ethernet (UEC participant) vs NVIDIA's integrated stack. Tomahawk Ultra's pin-compatibility with Tomahawk 5 supports the disaggregated-ODM narrative.",
+            "last_verified": "2026-05-21"
+          }
+        }
+      }
+    },
+    {
+      "id": "arista_ethernet",
+      "name": "Arista 7800R4 / 7700R4 Etherlink (AI fabric platform)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "arista",
+      "generation": "current",
+      "positioning": "Within-cake fabric swap. Etherlink is Arista's AI networking platform — 7800R4 AI Spine (up to 460 Tbps single chassis, 576x 800GbE ports) + 7700R4 Distributed Etherlink Switch (DES) scaling to 27,000+ 800GbE ports across 3-tier deployments. Built on Broadcom Jericho3-AI silicon with Arista EOS software differentiation. Co-developed with Meta. Shipping.",
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port (line-card up to 28.8 Tb/s; chassis up to 460 Tb/s)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Arista 7800R4 Series AI Spine + 7700R4 Distributed Etherlink Switch datasheets — 800GbE line cards, 10.8B PPS, 28.8 Tb/s per line card, 460 Tb/s per chassis.",
+            "source_url": "https://www.arista.com/assets/data/pdf/Datasheets/7800R4-Series-AI-Spine-Datasheet.pdf",
+            "last_verified": "2026-05-21",
+            "notes": "Structured datasheet nameplate spec. 800 Gbps per port matches NVIDIA SN5600 and Broadcom Tomahawk Ultra — not an Arista performance differentiator at port level; differentiation is at platform scale (3-tier DES → 27,000 ports) and EOS software."
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 10800, "max": 10800, "unit": "million packets/sec per line card (= 10.8 billion PPS)" },
+          "provenance": {
+            "status": "cited",
+            "source": "Arista 7800R4 line-card datasheet — 10.8 billion PPS per line card.",
+            "source_url": "https://www.arista.com/assets/data/pdf/Datasheets/7800R4-Series-AI-Spine-Datasheet.pdf",
+            "last_verified": "2026-05-21",
+            "notes": "Per-line-card packet rate, not per-switch or per-port. Like Broadcom's figure, packet rate not MPI-style msg/sec — different methodology than Cornelis. Aggregate chassis rate scales with line-card count."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "disaggregation / flexibility — open Ethernet platform, EOS software, scales via distributed DES architecture",
+          "provenance": {
+            "status": "directional",
+            "source": "Arista positioning emphasizes open Ethernet + EOS software vs vendor-locked fabric. Etherlink platform's 3-tier DES architecture is the platform-scale differentiator over leaf-spine.",
+            "last_verified": "2026-05-21"
+          }
+        }
+      }
+    },
+    {
+      "id": "cornelis_cn6000",
+      "name": "Cornelis CN6000 (800G RoCEv2 + UEC, current-gen announced)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "cornelis",
+      "generation": "current",
+      "positioning": "Current-generation announced fabric baseline. Announced Nov 18 2025; customer sampling mid-2026, production to follow. Multi-protocol single-platform fabric: Omni-Path + Ethernet RoCEv2 + Ultra Ethernet (UEC) on one switch. Cornelis co-developed libfabric and is a founding UEC member.",
+      "performance_vs_prior": {
+        "text": "2x the performance of CN5000",
+        "provenance": {
+          "status": "claimed",
+          "claimed_by": "cornelis",
+          "source": "Cornelis CN6000 announcement (Nov 18 2025) positioning vs prior-gen CN5000.",
+          "last_verified": "2026-05-21",
+          "notes": "Generation-jump vendor claim; pre-production. Component-level metadata (not a KPI) because relative-to-own-prior-gen is not a comparable dependency-graph metric."
+        }
+      },
+      "protocol": {
+        "text": "multi-protocol — Omni-Path + Ethernet RoCEv2 + Ultra Ethernet (UEC) compliant on a single platform",
+        "provenance": {
+          "status": "cited",
+          "source": "Cornelis CN6000 announcement materials (Nov 2025) — stated multi-protocol capability + UEC standard compliance.",
+          "last_verified": "2026-05-21",
+          "notes": "Structural product spec (capability declaration + standards compliance), not a performance claim — pill renders CITED."
+        }
+      },
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "cited",
+            "source": "Cornelis CN6000 announcement (Nov 18 2025) — 800 Gbps per port; structured product nameplate spec, parallel to NVIDIA SN5600 and Broadcom Tomahawk Ultra 800GbE.",
+            "last_verified": "2026-05-21",
+            "notes": "Nameplate port spec for a pre-production product. Cited consistent with how CN5000's 400G nameplate is cited and how NVIDIA Spectrum-X is cited."
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 1600, "max": 1600, "unit": "million msg/sec (vendor 'industry-highest' claim)" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN6000 announcement materials — 'up to 1.6 billion msg/sec, industry-highest.' Pre-production figure.",
+            "last_verified": "2026-05-21",
+            "notes": "Vendor pre-production claim, MPI-style message rate; sky-pill CLAIMED. Different methodology than Broadcom/Arista's packet-rate (PPS) figures — not directly comparable but both are fabric throughput metrics."
+          }
+        },
+        "fabric_latency": {
+          "band": "low",
+          "text": "ultra-low latency, deterministic at scale (lightweight QPs + RoCEv2 In-Flight table)",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN6000 positioning — qualitative claim; no published per-hop latency figure for CN6000 yet.",
+            "last_verified": "2026-05-21",
+            "notes": "Qualitative vendor positioning, not a numeric figure. Pill renders CLAIMED. Compare-against: Broadcom Tomahawk Ultra publishes specific 250 ns cited; CN6000 chose qualitative framing."
+          }
+        },
+        "fabric_collective_op": {
+          "scale_conditional": {
+            "small_scale": "Cornelis wins (carrying forward CN5000's small-node HPC strength — RoCEv2 + UEC architecture preserves the tail-latency-determinism profile)",
+            "large_scale": "verify-needed — CN6000's RoCEv2 / UEC design at large scale not yet independently measured; NVIDIA SHARP/NCCL large-scale advantage remains cited from CN5000-era comparison",
+            "breakpoint": "verify-needed — CN6000 breakpoint not yet established; CN5000's was ~16-32 nodes"
+          },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Carried forward from CN5000's scale-conditional framing; CN6000's RoCEv2/UEC redesign may shift the breakpoint but no independent benchmark exists pre-production.",
+            "last_verified": "2026-05-21",
+            "notes": "Directional + verify-needed honestly reflects that CN6000's collective-op shape is not yet measurable; do not assert CN5000-equivalent breakpoint without confirmation."
+          }
+        },
+        "fabric_cost_capex_directional": {
+          "band": "medium",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis CN6000 positioning — typically below NVIDIA per-port at director-class scale, above merchant Ethernet (carried forward from CN5000-era characterization; no pre-production list pricing).",
+            "last_verified": "2026-05-21",
+            "notes": "Directional band only. No published per-port CapEx for CN6000."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "extreme-performance-tuning + multi-protocol flexibility",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis CN6000 positioning extends the CN5000 'extreme-performance-tuning' archetype with multi-protocol single-platform flexibility (Omni-Path + RoCEv2 + UEC).",
+            "last_verified": "2026-05-21"
+          }
+        }
+      }
+    },
+    {
+      "id": "cornelis_cn5000",
+      "name": "Cornelis CN5000 (Omni-Path, prior-gen reference)",
+      "category": "fabric_alternatives",
+      "slot": "fabric",
+      "vendor": "cornelis",
+      "generation": "prior",
+      "positioning": "Prior-generation reference. CN5000 400G Omni-Path → CN6000 800G RoCEv2 + UEC (current, announced Nov 2025) → CN7000 1.6T UEC (roadmap, 2027). Kept seeded as the comparison baseline showing Cornelis's 2x generation-jump claim.",
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 400, "max": 400, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "cited",
+            "source": "Cornelis CN5000 Omni-Path Switch Product Brief.",
+            "source_url": "https://www.cornelis.com/product/cornelis-cn5000-omni-path-switch",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "fabric_latency": {
+          "band": "low",
+          "text": "Cornelis claims 45% lower latency vs 400G InfiniBand NDR",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN5000 positioning materials.",
+            "last_verified": "2026-05-20",
+            "notes": "Vendor benchmark — NOT a neutral measurement. Compare-against is NVIDIA Quantum-2 NDR 400G."
+          }
+        },
+        "fabric_message_rate": {
+          "range": { "min": 800, "max": 1600, "unit": "million msg/sec" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis",
+            "source": "Cornelis CN5000 positioning materials (800M-1.6B msg/sec).",
+            "last_verified": "2026-05-21",
+            "notes": "Vendor figure. MPI-style message rate — different methodology than Broadcom/Arista's packet-rate (PPS) figures; NOT directly comparable. Do not rank against PPS values in a head-to-head heat-map: msg/sec ≠ PPS (category-error risk). Both measure fabric throughput, but the vendor measurement frames are different."
+          }
+        },
+        "fabric_collective_op": {
+          "scale_conditional": {
+            "small_scale": "Cornelis wins — small-node HPC. Vendor cites 2x application speedup on 8-node HPC.",
+            "large_scale": "NVIDIA wins via SHARP / NCCL — in-network compute advantages emerge at large scale.",
+            "breakpoint": "Cornelis advantage erodes as cluster scales beyond ~16-32 nodes; SHARP/NCCL gap widens with node count."
+          },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cornelis (small-scale claim); cited (large-scale via NVIDIA SHARP docs)",
+            "source": "Cornelis 2x app speedup on 8-node HPC is vendor-claimed. NVIDIA SHARP/NCCL large-scale advantage is documented public knowledge.",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "fabric_cost_capex_directional": {
+          "band": "medium",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis pricing positioning — typically below NVIDIA per-port at director-class scale, above merchant Ethernet.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band only."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "extreme-performance-tuning",
+          "provenance": {
+            "status": "directional",
+            "source": "Cornelis positioning emphasizes tail-latency determinism and MPI tightly-coupled HPC — buyers chose Cornelis when raw collective-op performance at small/medium scale is the priority.",
+            "last_verified": "2026-05-20"
+          }
+        }
+      }
+    },
+    {
+      "id": "cerebras_wse3",
+      "name": "Cerebras WSE-3 (wafer-scale inference appliance)",
+      "category": "paradigm_alternative",
+      "slot": "paradigm",
+      "vendor": "cerebras",
+      "generation": "current",
+      "positioning": "ALTERNATIVE PARADIGM. Cerebras does NOT decompose into NVIDIA's L1-L5 layer model — the WSE-3 is a single wafer with 900,000 cores, 4T transistors, 44GB on-chip SRAM, and ~21 PB/s on-chip bandwidth, packaged in the CS-3 appliance (~23 kW). The architectural thesis: by eliminating inter-chip communication entirely, the wafer removes the multi-GPU-cluster bottleneck that bounds NVIDIA distributed-GPU collective performance. Adopting Cerebras is a re-architecture, not a slot-swap. Public + validated (IPO May 2026, OpenAI 750 MW / $10-20B multi-year, AWS Bedrock Mar 2026) but narrow in workload-fit (inference-specific, Llama-class reasoning sweet spot) and small relative to NVIDIA (NVIDIA ~90% accelerator share, ~423× Cerebras revenue).",
+      "moat_framing": "Cerebras is the cleanest PARADIGM-state case in the demo: respect the architecture (real, novel, validated at the public-market level), size the scale honestly (fast-growing sliver, not imminent displacement), and locate NVIDIA's moat in the layers Cerebras structurally cannot fill — breadth, full training+inference range, the CUDA/NVAIE ecosystem, and the flexibility to deploy across the full workload spectrum. The 3-facet verdict (SERIOUS-BUT-NARROW + NICHE-SHARP + MARKET-ARC) all three must hold simultaneously — cherry-picking 'serious' alone would inflate the threat; cherry-picking 'niche' alone would dismiss real validation. The honest read is calibrated: precision strike on a specific inference niche, not a stack swap.",
+      "kpi_values": {
+        "paradigm_wafer_architecture": {
+          "text": "900,000 cores · 4 trillion transistors · 125 PF peak · 44 GB on-chip SRAM · ~21 PB/s on-chip bandwidth (~2,625× NVIDIA B200) · CS-3 appliance ~23 kW · NO inter-chip communication latency (the multi-GPU-cluster bottleneck — eliminated by the monolithic-wafer architecture)",
+          "provenance": {
+            "status": "cited",
+            "source": "Cerebras WSE-3 product specifications + CS-3 appliance datasheet, corroborated by independent semiconductor analyst coverage (SemiAnalysis, AnandTech, Tom's Hardware). The ~2,625× bandwidth comparison vs B200 is structurally derived from published per-component bandwidth figures.",
+            "last_verified": "2026-05-25",
+            "notes": "Architecture facts are CITED + structurally verifiable (transistor count, core count, on-chip memory, on-chip bandwidth) — the no-inter-chip-latency thesis is the architecturally real consequence of the wafer-scale design."
+          }
+        },
+        "paradigm_inference_claims": {
+          "text": "Up to 21× faster than NVIDIA DGX B200 on Llama 3 70B reasoning (specific token configuration) · ~32% lower TCO on the same workload · Meta Llama API integration showing 18× inference speedup · OpenAI deployments at 1,000+ tokens/sec",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "cerebras",
+            "source": "Cerebras vendor benchmarks + customer-facing performance materials (Cerebras inference launch announcement; Meta Llama API performance disclosures; OpenAI deployment metrics released alongside the 750 MW partnership announcement).",
+            "last_verified": "2026-05-25",
+            "flag": "verify-needed",
+            "notes": "CAUTION — vendor-benchmarked, workload-specific. The 21× / 18× / 1,000+ tok/sec figures are bound to specific workloads (Llama-class reasoning, specific token configurations). NOT a general speedup. NEVER render as 'Cerebras is 21× faster' flat. Workload-fit + benchmark-scope caveats are mandatory framing — without them, the claim overreaches."
+          }
+        },
+        "paradigm_market_position": {
+          "text": "IPO May 2026 (valuation + raise figures vary across sources — note the spread, do not assert one number) · OpenAI 750 MW / $10-20B multi-year deal · AWS CS-3 access via Bedrock (Mar 2026) · G42 customer-concentration moderating 85% → 24% · SCALE CHECK: NVIDIA ~90% AI accelerator share, ~423× Cerebras revenue ratio · Note: the OpenAI deal temporarily restricts Cerebras sales to Anthropic (sourced market-dynamics, not editorializing)",
+          "provenance": {
+            "status": "cited",
+            "source": "Public S-1 / IPO filings + Cerebras press releases + OpenAI partnership announcement + AWS Bedrock availability announcement + analyst coverage (The Information, Reuters, CNBC, semiconductor-analyst reports for the share + revenue ratio).",
+            "last_verified": "2026-05-25",
+            "notes": "MANDATORY framing: the NVIDIA ~90% share + ~423× revenue scale-check is what keeps 'serious + validated' from inflating to 'imminent displacement.' Cerebras is a fast-growing sliver of a fast-growing market, NOT a stack-replacement threat. IPO valuation + raise figures are noted as a source-spread rather than asserted — sources do not agree on a single number. The OpenAI-restricts-to-Anthropic clause is sourced market-dynamics; surfaced as fact, not editorialized as competitive-warfare-strategy."
+          }
+        }
+      }
+    },
+    {
+      "id": "google_tpu",
+      "name": "Google TPU v7 Ironwood",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "google",
+      "generation": "current",
+      "positioning": "The MOST MATURE + ONLY MERCHANT-AMBITION self-supply program. Google TPU is the longest-running customer-built AI silicon program (since 2015) and the only one moving beyond its origin cloud — external + on-prem deployments are underway, and Meta is reportedly in talks for billions in TPU purchases. Co-designed with Broadcom + MediaTek. Gemini 3 trained on TPU. This is the self-supply chip with merchant-vendor characteristics, which makes it the most direct customer-becoming-supplier-becoming-competitor path of the 4.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "MOST MATURE + MERCHANT — the only self-supply program with merchant-vendor characteristics (external / on-prem deployment beyond Google Cloud; Meta in talks)",
+          "provenance": {
+            "status": "cited",
+            "source": "Google Cloud TPU v7 Ironwood announcement + Meta-in-talks-for-TPUs coverage (Reuters, The Information, CNBC 2026). Google TPU has been in production since 2015 — the longest-running custom AI silicon program among hyperscalers.",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "v7 Ironwood · ~10× prior generation · ~42.5 exaflops per pod · 192 GB HBM3e per chip · Broadcom + MediaTek co-design",
+          "provenance": {
+            "status": "cited",
+            "source": "Google Cloud TPU v7 Ironwood specifications + Google Cloud Next 2026 announcements; Broadcom + MediaTek co-design partnership disclosed in Google blog + semiconductor analyst coverage (SemiAnalysis, Tom's Hardware).",
+            "last_verified": "2026-05-26",
+            "notes": "Public specs are CITED via Google announcements. NOT independently benchmarked vs NVIDIA B200 spec-for-spec — market-structure analysis, not spec comparison."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "Generally Available on Google Cloud. Moving beyond GCP via external + on-prem partnerships. Meta in talks for billions in TPU purchases (reported, Reuters / The Information). Gemini 3 trained on TPU.",
+          "provenance": {
+            "status": "cited",
+            "source": "Google Cloud TPU availability + Meta-in-talks coverage (Reuters, The Information, CNBC 2026) + Gemini 3 training disclosure (Google announcements).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Most direct self-supply-becomes-competitor path of the 4. Customers picking TPU outside GCP move workloads off NVIDIA more decisively than other hyperscaler chips. BUT: frontier model partnerships across the industry still flow through NVIDIA for cross-vendor compatibility; Google itself still buys NVIDIA for many GCP workloads.",
+          "provenance": {
+            "status": "cited",
+            "source": "Industry analyst coverage of TPU merchant deployments + Google Cloud's continued NVIDIA H100 / B200 availability for customers who require it.",
+            "last_verified": "2026-05-26",
+            "notes": "Coexistence is real even for the merchant-threat case — Google sells both TPU and NVIDIA capacity on GCP; the threat is in customer-share trajectory, not zero-sum replacement."
+          }
+        }
+      }
+    },
+    {
+      "id": "aws_trainium3",
+      "name": "AWS Trainium3",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "aws",
+      "generation": "current",
+      "positioning": "COMMERCIAL VOLUME + the MOST EXPLICIT COEXISTENCE signal. Trainium3 went GA December 2025 (3nm, 2.52 PFLOPS FP8) and is anchored by Anthropic + OpenAI workloads driving AWS volume. The defining coexistence signal: Trainium4 integrates NVLink Fusion (AWS-NVIDIA collaboration) — AWS is NOT trying to replace NVIDIA wholesale; the partnership says 'self-supply specific workloads + NVIDIA stays for the rest.' This is the not-zero-sum case in its purest form across the 4.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "COMMERCIAL VOLUME + COEXISTENCE — anchored by Anthropic + OpenAI for volume; coexists explicitly with NVIDIA via NVLink Fusion in Trainium4",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS re:Invent 2025 Trainium3 GA announcement + Anthropic / OpenAI Trainium adoption coverage + AWS-NVIDIA NVLink Fusion partnership announcement (re:Invent 2025).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "GA December 2025 · 3nm process · 2.52 PFLOPS FP8 · anchored by Anthropic + OpenAI workloads on AWS",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS Trainium3 specifications (AWS re:Invent 2025) + Anthropic + OpenAI Trainium adoption (AWS press releases, customer case studies).",
+            "last_verified": "2026-05-26",
+            "notes": "Public AWS-published specs. NOT independently benchmarked vs NVIDIA B200 spec-for-spec — workload-specific deployment, not spec comparison."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "GA on AWS only (captive cloud — NOT merchant; you can rent Trainium3 capacity on AWS, but Trainium3 chips do not ship outside AWS). Anthropic + OpenAI workloads driving production volume.",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS Trainium3 availability is AWS-cloud-only by design (AWS Trainium product positioning).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Trainium4 integrates NVLink Fusion (AWS-NVIDIA collaboration announced re:Invent 2025) — the most explicit coexistence signal across the 4 hyperscaler programs. AWS is NOT trying to replace NVIDIA wholesale; the partnership says 'self-supply specific workloads + NVIDIA stays for the rest.' AWS continues to sell NVIDIA H100 / B200 / GB200 capacity at scale.",
+          "provenance": {
+            "status": "cited",
+            "source": "AWS-NVIDIA NVLink Fusion partnership announcement (AWS re:Invent 2025 + NVIDIA GTC announcements) + AWS continued NVIDIA capacity (P5 / P5e instance families).",
+            "last_verified": "2026-05-26"
+          }
+        }
+      }
+    },
+    {
+      "id": "meta_mtia",
+      "name": "Meta MTIA (gens 300 / 400 / 500)",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "meta",
+      "generation": "current",
+      "positioning": "NARROW + INTERNAL — 100,000s of units deployed inside Meta (Facebook + Instagram inference workloads); NOT sold externally. RISC-V architecture, gens 300 / 400 / 500 in production. The defining limit-of-own-program signal: Meta is in talks to license or buy Google TPUs (billions, reported) — Meta hedges across NVIDIA + MTIA + (potentially) TPU. NOT 'Meta replaces NVIDIA with MTIA'; it's 'multi-vendor diversification.' Meta still buys NVIDIA for frontier training at scale.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "NARROW + INTERNAL — 100,000s deployed but production-only-inside-Meta, no external availability; Meta in talks for Google TPUs (limits-of-own-program signal)",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta MTIA deployment scale (Meta engineering blog + analyst coverage); Meta-in-talks-for-Google-TPUs coverage (Reuters, The Information 2026).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "MTIA generations 300 / 400 / 500 · RISC-V architecture · 100,000s of units deployed in Meta production (FB + IG inference)",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta engineering blog + RISC-V Foundation announcements + semiconductor-analyst coverage of MTIA generations.",
+            "last_verified": "2026-05-26",
+            "notes": "MTIA is internal-only by design — no public spec-vs-NVIDIA benchmarks exist. Architecture facts are CITED via Meta disclosures."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "Internal-only. 100,000s of MTIA units in Meta production for FB + IG inference workloads. NOT for sale externally. Meta uses NVIDIA for frontier training + MTIA for specific inference workloads — coexistence within Meta is multi-vendor by design.",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta engineering blog disclosures + analyst coverage of Meta's multi-vendor AI infrastructure strategy.",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Multi-vendor pattern within Meta. NVIDIA for training + MTIA for inference; reportedly exploring TPU adoption (billions, in talks) — Meta hedges across multiple silicon vendors, not replacing NVIDIA with MTIA. The Meta-in-talks-for-TPU signal explicitly bounds MTIA's own-program reach.",
+          "provenance": {
+            "status": "cited",
+            "source": "Meta multi-vendor infrastructure strategy coverage + Meta-in-talks-for-Google-TPUs reporting (Reuters, The Information 2026).",
+            "last_verified": "2026-05-26",
+            "notes": "Coexistence is real AND the in-talks-for-TPU signal shows the limits of any single self-supply program — even Meta hedges."
+          }
+        }
+      }
+    },
+    {
+      "id": "microsoft_maia200",
+      "name": "Microsoft Maia 200",
+      "category": "customer_self_supply",
+      "slot": "self-supply",
+      "vendor": "microsoft",
+      "generation": "current",
+      "positioning": "LEAST MATURE — earliest of the 4 self-supply programs. Maia 200 (3nm, 216 GB HBM3e, vendor-claimed ~3× Trainium3 FP4 — claimed, not independently benchmarked) is ramping; OpenAI's Azure compute volume justifies the program economically. OpenAI continues to use NVIDIA + AWS Trainium in parallel — Microsoft hasn't replaced NVIDIA volume; Maia adds capacity for OpenAI-specific workloads. Earliest of the 4, not the most concerning to NVIDIA today.",
+      "kpi_values": {
+        "self_supply_maturity_tier": {
+          "text": "LEAST MATURE — earliest of the 4 programs; OpenAI's Azure compute volume is what justifies Maia economically (anchor-customer-driven, not broad-platform)",
+          "provenance": {
+            "status": "cited",
+            "source": "Microsoft Ignite 2025 Maia 200 announcement + OpenAI Azure compute volume coverage + semiconductor-analyst comparisons across the 4 hyperscaler programs.",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_chip_specs": {
+          "text": "Maia 200 · 3nm process · 216 GB HBM3e · vendor-claimed ~3× Trainium3 FP4 (CLAIMED only — not independently benchmarked)",
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "microsoft",
+            "source": "Microsoft Maia 200 specifications (Microsoft Ignite 2025); the 3× Trainium3 FP4 figure is a Microsoft vendor claim.",
+            "last_verified": "2026-05-26",
+            "flag": "verify-needed",
+            "notes": "The 3× Trainium3 FP4 claim is vendor-stated and not independently benchmarked. Maia 200 is internal-Azure-only; no public head-to-head benchmarks vs NVIDIA exist."
+          }
+        },
+        "self_supply_deployment_state": {
+          "text": "Ramping on Azure. OpenAI's Azure compute volume justifies the program economically. OpenAI continues using NVIDIA + AWS Trainium in parallel — Maia adds capacity, NOT a replacement.",
+          "provenance": {
+            "status": "cited",
+            "source": "Microsoft Ignite 2025 + OpenAI multi-vendor compute coverage (The Information, Reuters 2026).",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "self_supply_coexistence_signal": {
+          "text": "Multi-vendor pattern. OpenAI uses NVIDIA + AWS Trainium + Microsoft Maia simultaneously across its compute footprint. Microsoft has NOT replaced NVIDIA on Azure; Maia adds capacity for OpenAI-specific workloads. Earliest of the 4 programs — least mature, least concerning to NVIDIA today.",
+          "provenance": {
+            "status": "cited",
+            "source": "OpenAI multi-vendor compute strategy (The Information, Reuters, CNBC 2026); Microsoft Azure continued NVIDIA H100 / B200 capacity at scale.",
+            "last_verified": "2026-05-26"
+          }
+        }
+      }
+    }
+  ]
+}

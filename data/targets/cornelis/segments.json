@@ -1,0 +1,492 @@
+[
+  {
+    "id": "federal-hpc",
+    "name": "Federal HPC",
+    "subtitle": "DOE / NNSA / federal labs — tier-1 customer base",
+    "badge": "STRONGEST",
+    "is_stub": false,
+    "workload": {
+      "primary_mix": [
+        "Tightly-coupled MPI: climate / weather modeling",
+        "Nuclear weapons stewardship",
+        "Molecular dynamics, CFD, materials science",
+        "AI-for-science overlay (surrogate models, inverse problems)"
+      ],
+      "typical_scale": "1,000 to 10,000 nodes per cluster at the lab tier; flagship systems (Frontier, Aurora, El Capitan) at 50K+ nodes.",
+      "critical_characteristics": [
+        "Collective-heavy communication patterns (AllReduce, AllGather, AlltoAll)",
+        "Strong-scaling sensitivity",
+        "Long-running campaigns (days to weeks per job)",
+        "Multi-PI sharing with strict queue policies"
+      ],
+      "latency_budget": "Sub-microsecond MPI message latency required; tail-latency variance matters more than median — a single straggling rank stalls the entire collective.",
+      "bottleneck_profile": "Network injection rate and collective tail latency at scale — endpoint NIC behavior under congestion is the differentiator, not raw bandwidth.",
+      "buying_criteria": [
+        "Predictable tail latency",
+        "Mature MPI/libfabric stack",
+        "US-based supply chain (NDAA / Trade Agreements Act compliance)",
+        "10-year lifecycle support",
+        "Established federal procurement vehicle (GSA, SEWP, ITES)"
+      ]
+    },
+    "architecture": {
+      "products": ["CN6000 SuperNIC", "Omni-Path Express (OPA)", "Director-Class Switch"],
+      "descriptions": [
+        "CN6000 at 800 Gbps per port; one NIC per compute node",
+        "Native OPA protocol — purpose-built for tightly-coupled MPI collectives",
+        "Director-class fabric switch with up to 576 ports for fat-tree topologies"
+      ],
+      "protocol_reasoning": "Ten years of OPA MPI collective optimization deliver predictable tail latency under congestion — what RoCEv2 still tunes for and UEC hasn't replicated."
+    },
+    "channel": {
+      "oem_odm": [
+        { "name": "HPE Cray", "role": "Primary federal HPC OEM — EX-series systems with Cornelis interconnect option" },
+        { "name": "Penguin Solutions", "role": "Federal HPC integrator — TrueHPC platform, longstanding Cornelis/Intel OPA relationship" },
+        { "name": "Supermicro", "role": "Reference designs for academic and federal lab procurements" }
+      ],
+      "hpc_isvs": ["Slurm (workload manager)", "OpenMPI", "MVAPICH2", "libfabric (OFI provider)", "OpenSHMEM", "Intel MPI"],
+      "ai_ml_isvs": ["PyTorch (distributed)", "JAX", "Megatron-LM", "FlexFlow"],
+      "day1_isv_priority": "Slurm topology-aware scheduling + libfabric OPA provider certification on CN6000 — gates federal procurement."
+    },
+    "tco": {
+      "deployment_scenario": "1,000-node tier-1 federal HPC deployment — CN6000 SuperNICs + Director-Class switches",
+      "baseline_size": 1000,
+      "default_horizon_years": 3,
+      "cornelis_3yr_tco_M": 8.4,
+      "nvidia_3yr_tco_M": 11.6,
+      "broadcom_3yr_tco_M": 9.8,
+      "advantage_drivers": [
+        "Lower per-port cost vs InfiniBand NDR/XDR director-class fabric",
+        "Mature OPA stack reduces tuning labor (~$300K/yr saved per analyst estimate)",
+        "US-based supply chain — no ITAR friction, predictable federal procurement lead times"
+      ],
+      "sensitivity_inputs": {
+        "supply_lead_time_weeks": { "default": 16, "min": 8, "max": 32 },
+        "deployment_size": { "default": 1000, "min": 500, "max": 5000 }
+      }
+    },
+    "value_proposition": {
+      "statement": "Predictable MPI tail latency, NDAA-clean US supply chain, and 10-year lifecycle — built for federal HPC procurement.",
+      "competitive_position": [
+        { "vs": "NVIDIA InfiniBand (NDR/XDR)", "angle": "Lower MPI tail-latency variance; lower per-port cost at director scale; established federal footprint." },
+        { "vs": "Broadcom Tomahawk + UEC", "angle": "Decade of OPA MPI collective optimization; UEC ecosystem still maturing through 2027." },
+        { "vs": "Cisco / Arista Ethernet (RoCEv2)", "angle": "OPA is purpose-built for tightly-coupled MPI; generic Ethernet needs per-deployment DCQCN tuning." }
+      ]
+    },
+    "sources": [
+      { "id": 1, "section": "workload", "description": "DOE Office of Science HPC procurement public materials (CTS-3, El Capitan workload mix)" },
+      { "id": 2, "section": "architecture", "description": "Cornelis CN6000 product announcement (Nov 2025)" },
+      { "id": 3, "section": "architecture", "description": "HPCwire interview with Phil Hays on protocol selection (OPA vs RoCEv2 vs UEC)" },
+      { "id": 4, "section": "channel", "description": "HPE Cray + Cornelis partnership announcement (2024)" },
+      { "id": 5, "section": "channel", "description": "Penguin Solutions TrueHPC platform marketing materials" },
+      { "id": 6, "section": "tco", "description": "Publicly disclosed federal HPC procurement vehicles; analyst content on InfiniBand vs OPA port economics" },
+      { "id": 7, "section": "value_proposition", "description": "Cornelis Spelman keynote (2024) on federal HPC positioning" }
+    ],
+    "inferences_flagged": [
+      "Day-1 ISV priority (Slurm + libfabric) is inferred from HPC stack convention, not a stated Cornelis priority list.",
+      "OPA tail-latency advantage vs RoCEv2 is sourced to Hays interview characterization, not benchmark data.",
+      "Federal procurement lifecycle assumptions (10-year support) reflect general DOE practice, not a Cornelis-specific commitment."
+    ],
+    "open_questions": [
+      "Which specific federal customers have firm CN6000 commitments for 2026 vs 2027 vs 2028?",
+      "How is Cornelis positioning against the NNSA CORAL-3 procurement timeline?",
+      "What is the installed-base coverage strategy for CN5000 -> CN6000 migration at DOE Office of Science labs?"
+    ]
+  },
+
+  {
+    "id": "academic-hpc",
+    "name": "Academic HPC",
+    "subtitle": "NSF-funded centers, university clusters — campus AI + traditional HPC mix",
+    "is_stub": false,
+    "workload": {
+      "primary_mix": [
+        "Heterogeneous MPI (chemistry via GROMACS/NAMD/LAMMPS, climate via WRF, bioinformatics)",
+        "AI training (campus model factories, research LLM fine-tuning, materials surrogate models)"
+      ],
+      "typical_scale": "100 to 1,500 nodes per cluster (Stampede-3-class to mid-tier campus); multi-tenant fairshare scheduling; high job churn (10K+ jobs/day not uncommon).",
+      "critical_characteristics": [
+        "Heterogeneous workload mix on shared physical fabric",
+        "Many short jobs alongside long campaigns",
+        "Multi-PI sharing under fairshare policies",
+        "Campus AI factories layered on existing HPC infrastructure"
+      ],
+      "latency_budget": "Sub-microsecond MPI on HPC partitions and sub-millisecond AllReduce on AI partitions, served by the same fabric without cross-starvation.",
+      "bottleneck_profile": "Cross-partition resource contention more than absolute fabric performance — small ops teams (1-3 admins) can't tune dual fabrics, so single-fabric protocol flexibility outweighs raw throughput.",
+      "buying_criteria": [
+        "Price-performance per NSF MRI / state funding dollar",
+        "Fabric versatility across heterogeneous workloads",
+        "Ecosystem breadth (Slurm + PyTorch both must work)",
+        "Operational simplicity for small staffs",
+        "ACCESS-allocation-compatible reference architectures"
+      ]
+    },
+    "architecture": {
+      "products": ["CN6000 SuperNIC", "OPA or RoCEv2 mode (configurable per partition)", "Standard fat-tree fabric (non-director-class)"],
+      "descriptions": [
+        "CN6000 at 800 Gbps, protocol-configurable per partition",
+        "OPA for MPI partitions; RoCEv2 for AI partitions",
+        "Cost-optimized switch tier (Arista / commodity Ethernet, not director-class)"
+      ],
+      "protocol_reasoning": "Tri-protocol on one fabric wins academic HPC on staffing, not just CapEx — small ops teams (1-3 admins) can't operate dual fabrics."
+    },
+    "channel": {
+      "oem_odm": [
+        { "name": "Dell Technologies", "role": "Dominant academic OEM — PowerEdge in NSF MRI and state university procurements" },
+        { "name": "Supermicro", "role": "NSF MRI reference designs at smaller campus tiers; aggressive price-performance positioning" },
+        { "name": "HPE", "role": "Less dominant than federal; Cray heritage opens flagship NSF centers (Frontera, Bridges-2)" },
+        { "name": "Advanced Clustering / Aspen Systems", "role": "Specialized academic HPC integrators with deep institutional relationships" }
+      ],
+      "hpc_isvs": ["Slurm (workload manager)", "OpenMPI", "MVAPICH2", "Intel MPI", "libfabric (OFI provider)", "GROMACS / NAMD / LAMMPS (molecular dynamics)", "WRF (weather/climate)"],
+      "ai_ml_isvs": ["PyTorch (distributed)", "Hugging Face Transformers", "JAX", "scikit-learn / Pandas (data science layer)", "Jupyter (notebook environments)"],
+      "day1_isv_priority": "Mixed-protocol Slurm scheduling certification on CN6000 — the segment-specific gap where tri-protocol holds up or doesn't."
+    },
+    "tco": {
+      "deployment_scenario": "300-node mid-tier academic cluster (NSF MRI-class) — CN6000 NICs + commodity Ethernet switching, dual-protocol partitions",
+      "baseline_size": 300,
+      "default_horizon_years": 3,
+      "cornelis_3yr_tco_M": 2.8,
+      "nvidia_3yr_tco_M": 3.9,
+      "broadcom_3yr_tco_M": 3.1,
+      "advantage_drivers": [
+        "Single fabric serves MPI + AI partitions — avoids ~$400K second-fabric CapEx",
+        "Lower per-port cost than InfiniBand HDR/NDR at non-director-class campus scale",
+        "OPA in NIC — no separate OPA-only (CN5000) + Ethernet-only NIC spend",
+        "Mature MPI stack: less tuning labor for small ops teams (1-3 admins)"
+      ],
+      "sensitivity_inputs": {
+        "supply_lead_time_weeks": { "default": 12, "min": 6, "max": 24 },
+        "deployment_size": { "default": 300, "min": 100, "max": 1500 }
+      }
+    },
+    "value_proposition": {
+      "statement": "Tri-protocol on one fabric — CN6000 serves MPI and AI training partitions from a single network and a single ops team.",
+      "competitive_position": [
+        { "vs": "NVIDIA InfiniBand", "angle": "Lower CapEx for the heterogeneous workload mix typical of academic centers." },
+        { "vs": "Generic Ethernet (RoCEv2)", "angle": "Native OPA preserves MPI performance that Ethernet-only fabrics give up." },
+        { "vs": "Dual-fabric (InfiniBand + Ethernet)", "angle": "Single-fabric viability for centers with 1-3 admins — dual-fabric designs lose to staffing before CapEx." }
+      ]
+    },
+    "sources": [
+      { "id": 1, "section": "workload", "description": "NSF ACCESS program documentation — academic HPC allocation patterns and workload mix" },
+      { "id": 2, "section": "workload", "description": "TACC Stampede-3, PSC Bridges-2, NCSA Delta public infrastructure documentation" },
+      { "id": 3, "section": "architecture", "description": "Cornelis CN6000 product announcement (Nov 2025) — tri-protocol mode capabilities" },
+      { "id": 4, "section": "channel", "description": "NSF Major Research Instrumentation (MRI) program — recent awards and named OEM partners (Dell, HPE, Supermicro)" },
+      { "id": 5, "section": "channel", "description": "HPCwire / Inside HPC coverage of academic HPC procurements 2023-2025" },
+      { "id": 6, "section": "tco", "description": "NSF budget documentation — academic HPC funding levels and acquisition cost benchmarks" },
+      { "id": 7, "section": "value_proposition", "description": "Slurm topology-aware scheduling documentation — partition-level protocol configuration model" },
+      { "id": 8, "section": "value_proposition", "description": "PyTorch FSDP / distributed training documentation — academic AI training workload model" }
+    ],
+    "inferences_flagged": [
+      "CN6000 tri-protocol partition mode as the academic value prop is candidate-inferred from product capability — Cornelis has not publicly positioned tri-protocol as the academic-segment differentiator.",
+      "Channel ranking (Dell primary, Supermicro secondary, HPE tertiary at academic tier) reflects NSF MRI award patterns observable in public records, not stated Cornelis channel strategy.",
+      "Day-1 ISV priority calling out mixed-protocol partition Slurm certification is candidate-assessed; no Cornelis documentation publicly addresses this specific certification gap."
+    ],
+    "open_questions": [
+      "Which academic centers have committed to CN6000 vs sticking with CN5000? Are there named NSF MRI awards for 2025-2027 with CN6000 as the specified fabric?",
+      "Has tri-protocol partition mode been demonstrated in production at any academic site? What's the reference deployment story?",
+      "How does the campus AI factory pattern (smaller AI partitions added to existing HPC clusters) sequence for academic centers running CN5000 today?"
+    ]
+  },
+
+  {
+    "id": "enterprise-ai",
+    "name": "Enterprise Commercial AI",
+    "subtitle": "Fortune 500 internal AI clusters — training, fine-tuning, inference serving",
+    "is_stub": false,
+    "workload": {
+      "primary_mix": [
+        "Fine-tuning of base models (Llama, Mistral, Falcon) for vertical use cases",
+        "Production inference for customer-service AI and internal copilots",
+        "Vertical-specific pre-training"
+      ],
+      "typical_scale": "200 to 2,000 GPUs per cluster; single-tenant (no rental); 3-5 year refresh cycles tied to enterprise IT budget planning.",
+      "critical_characteristics": [
+        "AllReduce-dominated training collectives (PyTorch FSDP / DDP)",
+        "Strict change-management windows",
+        "Enterprise audit and compliance requirements",
+        "Bundled-vendor procurement preference (single accountable supplier)"
+      ],
+      "latency_budget": "Sub-millisecond AllReduce gates training throughput at scale; tail latency matters for online inference SLAs.",
+      "bottleneck_profile": "Fabric bandwidth and collective efficiency for training, tail latency for inference — bundled-fabric competition (NVIDIA Spectrum-X) matters as much as absolute performance because enterprises value single-vendor accountability.",
+      "buying_criteria": [
+        "Enterprise OEM support model (Dell, Lenovo, HPE relationships own the buying motion)",
+        "Ethernet ecosystem familiarity (existing data-center skillset)",
+        "NVIDIA GPU compatibility",
+        "Audit/compliance posture for production AI",
+        "Vendor-diversification asks from CIOs concerned about NVIDIA lock-in"
+      ]
+    },
+    "architecture": {
+      "products": ["CN6000 SuperNIC", "RoCEv2 mode", "Standard Ethernet leaf-spine (Arista / Cisco / Juniper)"],
+      "descriptions": [
+        "CN6000 at 800 Gbps in RoCEv2 — drops into existing Ethernet fabrics",
+        "Compatible with enterprise data-center switching (Arista, Cisco, Juniper)",
+        "Endpoint NIC tuned for AllReduce (DCQCN + Cornelis tail-variance handling)"
+      ],
+      "protocol_reasoning": "Enterprise AI is RoCEv2-native; Cornelis's endpoint-NIC tail-variance handling delivers AllReduce performance without the parallel InfiniBand tier and trained headcount premium CIOs reject."
+    },
+    "channel": {
+      "oem_odm": [
+        { "name": "Dell Technologies (PowerEdge AI)", "role": "Dominant enterprise OEM — XE9680/XE9640 SKUs with Fortune 500 support contracts" },
+        { "name": "Lenovo (ThinkSystem SR675 V3)", "role": "Second-largest enterprise AI OEM — strong in EMEA and APAC enterprise accounts" },
+        { "name": "HPE (ProLiant DL380 Gen11 + AI variants)", "role": "Enterprise reach via existing HPE/Aruba networking relationships; less AI-specific than Dell/Lenovo" },
+        { "name": "WWT / CDW / Insight (national enterprise integrators)", "role": "Deployment and integration services for Fortune 500 — own the buying motion alongside OEMs" }
+      ],
+      "hpc_isvs_note": "Not applicable — Kubernetes-orchestrated, no Slurm or MPI.",
+      "ai_ml_isvs": ["PyTorch (FSDP, DDP)", "NCCL (gating cert)", "NVIDIA Triton Inference Server", "NVIDIA TensorRT-LLM", "Kubeflow / KServe", "Ray"],
+      "day1_isv_priority": [
+        "Priority 1: NCCL certification on CN6000 RoCEv2 — gates every PyTorch FSDP customer",
+        "Priority 2: Triton + TensorRT-LLM compatibility plus 2am-incident accountability model"
+      ]
+    },
+    "tco": {
+      "deployment_scenario": "500-GPU enterprise AI training cluster — Dell XE9680 servers with CN6000 RoCEv2 fabric, standard Ethernet leaf-spine",
+      "baseline_size": 500,
+      "default_horizon_years": 3,
+      "cornelis_3yr_tco_M": 5.6,
+      "nvidia_3yr_tco_M": 8.2,
+      "broadcom_3yr_tco_M": 6.4,
+      "advantage_drivers": [
+        "CapEx delta vs NVIDIA InfiniBand NDR — no parallel fabric tier needed",
+        "Existing Ethernet ops skillset — avoids ~$400K-600K InfiniBand-trained NetOps headcount",
+        "Enterprise OEM support continuity — Dell/Lenovo bundle covers Cornelis NIC",
+        "Vendor diversification from NVIDIA — CIO strategic ask vs training monoculture",
+        "Standard switch choice (Arista/Cisco/Juniper) preserves leverage Spectrum-X forecloses"
+      ],
+      "sensitivity_inputs": {
+        "supply_lead_time_weeks": { "default": 14, "min": 8, "max": 28 },
+        "deployment_size": { "default": 500, "min": 200, "max": 2000 }
+      }
+    },
+    "value_proposition": {
+      "statement": "Standard Ethernet ecosystem with NVIDIA-class collective performance, at materially lower CapEx than InfiniBand.",
+      "competitive_position": [
+        { "vs": "NVIDIA InfiniBand (NDR)", "angle": "Lower CapEx with NCCL-compatible collective performance; no parallel InfiniBand fabric tier required." },
+        { "vs": "NVIDIA Spectrum-X (bundled NIC + switch)", "angle": "Standard switch vendor choice preserves procurement leverage that Spectrum-X bundling forecloses." },
+        { "vs": "Broadcom Tomahawk + standard NIC", "angle": "Endpoint NIC optimization for AllReduce that merchant-silicon NICs lack — less DCQCN tuning labor." }
+      ]
+    },
+    "sources": [
+      { "id": 1, "section": "workload", "description": "Cornelis CN6000 product announcement (Nov 2025) — tri-protocol RoCEv2 mode" },
+      { "id": 2, "section": "architecture", "description": "Dell PowerEdge XE9680 / XE9640 AI server reference architectures" },
+      { "id": 3, "section": "architecture", "description": "NVIDIA NCCL documentation — RDMA collective library context" },
+      { "id": 4, "section": "architecture", "description": "RoCEv2 / IEEE 802.1 DCB standards documentation (PFC, ECN, DCQCN tuning model)" },
+      { "id": 5, "section": "channel", "description": "Dell Technologies AI Factory announcements; Lenovo Hybrid AI strategy public materials" },
+      { "id": 6, "section": "tco", "description": "NVIDIA Spectrum-X product announcement and bundled fabric positioning" },
+      { "id": 7, "section": "tco", "description": "Analyst content (SemiAnalysis, IDC) on enterprise AI fabric economics 2024-2025" },
+      { "id": 8, "section": "value_proposition", "description": "NVIDIA Triton Inference Server / TensorRT-LLM documentation — enterprise inference workload context" }
+    ],
+    "inferences_flagged": [
+      "Enterprise AI segment positioning for CN6000 is candidate-inferred — Cornelis has publicly emphasized federal HPC; enterprise commercial AI go-to-market priority is not publicly stated.",
+      "NCCL certification gap as the gating ISV requirement is candidate-assessment — Cornelis has not publicly disclosed an NCCL certification roadmap or partnership status with NVIDIA.",
+      "Spectrum-X competitive framing reflects NVIDIA's stated bundled-fabric strategy; Cornelis competitive response to Spectrum-X has not been publicly positioned."
+    ],
+    "open_questions": [
+      "Does Cornelis treat enterprise commercial AI as a primary go-to-market segment, or as a secondary opportunity downstream of federal HPC and neocloud wins?",
+      "How does Cornelis position vs NVIDIA Spectrum-X with enterprise customers who explicitly prefer bundled solutions and single-vendor accountability?",
+      "Are there named enterprise reference customers in financial services, healthcare, or automotive that can be cited publicly to anchor the segment story?"
+    ]
+  },
+
+  {
+    "id": "neoclouds",
+    "name": "Neoclouds",
+    "subtitle": "GPU-as-a-service operators — CoreWeave, Lambda, Together, Crusoe, RunPod class",
+    "is_stub": false,
+    "workload": {
+      "primary_mix": [
+        "Multi-tenant GPU rental for AI training (dominant load)",
+        "Growing inference-as-a-service at the platform edge",
+        "Serves AI labs, AI-native enterprises, and increasingly non-NVIDIA accelerator customers (AMD MI300, AWS Trainium)",
+        "PyTorch FSDP/DDP is the dominant collective pattern"
+      ],
+      "typical_scale": "1,000 to 50,000 GPUs per region; aggressive multi-region build cadence (new pod every 3-6 months for tier-1 operators); single-tenant from the customer perspective but multi-customer from the operator perspective.",
+      "critical_characteristics": [
+        "Time-to-revenue on new build-outs (every week of build delay is direct revenue impact)",
+        "Multi-tenancy isolation between customers",
+        "Per-GPU economics dominate operator margin",
+        "High build cadence requires repeatable reference architecture"
+      ],
+      "latency_budget": "Sub-millisecond AllReduce for training collectives — gates customer-visible training throughput; bandwidth maximization at rack level for FSDP shard exchange.",
+      "bottleneck_profile": "Per-GPU fabric CapEx and build cadence (next 10K-GPU pod stood up including fabric tuning) dominate — NVIDIA NDR/XDR premium directly compresses operator margin.",
+      "buying_criteria": [
+        "$/GPU fabric cost",
+        "Supply lead time",
+        "Protocol flexibility for UEC migration path",
+        "Open-standards alignment (operators reject NVIDIA lock-in for strategic margin and customer-mix reasons)",
+        "Repeatable reference architecture for fast build cadence"
+      ]
+    },
+    "architecture": {
+      "products": ["CN6000 SuperNIC", "RoCEv2 mode (today) → UEC (CN7000)", "High-density Ethernet leaf-spine (Arista 7800R / Cisco Nexus 9300)"],
+      "descriptions": [
+        "CN6000 at 800 Gbps RoCEv2 — drops into standard Ethernet, no NVIDIA switching required",
+        "UEC roadmap commit (CN7000 at 1.6T) aligns with open-standards preference",
+        "Dense rack designs (8-16 GPU/node) optimized for $/GPU at hyperscale"
+      ],
+      "protocol_reasoning": "Cornelis chairs UEC; CN7000 (1.6T, 2027-2028) will be among the first production UEC chips — neoclouds buy the roadmap, not the current part."
+    },
+    "channel": {
+      "oem_odm": [
+        { "name": "Supermicro", "role": "Dominant neocloud server OEM — H100/H200 SKUs with multi-NIC slot density" },
+        { "name": "Wiwynn / Quanta / Foxconn", "role": "ODM-direct for CoreWeave-tier operators — custom designs, direct silicon-to-system supply" },
+        { "name": "Penguin Solutions", "role": "Mid-tier neocloud integrator — federal HPC heritage transfers to neocloud build patterns" },
+        { "name": "Cornelis direct sales", "role": "Bypasses traditional OEM channel — operators pair NICs with chosen server/switch vendors" }
+      ],
+      "hpc_isvs_note": "Not applicable — neoclouds do not run Slurm or MPI.",
+      "ai_ml_isvs": ["PyTorch (FSDP, DDP)", "NCCL (gating cert)", "Ray", "vLLM (inference)", "Kubernetes + CNI/RDMA (Cilium, Calico)", "Determined AI / Anyscale"],
+      "day1_isv_priority": [
+        "Priority 1: NCCL certification on CN6000 RoCEv2 — operators can't guarantee collective perf to PyTorch FSDP customers without it",
+        "Priority 2: Kubernetes CNI RDMA (Cilium, Calico) — neocloud orchestration is K8s-native"
+      ]
+    },
+    "tco": {
+      "deployment_scenario": "5,000-GPU neocloud pod — Supermicro H200 servers, CN6000 RoCEv2 fabric, Arista 7800R high-density leaf-spine",
+      "baseline_size": 5000,
+      "default_horizon_years": 3,
+      "cornelis_3yr_tco_M": 42,
+      "nvidia_3yr_tco_M": 64,
+      "broadcom_3yr_tco_M": 48,
+      "advantage_drivers": [
+        "$/GPU CapEx ~30-35% lower than NVIDIA NDR/XDR (illustrative)",
+        "Open switch choice (Arista/Cisco/Juniper) preserves leverage Spectrum-X forecloses",
+        "UEC roadmap commit reduces 2027-2029 build-cadence risk — no protocol stranding",
+        "800 Gbps GA 2026 — ahead of merchant-silicon Ethernet at this tier",
+        "Direct sales bypasses OEM markup — per-NIC cost delta at neocloud volume"
+      ],
+      "sensitivity_inputs": {
+        "supply_lead_time_weeks": { "default": 14, "min": 8, "max": 28 },
+        "deployment_size": { "default": 5000, "min": 1000, "max": 50000 }
+      }
+    },
+    "value_proposition": {
+      "statement": "Lower $/GPU fabric cost and an open-standards UEC migration path — the fabric for operators serving non-NVIDIA accelerator customers.",
+      "competitive_position": [
+        { "vs": "NVIDIA InfiniBand + Spectrum-X bundle", "angle": "Lower $/GPU cost at scale, open switch vendor choice, protocol independence for non-NVIDIA accelerators." },
+        { "vs": "Broadcom Tomahawk 5 + merchant-silicon NIC", "angle": "Endpoint NIC optimization plus UEC roadmap — Cornelis chairs UEC, Broadcom participates." },
+        { "vs": "AWS / Azure / GCP managed AI compute", "angle": "Not directly competitive — but operators want fabric-stack visibility hyperscalers don't expose." }
+      ]
+    },
+    "sources": [
+      { "id": 1, "section": "workload", "description": "Cornelis CN6000 product announcement (Nov 2025) — tri-protocol mode and UEC roadmap" },
+      { "id": 2, "section": "workload", "description": "CoreWeave S-1 filing / public infrastructure preference disclosures (2024)" },
+      { "id": 3, "section": "architecture", "description": "Ultra Ethernet Consortium technical overview and member roster — Cornelis working-group leadership" },
+      { "id": 4, "section": "architecture", "description": "PyTorch FSDP / Fully Sharded Data Parallel documentation — collective workload model" },
+      { "id": 5, "section": "channel", "description": "Supermicro AI server SKU roadmap; ODM-tier neocloud build coverage (SemiAnalysis, ServeTheHome)" },
+      { "id": 6, "section": "tco", "description": "SemiAnalysis neocloud economics coverage 2024-2025 — operator margin analysis and fabric cost structure" },
+      { "id": 7, "section": "tco", "description": "NVIDIA Spectrum-X product positioning and bundled-fabric pricing model" },
+      { "id": 8, "section": "value_proposition", "description": "Public statements from CoreWeave / Lambda / Together AI on open-standards infrastructure preferences" }
+    ],
+    "inferences_flagged": [
+      "Strategic alignment of UEC with neocloud customer mix preferences is inferred from neocloud public statements about NVIDIA lock-in; not a stated Cornelis neocloud go-to-market positioning.",
+      "Direct sales channel motion bypassing OEMs at neocloud volume is inferred from neocloud procurement patterns (CoreWeave-tier operators are known to buy components directly); Cornelis has not publicly stated direct-sales policy at this segment.",
+      "NCCL certification gap as the segment-gating ISV requirement is candidate-assessment based on PyTorch FSDP's reliance on NCCL collectives; Cornelis NCCL certification roadmap has not been publicly disclosed."
+    ],
+    "open_questions": [
+      "Which neocloud operators have firm CN6000 commitments vs which are in evaluation pipeline? Is the at-risk Neocloud A commitment (10K-NIC deployment in commitment register) a single named operator, or is the segment more distributed?",
+      "How does Cornelis position vs NVIDIA Spectrum-X for neocloud operators — does Cornelis have a credible switch-tier story (partnership with Arista / Cisco) or fully relies on operator switch vendor choice?",
+      "Is there a named lighthouse neocloud reference deployment for CN6000 we can cite publicly — even at the pilot-pod scale?"
+    ]
+  },
+
+  {
+    "id": "sovereign-ai",
+    "name": "Sovereign AI",
+    "subtitle": "Nation-state and regional AI infrastructure — compliance, supply-chain provenance, vendor independence",
+    "is_stub": false,
+    "workload": {
+      "primary_mix": [
+        "Regional/national LLM training",
+        "Government services AI",
+        "Compliance-sensitive enterprise workloads"
+      ],
+      "typical_scale": "200 to 2,000 nodes per deployment; multi-year commitments tied to national program timelines (3-5 year horizons typical); often phased pilot → expansion → full-scale.",
+      "critical_characteristics": [
+        "Data residency requirements (workload and storage stay within national borders)",
+        "Supply chain provenance (NDAA / Trade Agreements Act / EU procurement compliance)",
+        "Vendor independence from US-China tension axis",
+        "Regulated procurement timelines (12-24 months typical)"
+      ],
+      "latency_budget": "AI training collectives — not latency-pathological but throughput-sensitive; regional-language fine-tuning workloads tolerate slightly higher AllReduce latency than tier-1 frontier-model training.",
+      "bottleneck_profile": "Procurement timeline (regulatory approvals) and supply chain provenance dominate over raw fabric performance — the bottleneck is getting the contract through compliance review, not the network.",
+      "buying_criteria": [
+        "Supply chain provenance (US-based or allied-nation, NDAA-clean)",
+        "Long-term roadmap visibility (3-5 year procurement requires confidence in the vendor's product roadmap)",
+        "Protocol independence (avoid NVIDIA lock-in for strategic reasons)",
+        "Local presence: regional support, language, time-zone coverage"
+      ]
+    },
+    "architecture": {
+      "products": ["CN6000 SuperNIC", "RoCEv2 mode", "Regional integrator-selected fabric tier"],
+      "descriptions": [
+        "CN6000 at 800 Gbps RoCEv2 — sovereign AI is training-dominant, not MPI",
+        "NDAA-clean supply chain meets allied-nation sovereign procurement requirements",
+        "Region-dependent: Arista in EU, NTT/Hitachi-supported tiers in APAC. Pairs with regional integrator switch/server tier — named local partners required."
+      ],
+      "protocol_reasoning": "NDAA-clean US supply chain meets allied-nation procurement, and UEC alignment hedges against US export-control shifts — the structural sovereign value prop, not RoCEv2 performance."
+    },
+    "channel": {
+      "oem_odm": [
+        { "name": "Atos / Eviden / Bull (France, EU)", "role": "Primary EU sovereign integrator — Mistral and EuroHPC AI Factory deployments" },
+        { "name": "NTT Data / Hitachi (Japan)", "role": "Japanese sovereign AI program partners — METI-aligned infrastructure projects, regional integration capability" },
+        { "name": "HPE Sovereign Cloud / Dell Sovereign", "role": "Multi-region OEMs with dedicated sovereign-AI teams and federal-grade supply chains" },
+        { "name": "Capgemini / Accenture sovereign practice", "role": "Multi-region SI for sovereign program advisory and deployment" },
+        { "name": "Direct sales to nation-state programs", "role": "Some sovereign programs (G42 / UAE, HUMAIN / KSA) buy direct, outside OEM channels" }
+      ],
+      "hpc_isvs_note": "Not applicable — sovereign AI is AI-focused, not HPC.",
+      "ai_ml_isvs": ["PyTorch", "Hugging Face Transformers", "Mistral fine-tuning stack (EU sovereign ecosystem)", "Regional model providers (Falcon UAE, Stockmark Japan, others)", "NVIDIA Triton Inference Server", "NCCL (gating cert)"],
+      "day1_isv_priority": [
+        "Priority 1: NCCL certification on CN6000 RoCEv2 — segment-shared gating requirement",
+        "Priority 2: Regional model frameworks (Mistral for EU, regional inference for APAC) — ISV story varies by region"
+      ]
+    },
+    "tco": {
+      "deployment_scenario": "800-NIC sovereign AI pilot deployment — Atos / NTT-led regional integration, CN6000 RoCEv2, multi-year national program commitment",
+      "baseline_size": 800,
+      "default_horizon_years": 3,
+      "cornelis_3yr_tco_M": 4.1,
+      "nvidia_3yr_tco_M": 5.6,
+      "broadcom_3yr_tco_M": 4.6,
+      "advantage_drivers": [
+        "NDAA-clean US supply chain meets allied-nation procurement where Chinese alternatives are excluded",
+        "Vendor independence from NVIDIA — EU sovereign (Mistral/EuroHPC) strategic ask",
+        "Roadmap CN5000 → CN6000 → CN7000 (UEC) — anchors 5-year sovereign commitments",
+        "Federal-procurement-grade supply chain differentiates vs commercial-grade at sovereign tier",
+        "Regional integrator model (Atos/NTT/Hitachi) preserves local content requirements"
+      ],
+      "sensitivity_inputs": {
+        "supply_lead_time_weeks": { "default": 18, "min": 10, "max": 36 },
+        "deployment_size": { "default": 800, "min": 200, "max": 2000 }
+      }
+    },
+    "value_proposition": {
+      "statement": "NDAA-clean US supply chain with vendor diversification from NVIDIA — built for sovereign AI programs that require auditable provenance.",
+      "competitive_position": [
+        { "vs": "NVIDIA InfiniBand", "angle": "Vendor diversification from NVIDIA for sovereign programs that require it; auditable US supply chain." },
+        { "vs": "Chinese networking-fabric alternatives (Huawei, H3C, Inspur)", "angle": "NDAA-clean US supply chain meets allied-nation procurement standards under current export controls." },
+        { "vs": "Local regional alternatives", "angle": "Production-mature 800G silicon today; domestic sovereign-program alternatives still in development through 2027+." }
+      ]
+    },
+    "sources": [
+      { "id": 1, "section": "workload", "description": "Mistral AI infrastructure announcements and EuroHPC AI Factory program documentation (2024-2025)" },
+      { "id": 2, "section": "workload", "description": "G42 / Inception AI (UAE) and HUMAIN (Saudi Arabia) sovereign AI program public materials" },
+      { "id": 3, "section": "architecture", "description": "Cornelis CN6000 product announcement (Nov 2025) — supply chain provenance positioning" },
+      { "id": 4, "section": "channel", "description": "Atos / Eviden sovereign cloud and AI program announcements; NTT Data / Hitachi sovereign AI partnerships" },
+      { "id": 5, "section": "tco", "description": "US AI Diffusion Rule and export control framework for AI infrastructure (BIS materials, 2024-2025)" },
+      { "id": 6, "section": "tco", "description": "NDAA Trade Agreements Act procurement guidance — supply chain provenance requirements" },
+      { "id": 7, "section": "value_proposition", "description": "Ultra Ethernet Consortium technical overview — open-standards alignment relevant to sovereign program preferences" },
+      { "id": 8, "section": "value_proposition", "description": "Analyst coverage of sovereign AI infrastructure spending forecasts (IDC, Omdia, Gartner — 2024-2025 sovereign AI reports)" }
+    ],
+    "inferences_flagged": [
+      "Sovereign AI as a distinct customer segment is candidate-constructed — Cornelis has not publicly segmented this customer class; segment definition draws on observable nation-state AI program patterns (EU AI Factories, G42, HUMAIN, METI).",
+      "Regional channel partner ranking (Atos primary EU, NTT primary Japan, etc.) reflects observable sovereign program SI patterns, not stated Cornelis channel strategy.",
+      "Strategic value of UEC alignment to sovereign customers as a hedge against US export controls is candidate-framing — not a stated Cornelis positioning for the sovereign segment."
+    ],
+    "open_questions": [
+      "Has Cornelis publicly named any sovereign AI program partnerships, or signed pipeline opportunities in EU (Mistral / EuroHPC AI Factories), Middle East (G42 / HUMAIN), or APAC (METI / Singapore AISG)?",
+      "What's the export control posture — which sovereign customers can Cornelis sell to under current BIS rules, and how does the AI Diffusion Rule framework affect allied-nation procurements?",
+      "How does Cornelis position vs Chinese-origin networking alternatives (Huawei, H3C, Inspur) in allied-nation sovereign AI procurements where vendor provenance is the gating requirement?"
+    ]
+  }
+]

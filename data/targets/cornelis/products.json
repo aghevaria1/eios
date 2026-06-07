@@ -1,0 +1,34 @@
+{
+  "generations": [
+    {
+      "id": "cn5000",
+      "name": "CN5000",
+      "tagline": "400G OPA — current production",
+      "bandwidth_gbps": 400,
+      "protocols": ["OPA"],
+      "lifecycle_phase": "production_to_sustaining",
+      "shipping_since": "2024",
+      "shipping_to": null
+    },
+    {
+      "id": "cn6000",
+      "name": "CN6000",
+      "tagline": "800G tri-protocol — strategic bridge",
+      "bandwidth_gbps": 800,
+      "protocols": ["OPA", "RoCEv2", "UEC"],
+      "lifecycle_phase": "development_to_production",
+      "shipping_since": "late_2026",
+      "shipping_to": null
+    },
+    {
+      "id": "cn7000",
+      "name": "CN7000",
+      "tagline": "1.6T full UEC — open standard commit",
+      "bandwidth_gbps": 1600,
+      "protocols": ["UEC", "OPA"],
+      "lifecycle_phase": "concept_to_development",
+      "shipping_since": "2027",
+      "shipping_to": null
+    }
+  ]
+}

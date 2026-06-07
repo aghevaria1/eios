@@ -1,454 +1,195 @@
-# EIOS — EdgeInferenceOS
+# EIOS v3 — NVIDIA AI Factory Advisor
 
-**A multi-agent AI reasoning layer for edge inference infrastructure.**
+A decision-support tool for reasoning about NVIDIA AI-factory deployments: who buys them, how they're built, who competes for them, and how partners slot in. Built as a working model, not a slide deck — it **calculates** what can be calculated from cited specs, stays **directional** where the truth is genuinely uncertain, and makes that boundary explicit at every layer.
 
-EIOS sits on top of existing monitoring stacks and adds autonomous reasoning, root cause analysis, SLA enforcement, and predictive what-if simulation. Built with Next.js 14, TypeScript, SQLite, and the Anthropic Claude API.
+That boundary is the point. Anyone can assert numbers; the harder discipline is being precise about which numbers are computed, which are claimed, which are directional judgment, and which simply aren't knowable yet — and never letting a directional read masquerade as a fact. This app holds that line from the seeded data all the way through to the printable briefs.
 
----
-
-## What Problem It Solves
-
-Traditional infrastructure monitoring uses rules and thresholds. Rules tell you *that* something is wrong. EIOS tells you *why*, *what to do*, and *what happens next* — in plain English, in seconds, automatically.
-
-| Capability | Rules-Based Monitoring | EIOS |
-|---|---|---|
-| Anomaly detection | Threshold breach | Pattern + context reasoning |
-| Root cause analysis | Manual, 20+ minutes | Automated, 4 seconds |
-| Placement decisions | Static failover rules | SLA-aware reasoning |
-| What-if simulation | Not available | Natural language query |
-| Customer communication | Manual NOC write-up | Auto-generated brief |
+**Live:** [eios-v3.vercel.app](https://eios-v3.vercel.app)
 
 ---
 
-## Architecture
+## What's in it
 
-EIOS is a 3-agent A2A (Agent-to-Agent) system connected via an EventEmitter bus.
+Three views, one underlying engine and knowledge base:
+
+- **Architect** (`/factory/architect`) — the customer-facing solution architect. Pick one of 6 customer segments, see the reference build (a 5-layer "cake" from facility → silicon → software → orchestration → ecosystem), drag a GPU-count slider and watch the build metrics (FLOPS, HBM, power, racks, CapEx) recompute live from cited per-GPU specs, with the delivered-KPI scorecard and TCO bands for that segment.
+
+- **Competitive** (`/factory/competitive`) — five competitive lenses. A **Bird's Eye** segment×threat matrix (which competitor type threatens which segment), plus four depth analyses: **Full-Stack Replacement** (AMD, a 3-act analysis — where's the fight, the silicon race & the moat, the switching cost), **Slot Swaps** (the three fabric competitors), **Alternative Paradigm** (Cerebras), and **Customer Self-Supply** (the four hyperscaler in-house chips). The throughline: silicon is at parity; the moat lives at L3–L5 (ecosystem/software/orchestration), not in the chip.
+
+  The Bird's Eye matrix is 6 segments × 4 threat types — rows are who's being targeted, columns are who's targeting them, and each cell carries a directional threat verdict (PRIMARY / SECONDARY / NICHE / N/A) sourced from the depth analyses. Hyperscalers face two primary threats (Slot Swaps and Customer Self-Supply); Industry Verticals face one niche threat and three deliberate N/As; Neocloud's self-supply cell is a deliberate N/A (neoclouds don't build their own silicon — antithetical to the GPU-rental model), matching the same honest-absence framing used across the rest of the app. Click any non-N/A cell to drill into that competitor type's depth view.
+
+- **Partner** (`/factory/partner`) — the partner lens. Toggle OEM / ISV / Neocloud-as-channel, segment-aware, showing each partner's responsibility slot, the operational KPIs they own (with honest "not seeded for this segment" gaps), and the co-sell motion as a partner-PM mental model.
+
+Each view generates an **audience-targeted printable brief** (customer / sales / partner) capturing the view's current state — the provenance carries through unchanged, so a brief never reads more confident than the view it came from.
+
+---
+
+## End-to-end architecture
+
+The whole app is one pipeline, and **provenance is preserved at every hop** — a value's honesty status (calculated / cited / directional / verify-needed) travels with it from the seed file to the printed brief, and is never upgraded along the way.
 
 ```
-Live Telemetry (5s tick)
-        │
-        ▼
-┌─────────────────────┐
-│   Telemetry Agent   │  ← MCP: get_node_metrics()
-│                     │  ← RAG: similar historical incidents
-│  Detects anomalies  │
-│  Reasons severity   │
-└────────┬────────────┘
-         │ node.anomaly.detected
-         ▼
-┌─────────────────────┐
-│  Placement Agent    │  ← MCP: get_sla_contract()
-│                     │  ← RAG: remediation runbooks
-│  Decides action     │
-│  REROUTE/SCALE/     │
-│  HOLD/FAILOVER      │
-└────────┬────────────┘
-         │ placement.decision
-         ▼
-┌─────────────────────┐
-│   SLA Guardian      │  ← MCP: write_incident()
-│                     │  ← RAG: SLA contract terms
-│  Confirms breach    │
-│  Writes full RCA    │
-│  Logs incident      │
-└─────────────────────┘
-         │ sla.alert.fired
-         ▼
-    SQLite + Dashboard
+┌─────────────────────────────────────────────────────────────────────────┐
+│  1. SEEDED KNOWLEDGE         the ground truth, each value provenance-tagged │
+│     • stack.json             NVIDIA L1–L5 components + competitor parts      │
+│                              (AMD, fabric x3, Cerebras, hyperscaler chips)   │
+│     • segments.json          6 customer segments — archetype, buying         │
+│                              behavior, north-star, delivered-KPIs, blend     │
+│     • kpi definitions        the KPI catalog + provenance model              │
+│     provenance states:  CITED · CALCULATED · DIRECTIONAL · VERIFY-NEEDED     │
+└─────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  2. ENGINE                  resolves data → values, computes consequences   │
+│     • loadKnowledge          loads + validates the seeded layer              │
+│     • KPI resolver           segment-first (segment.delivered_kpis) →        │
+│                              component fallback                              │
+│     • applySwap              dependency cascade: swap a component →           │
+│                              { changed, held, unverified }                   │
+│     • calculated metrics     FLOPS/HBM/power/racks/CapEx computed live from   │
+│                              cited specs at the current slider value         │
+│     (no value is invented here — everything traces to the seed + inputs)     │
+└─────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  3. VIEWS                   consume engine output, render with provenance   │
+│     • /architect             segment build + slider + delivered KPIs         │
+│     • /competitive           Bird's Eye + 4 depth modes                      │
+│     • /partner               OEM/ISV/Neocloud × segment                      │
+│     (each renders the SAME ProvenancePill — views can't drift from truth)    │
+└─────────────────────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│  4. ARTIFACTS               audience-targeted printable briefs              │
+│     • customer brief         from architect — what you're buying + cost      │
+│     • sales brief            from competitive — verdict + moat + talk track   │
+│     • partner brief          from partner — slot + owned KPIs + co-sell       │
+│     (button per view · captures current state · print-to-PDF)                │
+└─────────────────────────────────────────────────────────────────────────┘
+
+   ◀══════════════ PROVENANCE THROUGHLINE (the spine) ═══════════════▶
+   A CALCULATED value renders CALCULATED in the brief. A DIRECTIONAL read
+   stays DIRECTIONAL. A VERIFY-NEEDED gap stays a gap. Single source of
+   truth: the briefs reuse the views' rendering components, so nothing is
+   ever silently upgraded to false confidence between seed and print.
 ```
 
 ---
 
-## The Three Agents
+## The honesty model
 
-### ① Telemetry Agent (`agents/telemetry-agent.ts`)
+The provenance states are the backbone, and they mean specific things:
 
-**Role:** Continuously monitors all 5 inference nodes and detects anomalies.
+- **CITED** — sourced from a public, verifiable spec or disclosure (e.g. a published per-GPU memory figure). Traceable.
+- **CALCULATED** — computed live from cited inputs (e.g. total FLOPS = per-GPU FLOPS × slider count). Carries compound provenance: a calculated value built on a verify-needed input is flagged as such, not laundered into certainty.
+- **DIRECTIONAL** — synthesis judgment where configuration doesn't determine the answer (e.g. the L3–L5 moat trajectory, the competitive threat verdicts). Honest about being a read, not a measurement.
+- **VERIFY-NEEDED** — a value that should be checked before relying on it; surfaced, not hidden.
+- **N/A (honest absence)** — where something genuinely doesn't apply (e.g. self-supply for neoclouds, a partner KPI a segment doesn't prioritize), rendered as a deliberate, explained gap — never a fabricated low score.
 
-**What it does:**
-- Calls `get_node_metrics()` MCP tool for live snapshot + 1-hour trend
-- Retrieves similar historical incidents from RAG corpus
-- Calls Claude to reason about severity, pattern match, and urgency
-- Publishes `node.anomaly.detected` event to the bus
-
-**What Claude reasons about:**
-- Is this a hardware fault pattern (low util + low throughput = NVLink/PCIe issue)?
-- Is this a thermal pattern (rising temp + high util = cooling issue)?
-- Is this a memory pattern (high mem + dropping throughput = leak or overflow)?
-- How does this compare to historical incidents?
-- What severity level applies?
-
-**Anomaly signals it detects:**
-- GPU utilization above threshold
-- Temperature rising toward SLA limit
-- Token throughput below contracted minimum
-- HBM memory pressure above safe level
-- Power draw approaching cap
+Where the data doesn't support a claim, the app says so. Competitor strengths are conceded explicitly (concede-then-locate, never an NVIDIA sweep). Partner KPI gaps are framed as deliberate segment scoping. System integrators and distributors are named as real partner motions consciously left out for lack of seeded data, rather than faked. The boundary between what's computed and what's judged is the senior judgment the tool is built to demonstrate.
 
 ---
 
-### ② Placement Agent (`agents/placement-agent.ts`)
+## Technical
 
-**Role:** Decides what to do about the anomaly — reroute, scale, hold, or failover.
+**Stack:** Next.js (App Router) · TypeScript · deployed on Vercel.
 
-**What it does:**
-- Receives anomaly event from Telemetry Agent
-- Calls `get_sla_contract()` MCP tool for customer thresholds and penalties
-- Retrieves relevant remediation runbooks from RAG
-- Calls Claude to reason about best action given current node availability
-- Publishes `placement.decision` event to the bus
+**Routes** (all under `/factory`):
 
-**Four possible decisions:**
-| Decision | When Used |
+| Route | Role |
 |---|---|
-| `REROUTE` | Healthy peer node available with headroom below 85% util |
-| `SCALE` | No peer available — reduce batch size, shed load on current node |
-| `HOLD` | Anomaly is borderline — monitor without action |
-| `FAILOVER` | Emergency — node unresponsive or hardware fault confirmed |
+| `/factory/architect` | 6-segment selector · 5-layer build · live calculated metrics (slider) · delivered-KPI panel · TCO bands |
+| `/factory/competitive` | Bird's Eye matrix + 4 depth modes (AMD / fabric / Cerebras / hyperscaler self-supply) |
+| `/factory/partner` | OEM / ISV / Neocloud-as-channel toggle, segment-aware · slot diagram · KPI scorecard · co-sell mental model |
 
-**What Claude reasons about:**
-- Which nodes have capacity headroom?
-- Is the anomaly customer-tier-specific (Cisco nodes only fail over to Cisco nodes)?
-- What is the SLA penalty exposure if no action is taken?
-- Which runbook applies to this failure pattern?
+**Data layer** (`data/targets/nvidia/knowledge/`):
+- `stack.json` — NVIDIA components across L1–L5 plus competitor parts; each KPI value provenance-tagged.
+- `segments.json` — the 6 customer segments (frontier, hyperscaler, neocloud, fortune-500, sovereign, industry-vertical), each with archetype, buying behavior, north-star KPI, delivered-KPIs, architecture blend, and (for neocloud) the customer-AND-channel note.
+- `lib/factory/kpi/` — KPI definitions + the provenance model.
 
----
+**Engine** (`lib/factory/`):
+- `loadKnowledge` — loads and validates the seeded layer.
+- KPI resolver — segment-first (`segment.delivered_kpis`), component fallback.
+- `applySwap` — the dependency cascade; returns `{ changed, held, unverified }` when a component is swapped.
+- Calculated-metrics layer — derives FLOPS / HBM / power / racks / CapEx live from cited per-GPU specs at the current slider value, with compound provenance.
 
-### ③ SLA Guardian Agent (`agents/sla-agent.ts`)
+**Provenance rendering:** all views and all briefs render the same `ProvenancePill` component and shared formatters — there is no brief-specific pill, which is what structurally guarantees the briefs can't drift from the views.
 
-**Role:** Confirms SLA breach status, writes root cause analysis, logs incident.
+**Artifact layer:** each view has a "Generate Brief" button (top of view) that opens a one-page, print-ready overlay capturing the view's current interactive state; export is the browser's native print-to-PDF.
 
-**What it does:**
-- Receives placement decision from Placement Agent
-- Calls `get_sla_contract()` MCP tool for breach thresholds and penalty rates
-- Retrieves SLA contract terms from RAG
-- Calls Claude to write a full RCA in plain English
-- Calls `write_incident()` MCP tool to persist to SQLite
-- Publishes `sla.alert.fired` event to the bus
-
-**RCA format it produces:**
-```
-BREACH: YES or NO
-RCA: [Full root cause analysis in plain English]
-ACTION: [What was done automatically]
-FINANCIAL IMPACT: [Penalty amount or none]
-STATUS: RESOLVED or MONITORING
-```
-
----
-
-## MCP Tools (`lib/mcp-tools.ts`)
-
-MCP (Model Context Protocol) tools are the structured data layer that agents call to get real information. All four tools are defined in `lib/mcp-tools.ts`.
-
-### `get_node_metrics(nodeId)`
-Returns live snapshot + 1-hour trend summary for any node.
-
-**Returns:**
-- `live` — current util%, tempC, tokensPerSec, memUsedGB, memTotalGB, powerW
-- `trend` — avgUtil, avgTemp, avgTokens, peakUtil, peakTemp over last hour
-- `allNodes` — snapshot of all 5 nodes for comparison
-
-**Used by:** Telemetry Agent, Placement Agent
-
----
-
-### `get_sla_contract(customerId)`
-Returns the full SLA contract for a customer.
-
-**Customers:** `cisco`, `hippocratic`, `opencolo`
-
-**Returns:**
-- SLA thresholds: maxLatencyMs, minUptimePct, maxTempC, minTokensPerSec, maxMemUsedPct
-- Penalty rates: perHourDowntime, perLatencyBreach
-- Assigned nodes
-
-**Used by:** Placement Agent, SLA Guardian
-
----
-
-### `write_incident(params)`
-Persists a confirmed incident to SQLite with full RCA.
-
-**Parameters:** nodeId, customerId, severity, anomaly, decision, rca
-
-**Returns:** Generated incident ID (e.g. `INC-1234567890-ABC123`)
-
-**Used by:** SLA Guardian
-
----
-
-### `run_whatif_simulation(scenario)`
-Simulates node state changes for a natural language scenario.
-
-**How it works:**
-- Parses scenario string for pod name and event type keywords
-- Modifies node metrics in memory (does not affect live simulator)
-- Returns original state, simulated state, and list of affected nodes
-
-**Keyword mapping:**
-| Keywords | Effect |
-|---|---|
-| `memory`, `hbm` | memUsedGB → 97% of total, util +20% |
-| `temp`, `thermal` | tempC +15C, tokensPerSec × 0.6 |
-| `fail`, `down` | util → 0, tokensPerSec → 0, tempC → 0 |
-| `peak`, `surge` | util → 96%, tempC +8C, tokensPerSec × 0.7 |
-
-**Used by:** What-If Query panel
-
----
-
-## RAG Corpus (`lib/rag.ts`)
-
-RAG (Retrieval Augmented Generation) gives agents access to historical knowledge. EIOS uses token-based cosine similarity search across 24 documents.
-
-### Incident History (`data/incidents/`) — 15 files
-
-Synthetic historical incidents spanning November 2025 to March 2026. Each file contains: node, customer, anomaly description, root cause, action taken, SLA impact, and resolution.
-
-| File | Node | Severity | Event Type |
-|---|---|---|---|
-| inc-001 | pod-alpha | CRITICAL | GPU utilization spike, Cisco SLA breach |
-| inc-002 | pod-gamma | HIGH | Thermal escalation, AMD MI300X cooling |
-| inc-003 | pod-epsilon | MEDIUM | Memory leak, RTX PRO session overflow |
-| inc-004 | pod-beta | CRITICAL | NVLink fabric degradation |
-| inc-005 | pod-alpha | HIGH | Power cap breach, new model deployment |
-| inc-006 | pod-delta | CRITICAL | ROCm driver crash, full node dropout |
-| inc-007 | pod-gamma | MEDIUM | Job priority contention, throughput oscillation |
-| inc-008 | pod-alpha | HIGH | Runaway context window, HBM overflow |
-| inc-009 | pod-epsilon | LOW | Ambient temp rise, CRAC maintenance |
-| inc-010 | pod-beta | CRITICAL | PCIe bus error, hard node failure |
-| inc-011 | pod-alpha | HIGH | Batch job scheduling conflict, 3am peak |
-| inc-012 | pod-gamma | MEDIUM | Concurrent model load, memory exceeded |
-| inc-013 | pod-delta | HIGH | Valentine's Day traffic surge, power + thermal |
-| inc-014 | pod-epsilon | MEDIUM | Network egress bottleneck, switch failure |
-| inc-015 | pod-alpha | CRITICAL | Cascading failure — both Cisco nodes down simultaneously |
-
-### Remediation Runbooks (`data/runbooks/`) — 6 files
-
-Step-by-step remediation procedures that Placement Agent retrieves when deciding action.
-
-| File | Covers |
-|---|---|
-| rb-thermal.txt | Temperature escalation — WARNING/HIGH/CRITICAL response steps |
-| rb-memory.txt | HBM memory pressure — session termination, driver restart protocol |
-| rb-throughput.txt | Token throughput degradation — hardware vs software fault diagnosis |
-| rb-power.txt | Power cap escalation — load shed thresholds and recovery |
-| rb-failover.txt | Emergency node failover — target selection, DNS redirect, burn-in |
-| rb-cascade.txt | Cascading failure prevention — correlated failure detection, isolation |
-
-### SLA Contracts (`data/sla-contracts/`) — 3 files
-
-Customer SLA definitions used by Placement and SLA Guardian agents.
-
-| Customer | Tier | Nodes | Min Throughput | Max Latency | Penalty/hr |
-|---|---|---|---|---|---|
-| Cisco | Enterprise | pod-alpha, pod-beta | 800 tok/s | 50ms | $5,000 |
-| Hippocratic AI | Healthcare | pod-gamma, pod-delta | 400 tok/s | 100ms | $2,000 |
-| OpenColo | Standard | pod-epsilon | 200 tok/s | 200ms | $500 |
-
----
-
-## Infrastructure Nodes (`data/nodes.json`)
-
-| Node | GPU | VRAM | Max Temp | Max Power | Customer |
-|---|---|---|---|---|---|
-| pod-alpha | NVIDIA B200 | 192GB HBM3e | 85C | 1000W | Cisco |
-| pod-beta | NVIDIA B200 | 192GB HBM3e | 85C | 1000W | Cisco |
-| pod-gamma | AMD MI300X | 192GB HBM | 90C | 750W | Hippocratic AI |
-| pod-delta | AMD MI300X | 192GB HBM | 90C | 750W | Hippocratic AI |
-| pod-epsilon | NVIDIA RTX PRO | 96GB GDDR7 | 83C | 600W | OpenColo |
-
----
-
-## Telemetry Simulator (`lib/simulator.ts`)
-
-Generates realistic live metrics for all 5 nodes.
-
-- **Tick rate:** Every 5 seconds
-- **Chaos event:** Every 45 seconds, one random node degrades
-- **Degradation:** util spikes, temp rises, throughput drops, memory pressure increases over 6 ticks (~30 seconds)
-- **Recovery:** Node returns to normal after chaos cycle ends
-- **Node colors:** Green (healthy) → Amber (warning) → Red (critical)
-
----
-
-## Dashboard Panels
-
-### Panel 1 — Node Health
-Live color-coded cards for all 5 inference nodes. Updates every 5 seconds via Server-Sent Events.
-
-**Color thresholds:**
-- 🟢 Green: util < 75%, temp < 75C, mem < 80%
-- 🟡 Amber: util > 75% OR temp > 75C OR mem > 80%
-- 🔴 Red: util > 90% OR temp > 82C OR mem > 90%
-
-**Metrics shown per node:** util%, tempC, mem%, powerW, tok/s
-
----
-
-### Panel 2 — Agent Reasoning Chain
-Live token streaming from all 3 agents as they reason. Shows Claude's thinking in real time as each agent processes the anomaly.
-
-- ① Telemetry Agent — situation analysis and pattern matching
-- ② Placement Agent — decision reasoning with SLA context
-- ③ SLA Guardian — breach confirmation and RCA
-
----
-
-### Panel 3 — Incident Log
-Persistent incident history from SQLite. Click any row to expand the full RCA report written by the SLA Guardian.
-
-**Fields:** severity badge, node ID, customer, timestamp, full RCA on expand
-
----
-
-### Panel 4 — What-If Query
-Natural language scenario simulation. Type any what-if question, get a streaming analysis covering cascade effects, SLA risk, financial impact, and recommended preemptive actions.
-
----
-
-### Panel 5 — NOC Brief Generator
-One-click generation of two professional briefs after any agent pipeline run:
-
-- **Internal Brief** — executive-facing internal NOC report with incident ID, what happened, action taken, SLA status, and next steps
-- **Customer Notification** — professional customer-facing service notification with impact summary, resolution, and financial impact
-
----
-
-## What-If Query Reference
-
-### ✅ Safe Queries — Always Work
-
-Always include a pod name AND an event keyword.
-
-**High Drama (best for demos):**
-```
-What if pod-alpha loses 40GB HBM3e at 3am peak?
-What if pod-beta fails during Cisco peak hours?
-What if pod-alpha and pod-beta fail simultaneously?
-```
-
-**Cascade Scenarios:**
-```
-What if pod-gamma sees a traffic surge during Hippocratic peak?
-What if pod-delta has a thermal event overnight?
-What if pod-epsilon runs out of memory during a batch job?
-What if pod-gamma overheats during a batch job?
-```
-
-**Proactive Planning:**
-```
-What if pod-alpha goes down for scheduled maintenance?
-What if pod-beta has a thermal surge at 3am?
-What if pod-delta loses power during peak inference?
-What if pod-epsilon fails and opencolo has no failover?
-```
-
-**Safe Anytime:**
-```
-What if pod-alpha hits 95% utilization during peak?
-What if pod-gamma memory pressure reaches 95%?
-What if pod-delta temperature spikes to 88C?
-```
-
-### ⚠️ Avoid These
-
-Queries without a pod name will get a Claude response but no simulation data:
-```
-What if the whole rack fails?
-What if the network goes down?
-What if we get a traffic surge?   ← no pod name
-```
-
-### Keyword Reference
-
-| Include this word | Simulates |
-|---|---|
-| `memory`, `hbm` | Memory pressure to 97% |
-| `temp`, `thermal` | +15C temperature spike |
-| `fail`, `down` | Complete node dropout |
-| `peak`, `surge` | Utilization spike to 96% |
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 14 (App Router) |
-| Language | TypeScript |
-| AI | Anthropic Claude claude-sonnet-4-20250514 |
-| Database | SQLite via better-sqlite3 |
-| RAG | Token-based cosine similarity (no vector DB required) |
-| Streaming | Server-Sent Events (SSE) |
-| Agent Bus | Node.js EventEmitter (A2A pattern) |
-| Styling | Tailwind CSS |
-
----
-
-## Project Structure
-
-```
-eios/
-├── app/
-│   ├── api/
-│   │   ├── telemetry/route.ts      # SSE stream of live node metrics
-│   │   ├── agents/run/route.ts     # Triggers 3-agent pipeline
-│   │   ├── whatif/route.ts         # What-if simulation endpoint
-│   │   ├── brief/route.ts          # NOC brief generator
-│   │   └── incidents/route.ts      # Incident log API
-│   ├── dashboard/page.tsx          # Main dashboard UI
-│   └── layout.tsx
-├── agents/
-│   ├── telemetry-agent.ts          # Agent 1 — anomaly detection
-│   ├── placement-agent.ts          # Agent 2 — placement decisions
-│   └── sla-agent.ts                # Agent 3 — SLA enforcement + RCA
-├── lib/
-│   ├── bus.ts                      # A2A EventEmitter bus
-│   ├── simulator.ts                # Live telemetry simulator
-│   ├── types.ts                    # Shared TypeScript interfaces
-│   ├── db.ts                       # SQLite schema + queries
-│   ├── rag.ts                      # RAG retrieval engine
-│   └── mcp-tools.ts                # MCP tool definitions
-├── data/
-│   ├── nodes.json                  # Node configuration
-│   ├── incidents/                  # 15 historical incident files
-│   ├── runbooks/                   # 6 remediation runbooks
-│   └── sla-contracts/              # 3 customer SLA contracts
-├── .env.local                      # ANTHROPIC_API_KEY
-└── package.json
-```
-
----
-
-## Running Locally
+### Run locally
 
 ```bash
-# Install dependencies
 npm install
-
-# Add your Anthropic API key
-echo "ANTHROPIC_API_KEY=your-key-here" > .env.local
-
-# Start development server
-npm run dev
-
-# Open browser
-http://localhost:3000
+npm run dev      # http://localhost:3000/factory/architect
+npm run build    # production build
 ```
 
 ---
 
-## Demo Script
+## Roadmap — where this goes next
 
-1. Start `npm run dev` 2 minutes before the demo
-2. Let the chaos engine run — nodes will start turning amber
-3. Click **▶ Run Agents** — walk through the 3-agent reasoning chain
-4. Click **📋 Generate NOC Brief** — show internal + customer briefs
-5. Type a what-if query — the $108K cascade analysis speaks for itself
+The architecture was chosen for evolution. Two improvements, one story: make the retrieval and tool layers explicit, and the whole app becomes live. *(Framed as the designed-for trajectory — not capability the app claims today.)*
+
+**1. Make RAG + MCP explicit (the mechanism).** Today the knowledge is seeded JSON resolved by a deterministic engine — the retrieval and tool layers are implicit. The next layer makes them first-class: a retrievable vector corpus (RAG) over the knowledge base, and live source/tool ingestion via MCP. (This is a pattern proven elsewhere in production — it's an architectural maturation, not a rewrite.)
+
+**2. Real-time industry updates (the capability it unlocks).** When a competitor ships a capability or a vendor signs a new ISV, the app ingests it and every view + brief re-projects — because all views are projections of one provenance-tagged knowledge base. One change, propagated everywhere, with the honesty model intact.
+
+The two connect as a single pipeline extension:
+
+```
+new competitor / partner move
+        │
+        ▼
+   MCP ingests  →  RAG corpus updates  →  provenance-tagged KB updates  →  every view + brief re-projects
+```
+
+The single-source-of-truth knowledge base (one KB feeding all views) was a deliberate choice precisely to make this propagation possible — the roadmap is what the architecture was designed to enable, not a bolt-on.
 
 ---
 
-*Built by Ashit Ghevaria — Silicon Valley PM, ex-Calix Director (E9-2 platform, $100M+ revenue)*
-*EIOS demonstrates the intelligence layer that sits on top of existing edge inference infrastructure.*
+## Recent additions
+
+Newest first. The version tags are a presentation convention for this README — not git tags. Polish-only commits are omitted; only capability adds appear.
+
+- **v3.11 — Artifact layer.** Three audience-targeted printable briefs (customer / sales / partner), one per view, captured at the view's current interactive state and rendered through the same provenance components — a brief never reads more confident than the view it came from.
+
+- **v3.10 — Neocloud as 6th customer segment.** Added end-to-end across segment seed, selector, slider defaults, grounding, Bird's-Eye row, and partner-lens reuse — grounded in the January 2026 CoreWeave SUNK + Mission Control integration into NVIDIA's reference architectures for cloud partners.
+
+- **v3.9 — Partner lens (`/factory/partner`).** OEM / ISV / Neocloud-as-channel toggle, segment-aware, with seeded-KPI scorecard and honest *"not seeded for this segment"* gap framing; system integrators and distributors consciously out of scope, not faked.
+
+- **v3.8 — AMD competitive view redesign.** 3-act recomposition (where's the fight / silicon race & the L3–L5 moat / switching cost), table-based throughout for readability, with the moat-trajectory panel and switching-cost articulation replacing the older KPI-list framing.
+
+- **v3.7 — Bird's Eye matrix.** Segment × threat-type breadth view at the entry of the competitive tab, 5-state taxonomy with N/A as honest absence, every cell directional, click-through to depth views.
+
+- **v3.6 — Customer Self-Supply view.** Fourth competitive type — hyperscaler in-house silicon (TPU / Trainium / MTIA / Maia) as a strategic panel: four maturity-differentiated cards plus a 5-facet calibrated verdict.
+
+- **v3.5 — Alternative Paradigm view (Cerebras).** Sixth taxonomy state (PARADIGM) first use — six-band *doesn't decompose* cake plus cross-layer contrast panel plus 3-facet verdict (NICHE-SHARP / SERIOUS-BUT-NARROW / MARKET-ARC).
+
+- **v3.4 — Fabric fight-maps.** AGNOSTIC fifth taxonomy state and split-by-axis verdicts for Cornelis / Broadcom / Arista — each named for their distinct axis (performance / scale / operational) rather than reduced to a single winner.
+
+- **v3.3 — Calculated KPIs + GPU slider.** Live FLOPS / HBM / power / racks / CapEx from cited per-GPU specs at the current slider value, with compound provenance badges that propagate verify-needed inputs into the calculated output.
+
+- **v3.2 — Segment grounding.** Per-segment archetype + buying-behavior + representative-deployment lines, plus the hyperscaler dual-role cross-reference (customer AND competitor) and, later, the neocloud customer-AND-channel note.
+
+- **v3.1 — ROCm software layer + layer-fight-map.** First competitor (AMD) on the per-layer synthesis view, introducing the 4-state then 5-state taxonomy with SHARED / contested honesty.
+
+- **v3.0 — Foundation.** Verified corpus, dependency-graph KPI engine (segment-first → component fallback, applySwap dependency cascade), 5-layer cake at `/factory/architect`, delivered-KPIs panel, CapEx/OpEx directional bars, segment-first resolver, all six segments seeded with delivered KPIs.
+
+---
+
+## The six customer segments
+
+| Segment | Optimizes for |
+|---|---|
+| Frontier AI Labs | frontier-scale training/inference performance |
+| Hyperscalers | TCO/token at platform scale (and they build their own silicon) |
+| Neocloud | fleet utilization + time-to-capacity (the rental-margin model) |
+| Fortune 500 Enterprise | deployment cycle + compliance |
+| Sovereign AI | data residency + air-gap + portability |
+| Industry Verticals | safety certification + vertical fit |
+
+Neocloud (e.g. CoreWeave, Nebius, Lambda, Crusoe) is both a major customer **and** a go-to-market channel — reflected in the partner lens, and grounded in the January 2026 integration of CoreWeave's SUNK and Mission Control into NVIDIA's reference architectures for cloud partners.

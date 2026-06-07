@@ -1,0 +1,581 @@
+{
+  "version": "0.4.1",
+  "last_verified": "2026-05-25",
+  "layers": [
+    {
+      "id": "L1",
+      "name": "Land / Power / Shell",
+      "description": "Datacenter site, power capacity, cooling, physical envelope. Provided by hyperscaler or colo partner; not a NVIDIA product slot."
+    },
+    {
+      "id": "L2",
+      "name": "Chips",
+      "description": "NVIDIA silicon: Blackwell GPUs, networking (ConnectX, BlueField DPU, Spectrum-X, Quantum-X800)."
+    },
+    {
+      "id": "L3",
+      "name": "ISV Platform",
+      "description": "Enterprise AI platforms: Red Hat OpenShift AI, VMware Private AI Foundation, Nutanix Enterprise AI, VAST Data."
+    },
+    {
+      "id": "L4",
+      "name": "Models / Microservices",
+      "description": "NIM (microservices), Nemotron (foundation models), Dynamo (orchestration), NeMo Guardrails."
+    },
+    {
+      "id": "L5",
+      "name": "Applications",
+      "description": "Snowflake Cortex, custom agents, vertical applications. Wrapped under NVIDIA AI Enterprise (NVAIE)."
+    }
+  ],
+  "components": [
+    {
+      "id": "blackwell_b200",
+      "name": "NVIDIA Blackwell B200",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "generation": "current",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 192, "max": 192, "unit": "GB HBM3e (nominal)" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA HGX B200 datasheet (8-GPU baseboard, HBM3e)",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "192 GB HBM3e nominal per datasheet. Practical figures: ~186 GB shown on detailed datasheet entries, ~180 GB usable in cloud consoles (vendor-overhead). Keep the nominal figure as the canonical value; the 186/180 deltas are documentation/usable-overhead nuances, not separate SKUs."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 8, "max": 8, "unit": "TB/s" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA HGX B200 datasheet (per-GPU HBM3e bandwidth, confirmed directly — not derived).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense)" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA HGX B200 datasheet (per-GPU FP4 Tensor Core).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "9 PFLOPS dense / 18 PFLOPS sparse per GPU. The widely-quoted marketing figure '20 PFLOPS FP4' is the sparse 2:1 number — keep dense/sparse distinction explicit when comparing across vendors."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense, approx)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA HGX B200 datasheet individual-GPU column read at ~9 PFLOPS FP8 dense.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "Datasheet column read — confirm dense/sparse attribution before promoting to cited. NOTE: the prior value (4.5 PFLOPS) was the FP16/BF16 figure, mislabeled as FP8; corrected."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 1000, "max": 1000, "unit": "W" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA Blackwell B200 SXM module — TDP 1000 W per GPU per HGX B200 product brief / Blackwell architecture overview.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 40000, "max": 55000, "unit": "USD per GPU (compute-hardware only — excludes network/storage/facility/install)" },
+          "provenance": {
+            "status": "directional",
+            "source": "HSBC analyst pricing (GB200 NVL72 system ~$3M / 72 GPUs ≈ $42K/GPU low end) + gpu.fm March 2026 standalone B200 pricing ($45-55K high end) + Tom's Hardware corroboration. Band varies by volume, config, region, and partner deal — directional by structure.",
+            "last_verified": "2026-05-26",
+            "notes": "MANDATORY framing: COMPUTE-HARDWARE ONLY — excludes network, storage, facility, install. The range is the per-GPU acquisition cost, NOT a total-build-cost estimate. Always render as a range, never a point."
+          }
+        }
+      }
+    },
+    {
+      "id": "gb200",
+      "name": "NVIDIA GB200 Grace-Blackwell Superchip",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "generation": "current",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 192, "max": 192, "unit": "GB HBM3e per Blackwell GPU (superchip = 2 GPUs, ~384 GB combined)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 superchip positioning — Grace CPU + 2x Blackwell B200 GPUs interconnected via NVLink-C2C. Per-GPU HBM3e inherits from the standalone B200 datasheet (192 GB nominal).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "notes": "Per-GPU figure inherits from standalone B200 (192 GB HBM3e nominal); per-superchip aggregate is 2x that. Verify per-GPU vs per-superchip framing against the GB200 datasheet before promoting to cited.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 8, "max": 8, "unit": "TB/s per Blackwell GPU (HBM3e)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 per-GPU HBM3e bandwidth inherits from the B200 datasheet (8 TB/s).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "notes": "Per-GPU; the GB200 superchip adds NVLink-C2C bandwidth between Grace CPU and Blackwell GPUs that is separate from HBM bandwidth. Verify against the GB200 datasheet before promoting to cited.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense, per Blackwell GPU)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 per-GPU FP4 dense throughput inherits from the B200 datasheet (9 PFLOPS dense / 18 PFLOPS sparse per GPU).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "notes": "Per-GPU dense; sparse is 2x. Per-superchip total is ~18 PFLOPS dense across 2 Blackwell GPUs. Verify against the GB200 datasheet before promoting to cited.",
+            "last_verified": "2026-05-21"
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "range": { "min": 9, "max": 9, "unit": "PFLOPS (dense, approx, per Blackwell GPU)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA GB200 per-GPU FP8 dense throughput inherits from the B200 datasheet column read (~9 PFLOPS FP8 dense).",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "last_verified": "2026-05-26",
+            "notes": "Per-Blackwell-GPU dense. Inherits the same verify-needed status as B200's FP8 column read (dense/sparse attribution unconfirmed)."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 1200, "max": 1200, "unit": "W per Blackwell GPU (superchip ~2700 W including Grace CPU)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "GB200 superchip TDP characterization from NVIDIA materials + semiconductor-analyst coverage. Per-Blackwell-GPU vs per-superchip attribution varies by source.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+            "last_verified": "2026-05-26",
+            "notes": "Per-GPU figure inherits from documented superchip thermal envelope. Verify attribution (per-Blackwell-GPU vs per-superchip including Grace CPU) before promoting to cited."
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 40000, "max": 55000, "unit": "USD per GPU (compute-hardware only — excludes network/storage/facility/install)" },
+          "provenance": {
+            "status": "directional",
+            "source": "HSBC analyst pricing (GB200 NVL72 system ~$3M / 72 GPUs ≈ $42K/GPU low end) + gpu.fm March 2026 pricing ($45-55K high end). Band by structure — varies by volume, config, region, partner deal.",
+            "last_verified": "2026-05-26",
+            "notes": "MANDATORY framing: COMPUTE-HARDWARE ONLY — excludes network, storage, facility, install. Range, never point."
+          }
+        }
+      }
+    },
+    {
+      "id": "blackwell_b300",
+      "name": "NVIDIA Blackwell Ultra (B300)",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "generation": "current",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 262.5, "max": 262.5, "unit": "GB" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA HGX product page: HGX B300 8-GPU = 2.1 TB total ÷ 8 = 262.5 GB/GPU.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/hgx/",
+            "last_verified": "2026-05-20",
+            "notes": "Memory type not explicit on HGX page; likely HBM3e but unverified. Non-round figure (262.5) is unusual — verify against B300 datasheet."
+          }
+        }
+      }
+    },
+    {
+      "id": "vera_rubin_vr200",
+      "name": "NVIDIA Vera Rubin VR200",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "generation": "roadmap",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 288, "max": 288, "unit": "GB HBM4" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "nvidia",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin roadmap disclosure (GTC 2025 + CES 2026 announcements). HBM4 vendor target; 2H 2026 shipping target.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "Roadmap claim — every figure on this component is a vendor target until silicon ships. AMD MI455X claims 432 GB HBM4 (50% more) — the memory-capacity-AMD-lead pattern from current gen REPEATS at the roadmap pair."
+          }
+        },
+        "compute_memory_bandwidth_per_gpu": {
+          "range": { "min": 22.2, "max": 22.2, "unit": "TB/s HBM4" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "nvidia",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin bandwidth target — bumped from ~13 TB/s at GTC 2025 to ~22 TB/s at CES 2026 in an explicit competitive response to AMD MI455X positioning. Cite the GTC 2025 → CES 2026 announcement sequence.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "COMPETITIVE-RESPONSE STORY: the ~22 TB/s figure is a chosen-late spec, NOT an organic generation step. NVIDIA raised the bandwidth target between GTC 2025 and CES 2026 to land above MI455X's claimed 19.6 TB/s. The bandwidth lead is real (per current claims) AND tactically positioned — surface both readings."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 35, "max": 50, "unit": "PFLOPS (dense, RANGE — spread across public disclosures)" },
+          "provenance": {
+            "status": "claimed",
+            "claimed_by": "nvidia",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin FP4 figures vary across public disclosures by dense/sparse and per-GPU framing. Range 35-50 PFLOPS captures the spread honestly rather than asserting a single point. AMD MI455X claims 40 PFLOPS FP4 — sits INSIDE the NVIDIA spread, so no defensible winner.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "Rendered as a RANGE on purpose — public disclosures conflict on dense/sparse attribution and per-GPU framing. The spread IS the honest signal. AMD's 40 PFLOPS claim lies inside the range — UNRESOLVED is the correct verdict, not a winner."
+          }
+        },
+        "compute_flops_fp8_per_gpu_dense": {
+          "text": "~3.5× Blackwell B200 (vendor multiplier, no point figure — Blackwell FP8 base is itself verify-needed)",
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "NVIDIA Vera Rubin FP8 is described as a multiplier (~3.5×) on Blackwell B200 FP8. Blackwell FP8 dense is itself a verify-needed datasheet read (~9 PFLOPS dense, approx). A multiplier on a verify-needed base = double-uncertainty; no defensible point value to compare against AMD MI455X's 20 PFLOPS claim.",
+            "source_url": "https://www.nvidia.com/en-us/data-center/",
+            "last_verified": "2026-05-26",
+            "notes": "LAYERED UNCERTAINTY: vendor multiplier on a verify-needed base. UNRESOLVED is the honest verdict — neither PARITY (asserts confidence we don't have) nor a clean lead (no firm Rubin number to compare). Distinct from FP4's overlapping-range UNRESOLVED — FP8 has no firm Rubin figure at all."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 1800, "max": 1800, "unit": "W (Vera Rubin roadmap target; Rubin Ultra rumored ~2300 W with possible 2-die scale-back)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Vera Rubin TDP characterization from NVIDIA roadmap materials + semiconductor-analyst coverage. Roadmap target — not a measured spec.",
+            "last_verified": "2026-05-26",
+            "notes": "Roadmap target. Rubin Ultra (2H 2027) carries rumored thermal/design concerns at ~2300 W — see cadence timeline 2027 row."
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 50000, "max": 70000, "unit": "USD per GPU (compute-hardware only — roadmap estimate, no shipping pricing)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "Roadmap pricing estimate — extrapolated from B200/GB200 channel pricing ($40-55K) with generational uplift. No shipping channel pricing exists for unreleased silicon.",
+            "last_verified": "2026-05-26",
+            "notes": "Roadmap price estimate, NOT a shipping figure. Generational uplift over B200/GB200 channel pricing — directional only."
+          }
+        }
+      }
+    },
+    {
+      "id": "rtx_pro_6000",
+      "name": "NVIDIA RTX PRO 6000",
+      "layer": "L2",
+      "slot": "gpu",
+      "vendor": "nvidia",
+      "generation": "current",
+      "kpi_values": {
+        "compute_memory_capacity_per_gpu": {
+          "range": { "min": 96, "max": 96, "unit": "GB GDDR7" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "User-specified per NVIDIA RTX PRO 6000 product announcement; not independently fetched in this build pass.",
+            "last_verified": "2026-05-20",
+            "notes": "Verify against NVIDIA RTX PRO product page before promoting to 'cited'."
+          }
+        },
+        "compute_flops_fp4_per_gpu_dense": {
+          "range": { "min": 0.4, "max": 0.4, "unit": "PFLOPS (dense, approx — enterprise/edge class)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "RTX PRO 6000 (Blackwell workstation/edge class) FP4 throughput characterization. Per NVIDIA RTX PRO product materials, FP4 Tensor Core throughput is approximately an order of magnitude below HGX-class B200.",
+            "last_verified": "2026-05-26",
+            "notes": "Enterprise/edge class — designed for inference/visualization workloads, not large-scale training. Verify exact FP4 figure against RTX PRO 6000 datasheet."
+          }
+        },
+        "compute_tdp_per_gpu": {
+          "range": { "min": 600, "max": 600, "unit": "W" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA RTX PRO 6000 product page (Blackwell workstation/edge class).",
+            "source_url": "https://www.nvidia.com/en-us/design-visualization/rtx-pro-6000/",
+            "last_verified": "2026-05-26"
+          }
+        },
+        "compute_per_gpu_price_band": {
+          "range": { "min": 8000, "max": 12000, "unit": "USD per GPU (workstation/edge class — compute-hardware only)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "RTX PRO 6000 enterprise / workstation pricing characterization — channel pricing varies by configuration and partner. Lower than HGX/NVL72-class by order of magnitude.",
+            "last_verified": "2026-05-26",
+            "notes": "Verify against current channel pricing. The price band is workstation/edge class, not datacenter-rack class — different deployment scale."
+          }
+        }
+      }
+    },
+    {
+      "id": "nvidia_spectrum_x",
+      "name": "NVIDIA Spectrum-X Ethernet",
+      "layer": "L2",
+      "slot": "fabric",
+      "vendor": "nvidia",
+      "generation": "current",
+      "protocol": {
+        "text": "Ethernet (Spectrum-4 ASIC) — AI-optimized merchant-Ethernet; NVIDIA's Ethernet track",
+        "provenance": {
+          "status": "cited",
+          "source": "NVIDIA Spectrum SN5600 datasheet — Spectrum-4 silicon, 64 OSFP 800GbE ports, 51.2 Tb/s total switch capacity.",
+          "source_url": "https://www.nvidia.com/en-us/networking/ethernet/spectrum-x/",
+          "last_verified": "2026-05-25"
+        }
+      },
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA Spectrum SN5600 datasheet — 64 OSFP 800GbE ports, 51.2 Tb/s total switch throughput, Spectrum-4 silicon. SN5600 is the canonical Spectrum-X switch.",
+            "source_url": "https://www.nvidia.com/en-us/networking/ethernet/spectrum-x/",
+            "last_verified": "2026-05-21",
+            "notes": "Promoted from directional/verify-needed to cited in phase 3c-1a — SN5600 datasheet (Spectrum-X platform's flagship 800 GbE switch) confirms the 800 Gbps per-port figure as a structured product spec, parallel to how Cornelis CN5000 throughput is treated."
+          }
+        },
+        "fabric_latency": {
+          "band": "low",
+          "provenance": {
+            "status": "directional",
+            "source": "NVIDIA does not publish a single Spectrum-X latency number publicly; positioning is sub-microsecond AI fabric.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band only. NVIDIA's strength is collective performance at scale, not raw per-hop latency."
+          }
+        },
+        "fabric_message_rate": {
+          "band": "high",
+          "provenance": {
+            "status": "directional",
+            "source": "NVIDIA does not publish a single message-rate number publicly for Spectrum-X.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band reflects Spectrum-X's positioning for high-throughput AI workloads."
+          }
+        },
+        "fabric_collective_op": {
+          "scale_conditional": {
+            "small_scale": "parity (no decisive advantage at small node counts)",
+            "large_scale": "NVIDIA wins via SHARP / NCCL — in-network compute collapses AllReduce overhead at scale",
+            "breakpoint": "advantage emerges as cluster scales beyond ~64-128 nodes; SHARP / NCCL gap widens with node count"
+          },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA SHARP (Scalable Hierarchical Aggregation and Reduction Protocol) documentation; NCCL collective communication library public docs.",
+            "source_url": "https://developer.nvidia.com/nccl",
+            "last_verified": "2026-05-20",
+            "notes": "Scale-conditional outcome — direction of effect is cited; breakpoint estimate is directional."
+          }
+        },
+        "fabric_cost_capex_directional": {
+          "band": "high",
+          "provenance": {
+            "status": "directional",
+            "source": "Analyst coverage (SemiAnalysis, IDC) consistently characterizes NVIDIA integrated networking as premium-priced vs disaggregated Ethernet.",
+            "last_verified": "2026-05-20",
+            "notes": "Directional band only. No published per-port CapEx number from NVIDIA."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "integration / risk-mitigation",
+          "provenance": {
+            "status": "directional",
+            "source": "Characterization synthesized from NVIDIA's positioning of Spectrum-X + Quantum-X800 as the integrated NVIDIA stack option.",
+            "last_verified": "2026-05-20",
+            "notes": "Customer-archetype framing, not a measured number."
+          }
+        }
+      }
+    },
+    {
+      "id": "nvidia_quantum_x800",
+      "name": "NVIDIA Quantum-X800 InfiniBand",
+      "layer": "L2",
+      "slot": "fabric",
+      "vendor": "nvidia",
+      "generation": "current",
+      "protocol": {
+        "text": "InfiniBand (Quantum-3 ASIC) — distinct protocol from Spectrum-X's Ethernet; NVIDIA's InfiniBand track",
+        "provenance": {
+          "status": "cited",
+          "source": "NVIDIA Quantum-X800 (Q3400) product positioning — Quantum-3 InfiniBand ASIC, 200G-per-lane SerDes.",
+          "source_url": "https://www.nvidia.com/en-us/networking/infiniband/",
+          "last_verified": "2026-05-25"
+        }
+      },
+      "kpi_values": {
+        "fabric_throughput": {
+          "range": { "min": 800, "max": 800, "unit": "Gbps per port (144 ports per switch — Q3400)" },
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA Quantum-X800 (Q3400) InfiniBand datasheet — 144 ports × 800 Gb/s per port, Quantum-3 ASIC, 200G-per-lane SerDes.",
+            "source_url": "https://www.nvidia.com/en-us/networking/infiniband/",
+            "last_verified": "2026-05-25",
+            "notes": "Promoted from directional/verify-needed → cited in phase 3c-1b Quantum-X800 deepening. 144×800 per switch confirms the structural product nameplate spec, parallel to how Spectrum-X SN5600 is cited."
+          }
+        },
+        "fabric_collective_op": {
+          "text": "SHARP v4 in-network computing — hardware collective-op acceleration (AllReduce, Reduce, etc. executed in the switch fabric)",
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA Quantum-X800 product materials confirm SHARP v4 capability; SHARP (Scalable Hierarchical Aggregation and Reduction Protocol) is documented in NVIDIA networking docs.",
+            "source_url": "https://docs.nvidia.com/networking/category/sharp",
+            "last_verified": "2026-05-25",
+            "notes": "CAPABILITY is cited (Quantum-X800 supports SHARP v4). MAGNITUDE of acceleration (how much it speeds up collectives in a given workload) is workload-dependent and remains DIRECTIONAL — NVIDIA does not publish a single quantified speedup figure; do not assert a magnitude as cited."
+          }
+        },
+        "fabric_buying_philosophy": {
+          "text": "integration — InfiniBand track: highest-performance NVIDIA fabric for trillion-param training, SHARP v4 in-network compute",
+          "provenance": {
+            "status": "directional",
+            "source": "NVIDIA's two-track fabric strategy: Spectrum-X (Ethernet) for AI-native scale-out + Quantum-X800 (InfiniBand) for tightly-coupled training. Both NVIDIA-integrated; protocol choice is the buyer-archetype split.",
+            "last_verified": "2026-05-25",
+            "notes": "Customer-archetype framing. Quantum-X800 buyers prioritize collective-op performance and SHARP in-network compute over Ethernet's ecosystem fit; distinct from Spectrum-X's Ethernet integration story but both are NVIDIA-integrated."
+          }
+        }
+      }
+    },
+    {
+      "id": "connectx_8",
+      "name": "NVIDIA ConnectX-8 SuperNIC",
+      "layer": "L2",
+      "slot": "nic",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "nic_throughput": {
+          "range": { "min": 1600, "max": 1600, "unit": "Gb/s (1.6 Tb/s)" },
+          "provenance": {
+            "status": "directional",
+            "flag": "verify-needed",
+            "source": "User-specified per NVIDIA ConnectX-8/9 product positioning (1.6 Tb/s).",
+            "last_verified": "2026-05-20",
+            "notes": "Verify against NVIDIA ConnectX product page."
+          }
+        }
+      }
+    },
+    {
+      "id": "nvaie",
+      "name": "NVIDIA AI Enterprise (NVAIE)",
+      "layer": "L5",
+      "slot": "software",
+      "vendor": "nvidia",
+      "kpi_values": {
+        "software_ecosystem_depth": {
+          "band": "high",
+          "provenance": {
+            "status": "directional",
+            "source": "NVAIE wraps CUDA, cuDNN, TensorRT-LLM, NeMo, NIM, Dynamo, NeMo Guardrails — broadest enterprise AI software portfolio on the market.",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "software_tensorrt_llm_availability": {
+          "text": "NVIDIA-only — does not run on AMD ROCm",
+          "provenance": {
+            "status": "cited",
+            "source": "TensorRT-LLM is a CUDA-only library by design; ROCm has no compatible re-implementation as of writing.",
+            "source_url": "https://developer.nvidia.com/tensorrt",
+            "last_verified": "2026-05-20"
+          }
+        },
+        "software_framework_support": {
+          "text": "PyTorch (CUDA-native), TensorFlow, JAX, vLLM, SGLang, MLX — full first-class support across all major ML frameworks. CUDA-native at the kernel level. Most new frameworks ship CUDA-first in their primary release path.",
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA CUDA + NVAIE product materials confirm first-class CUDA support across major ML frameworks; CUDA-first default in framework release paths is widely documented in PyTorch / TF / vLLM release notes.",
+            "source_url": "https://developer.nvidia.com/deep-learning-frameworks",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_mainstream_inference": {
+          "text": "Baseline (100%) — H100 + Blackwell are NVIDIA's own silicon. Mainstream PyTorch / vLLM throughput on NVIDIA is the reference point against which all competitors are measured.",
+          "provenance": {
+            "status": "cited",
+            "source": "NVIDIA is the baseline by construction — competitor benchmarks express their throughput as a fraction of (or beat of) H100 / Blackwell. Not a vendor claim; an artifact of how the industry measures inference performance.",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_cuda_exclusive_libs": {
+          "text": "TensorRT-LLM (CUDA-only, no ROCm port planned), FlashAttention 3 (CUDA-only as of 2026; ROCm has FlashAttention 2 via Triton for RDNA3 but not FA3 — missing FA3 reportedly costs 30-40% training throughput on 7B+ models per Spheron May 2026), NCCL collective communication (no ROCm equivalent), cuDNN, cuBLAS, Triton inference server — the library moat.",
+          "provenance": {
+            "status": "cited",
+            "source": "TensorRT-LLM CUDA-only confirmed by NVIDIA TensorRT documentation + multiple 2026 analyses (Spheron, Thundercompute). FlashAttention 3 ROCm gap quantified in Spheron May 2026 (30-40% training throughput cost at 7B+ models). NCCL has no ROCm equivalent per AMD ROCm compatibility docs.",
+            "source_url": "https://developer.nvidia.com/tensorrt",
+            "last_verified": "2026-05-25",
+            "notes": "Library moat is real, specific, and named. Workloads using TensorRT-LLM or FA3 stay on CUDA today; workloads on stock PyTorch / vLLM can move to ROCm but at variable performance cost."
+          }
+        },
+        "software_ecosystem_maturity": {
+          "text": "~20 years of CUDA ecosystem (released 2007). cuDNN, cuBLAS, TensorRT, NCCL, Triton inference server, NeMo, NIM. Compounding ecosystem moat: more libraries, more courses, more papers, more practitioner-hours, more tooling defaults. CUDA-first default for new research and ML infrastructure.",
+          "provenance": {
+            "status": "directional",
+            "source": "CUDA's ecosystem age (release year 2007) + library breadth + community size are documented across analyst reports + practitioner surveys. 'CUDA-first default' characterization is directional — no single measured KPI captures 'ecosystem maturity.'",
+            "last_verified": "2026-05-25"
+          }
+        },
+        "software_switching_cost": {
+          "text": "High — CUDA-native codebases require port effort to alternatives; CUDA-exclusive libs (TensorRT-LLM, FA3, NCCL) have no full equivalent — porting requires re-implementation or accepting performance penalties; CUDA-first tooling default means new work tends to come up on CUDA first, perpetuating the gap.",
+          "provenance": {
+            "status": "directional",
+            "source": "Switching cost synthesized from practitioner reports of CUDA -> ROCm porting + analyst coverage (Spheron 2026, SemiAnalysis, Thundercompute 2026). Not a measured single number.",
+            "last_verified": "2026-05-25"
+          }
+        }
+      }
+    },
+    {
+      "id": "dell_xe9680",
+      "name": "Dell PowerEdge XE9680 (HGX-class server)",
+      "layer": "L3",
+      "slot": "oem",
+      "vendor": "dell",
+      "kpi_values": {}
+    },
+    {
+      "id": "red_hat_openshift_ai",
+      "name": "Red Hat OpenShift AI",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "red_hat",
+      "category": "orchestration",
+      "kpi_values": {}
+    },
+    {
+      "id": "vmware_private_ai_foundation",
+      "name": "VMware Private AI Foundation",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "vmware",
+      "category": "orchestration",
+      "kpi_values": {}
+    },
+    {
+      "id": "nutanix_enterprise_ai",
+      "name": "Nutanix Enterprise AI",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "nutanix",
+      "category": "orchestration",
+      "kpi_values": {}
+    },
+    {
+      "id": "vast_data",
+      "name": "VAST Data",
+      "layer": "L3",
+      "slot": "isv",
+      "vendor": "vast_data",
+      "category": "storage",
+      "kpi_values": {}
+    }
+  ]
+}

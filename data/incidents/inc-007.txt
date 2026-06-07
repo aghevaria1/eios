@@ -1,8 +1,0 @@
-INCIDENT-007 | pod-gamma | 2026-01-05 | MEDIUM
-Node: pod-gamma (AMD MI300X) | Customer: Hippocratic AI
-Anomaly: Token throughput oscillating between 380 and 210 tokens/sec every 90 seconds.
-Utilization cycling 88% to 45% in sync with throughput oscillation.
-Root Cause: Competing batch jobs with mismatched priorities creating resource contention cycle.
-Action Taken: Job scheduler priority queue rebalanced. Batch jobs rate-limited.
-SLA Impact: Hippocratic AI min throughput SLA intermittently breached during low cycles.
-Resolution: Priority queue fix eliminated oscillation within 2 minutes of deployment.

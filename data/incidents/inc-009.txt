@@ -1,8 +1,0 @@
-INCIDENT-009 | pod-epsilon | 2026-01-18 | LOW
-Node: pod-epsilon (NVIDIA RTX PRO) | Customer: OpenColo
-Anomaly: Gradual temperature rise from 72C to 81C over 6 hours during sustained light load.
-Utilization only 55%. No throughput impact.
-Root Cause: Ambient data center temperature elevated due to CRAC unit maintenance window.
-Action Taken: Workload temporarily throttled to 45% to reduce heat generation. Monitoring intensified.
-SLA Impact: No SLA breach. Proactive throttle prevented thermal event.
-Resolution: CRAC unit restored. Node returned to full capacity after 2 hours.
